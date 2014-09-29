@@ -1,0 +1,26 @@
+{
+  "name": "SmartHomeAPI",
+  "main": "index.js",
+  "liscense": "MIT",
+  "description": "API Server for the SmartHome Adroid App",
+  "version": "0.1.0",
+  "author": {
+    "name": "Jason Pollman",
+    "email": "JPPuffNStuff@gmail.com"
+  },
+  "dependencies": {
+    "cli-color": "~0.3.2",
+    "firebase": ">=1.0.21",
+    "progress": ">=1.1.8",
+    "request": ">=2.44"
+  },
+  "devDependencies": {
+    "mocha": ">=1.21.4",
+    "chai": ">=1.1.9",
+    "uglify-js": ">=2.4.15"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PuffNStuff/SmartHomeAPI"
+  }
+}
