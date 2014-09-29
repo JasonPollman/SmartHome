@@ -12,7 +12,8 @@
     "cli-color": "~0.3.2",
     "firebase": ">=1.0.21",
     "progress": ">=1.1.8",
-    "request": ">=2.44"
+    "request": ">=2.44",
+    "deep-diff": ">=0.2.0"
   },
   "devDependencies": {
     "mocha": ">=1.21.4",

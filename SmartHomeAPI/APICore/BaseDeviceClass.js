@@ -11,6 +11,8 @@ var Devices   = {};
 
 var DriverIDs = -1;
 
+var diff      = require("deep-diff").diff;
+
 var Users = {};
 
 if(!Object.setEqual) {
@@ -24,6 +26,9 @@ if(!Object.setEqual) {
 
 // The last "non-conflict" change was made by user:
 var lastSuccessfulChangeUserName;
+
+
+var lastUserSetting = {}
 
 // The base device object... to be inherited
 var BaseDeviceObject = function (name, address, mac) {
@@ -72,6 +77,16 @@ var BaseDeviceObject = function (name, address, mac) {
       value: mac,
       configurable: false,
       writable: false,
+      enumerable: true,
+    }
+  );
+
+
+  Object.defineProperty(this, "settings",
+    {
+      value: {},
+      configurable: false,
+      writable: true,
       enumerable: true,
     }
   );
@@ -141,8 +156,11 @@ var BaseDeviceObject = function (name, address, mac) {
   Object.defineProperty(this, "init",
     {
       value: function () {
-        self.firebase.parent().update({ name: this.name, address: this.address, mac: this.mac, settings: this.settings });
-        this.lastState.setEqual(this.settings);
+        if(this.construct) this.construct.call(this, function () {
+          self.firebase.parent().update({ name: this.name, address: this.address, mac: this.mac, settings: this.settings });
+          this.lastState.setEqual(this.settings);
+          self.emit("ready");
+        });
       },
       configurable: false,
       writable: false,
@@ -154,12 +172,14 @@ var BaseDeviceObject = function (name, address, mac) {
     {
       value: function (status, message) {
 
+        if(typeof status == "string") status = status.toLowerCase();
+
         switch(status) { // Switch codes to string
           case -1:
             status = "pending";
             break;
           case 0:
-            status = "sucess";
+            status = "success";
             break;
           case 1:
             status = "error";
@@ -182,7 +202,7 @@ var BaseDeviceObject = function (name, address, mac) {
     }
   );
 
-  function setState(data, user) {
+  var setState = function (data, user) {
 
     var d = data;
 
@@ -192,11 +212,11 @@ var BaseDeviceObject = function (name, address, mac) {
     self.firebase.update(self.settings, function (error) {
 
       if(error) {
-        console.log("Firebase Error:\n" + error);
+        console.notice("Firebase Error:\n" + error);
       }
       else {
 
-        var changeStr = ["\n"];
+        var changeStr = [];
 
         var changesMade = false;
         for(var i in self.settings) {
@@ -210,7 +230,7 @@ var BaseDeviceObject = function (name, address, mac) {
           }
         }
 
-        if(changesMade) console.notice("Firebase Settings State Change for: " + self.toString() + (changeStr.length > 1 ? changeStr.join("\n") : "") + "\n\nMade by user '" + user + "'.\n");
+        if(changesMade) console.notice("Firebase Settings State Change for: " + self.toString() + "\n" + (changeStr.length > 1 ? changeStr.join("\n") : "") + "\n\nMade by user '" + user + "'.\n");
 
         // Update the "last" state
         self.lastState.setEqual(self.settings);
@@ -237,24 +257,48 @@ var BaseDeviceObject = function (name, address, mac) {
         if(!Users[i][APIConfig.general.firebaseUserSettingsPath][self.mac] || [APIConfig.general.firebaseUserSettingsPath][self.mac] == null) {
           Users[i][APIConfig.general.firebaseUserSettingsPath][self.mac] = {};
           Users[i][APIConfig.general.firebaseUserSettingsPath][self.mac].setEqual(self.settings);
+
+          // Update the user's object in Firebase...
+          self.firebaseUsers.update(Users);
         }
 
-        // Update the user's object in Firebase...
-        self.firebaseUsers.update(Users);
+        lastUserSetting[i] = Users[i][APIConfig.general.firebaseUserSettingsPath][self.mac];
 
         var makeChanges = function (userSetting) {
 
           // The 'this' keyword is bound to the user firebase reference.
+          var user = this;
 
           var userSetting = userSetting.val();
           var newSettings = Conflict.resolve(Users, userSetting, self.settings);
 
           if(newSettings.setting == userSetting) { // The user's settings passed conflict resolution
 
-            lastSuccessfulChangeUserName = this.name();
+            lastSuccessfulChangeUserName = user.name();
+            self.onFirebaseData(diff(self.lastState, newSettings.setting), newSettings.setting, self.lastState, function (code, msg) {
+              self.updateStatus(code, msg);
 
-            self.onFirebaseData(newSettings.setting);
-            setState(newSettings.setting, this.name());
+              if(typeof code === "string") code = code.toLowerCase();
+              if(code == "success" || code == 0) {
+                setState(newSettings.setting, user.name());
+                lastUserSetting[user.name()] = newSettings.setting;
+              }
+              else { // Revert the user's setting back to it's last state...
+                user
+                .ref()
+                .child(APIConfig.general.firebaseUserSettingsPath)
+                .child(self.mac)
+                .update(lastUserSetting[user.name()]);
+              }
+
+              user.child("last_request/device_response").update({ // Update the user's last_change status...
+                status: code,
+                message: msg,
+                timestamp: Date.now(),
+              });
+
+            });
+            
 
           }
           else { // The user's settings we're rejected...
@@ -283,8 +327,9 @@ var BaseDeviceObject = function (name, address, mac) {
 
   }); // End this.on("ready")
 
-  // Call the constructor
-  this.init();
+  // Call the constructor(s)
+  self.on("instantiated", self.init);
+
 
 } // End BaseDeviceObject
 

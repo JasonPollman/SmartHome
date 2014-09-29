@@ -1,10 +1,9 @@
 LightingInterface = {
 
-  type               : "lighting",
+  type    : "lighting",
 
-  connect            : function() { },
-  setBrightness      : function() { },
-  setLightStatus     : function() { },
+  connect : function() { },
+  request : function() { },
 
 } // End LightingInterface
 

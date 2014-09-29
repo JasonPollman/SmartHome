@@ -326,7 +326,7 @@ var SmartHome = function() {
                 version : drivers[i].driverDetails.version,
               }
             }); // End set()
-            Devices[networkDevices[n].mac].emit("ready");
+            Devices[networkDevices[n].mac].emit("instantiated");
             break;
           }
           else {
