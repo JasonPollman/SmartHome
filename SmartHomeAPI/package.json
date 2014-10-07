@@ -13,7 +13,8 @@
     "firebase": ">=1.0.21",
     "progress": ">=1.1.8",
     "request": ">=2.44",
-    "deep-diff": ">=0.2.0"
+    "deep-diff": ">=0.2.0",
+    "wemo": ">=0.1.1"
   },
   "devDependencies": {
     "mocha": ">=1.21.4",
