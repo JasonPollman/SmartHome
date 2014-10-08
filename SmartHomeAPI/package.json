@@ -5,7 +5,7 @@
   "description": "API Server for the SmartHome Adroid App",
   "version": "0.1.0",
   "author": {
-    "name": "Jason Pollman",
+    "name": ["Jason Pollman", "Michael Battaglia", "Lawrence Ismail", "Patrick Sinnott"],
     "email": "JPPuffNStuff@gmail.com"
   },
   "dependencies": {
