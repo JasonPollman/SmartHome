@@ -139,6 +139,58 @@ PhilipsHue.driverKeywords = [
   "philips lighting bv"
 ]
 
+// Tell the API that these devices can be discovered by the driver...
+PhilipsHue.discoverable = true;
+
+
+/**
+ * Discover Hue Devices
+ * @param cb - The callback that will get executed when the device is discovered,
+ *             you must pass back an object with the following keys:
+ *                - address
+ *                - name
+ *                - port
+ *             ...in order for the device to be paired correctly.
+ */
+PhilipsHue.discover = function (driver, cb) {
+
+  // Send a request to discover all hues on the local network using the PhilipsHue discovery site
+  request('https://www.meethue.com/api/nupnp', function (error, response, body) {
+
+    if(error || response.statusCode != 200) { // Got an error from the request
+      console.error("Unable to connect to 'https://www.meethue.com/api/nupnp' for Philips Hue device discovery....\ntrying keyword method.");
+      return;
+    }
+    else { // Request response okay...
+
+      // Parse the JSON response into a JS object
+      var body = JSON.parse(body);
+
+      for(var i in body) { // Loop through the response body's array for each device found...
+
+        // If there's an IP, call the callback for each to add each device.
+        if(body[i].internalipaddress) {
+
+          // Object to pass to the callback, with the device's properties...
+          var deviceInfo = {
+            address: body[i].internalipaddress,
+            port: "N/A",
+            name: "philips_hue"
+          }
+
+          // Call the callback
+          if(cb instanceof Function) cb.call(null, driver, deviceInfo);
+
+        } // End if block
+
+      } // End for loop
+
+    } // End if/else block
+
+  }); // End request
+
+} // End PhilipsHue.discover()
+
 
 /**
  * Sets the settings in the devices: "device_data/[MAC]/settings" firebase object.
@@ -230,50 +282,66 @@ PhilipsHue.prototype.request = function (options, cb) {
  */
 PhilipsHue.prototype.onFirebaseData = function (diff, data, lastState, updateStatus) {
 
+  var requestCallback = function (error, response) {
+
+    if(error) {
+
+      // If there was an error update the status with code 1 ("error") and exit the function.
+      // Also, pass the error with the error message.
+
+      updateStatus(1, error); // updateStatus(code, message)
+      return;
+    }
+
+    // If the device response wasn't an error, update the status as "success" and pass the response.
+    (JSON.parse(response)[0].error) ? updateStatus(1, response) : updateStatus(0, response);
+
+  }
+
   var self = this;
   
   for(var i in diff) { // Loop through all the differences...
 
-    if(diff[i].kind == 'E') { // Kind 'E' means edited.
+    switch(true) { // If it's true execute it...
 
-      switch(true) { // If it's true execute it...
+      // A specific light state was changed...
+      case diff[i].path && diff[i].path.join("-").match(/lights-(\d+)-state-(.*)/g) != null:
 
-        // A specific light state was changed...
-        case diff[i].path.join("-").match(/lights-(\d+)-state-(.*)/g) != null:
+        var requestBody = {};
+        requestBody[diff[i].path[3]] = diff[i].rhs;
 
-          var requestBody = {};
-          requestBody[diff[i].path[3]] = diff[i].rhs;
+        var options = {
+          method : "PUT",
+          uri    : "http://" + self.address + "/api/SmartHomeAPI/lights/" + diff[i].path[1] + "/state",
+          body   : JSON.stringify(requestBody)
+        }
 
-          var options = {
-            method : "PUT",
-            uri    : "http://" + self.address + "/api/SmartHomeAPI/lights/" + diff[i].path[1] + "/state",
-            body   : JSON.stringify(requestBody)
-          }
+        // Make a request to change the setting
+        self.request(options, requestCallback);
 
-          // Make a request to change the setting
-          this.request(options, function (error, response) {
+        break;
 
-            if(error) {
+      case diff[i].path && diff[i].path.join("-").match(/groups-new/g) != null:
 
-              // If there was an error update the status with code 1 ("error") and exit the function.
-              // Also, pass the error with the error message.
+        // Adding new group
 
-              updateStatus(1, error); // updateStatus(code, message)
-              return;
-            }
+        var requestBody = {
+          name: diff[i].rhs.group.new.name,
+          lights: diff[i].rhs.group.new.lights
+        }
 
-            // If the device response wasn't an error, update the status as "success" and pass the response.
-            (JSON.parse(response)[0].error) ? updateStatus(1, response) : updateStatus(0, response);
+        var options = {
+          method : "POST",
+          uri    : "http://" + self.address + "/api/SmartHomeAPI/groups/",
+          body   : JSON.stringify(requestBody)
+        }
 
-          }); // End request()
+        // Make a request to change the setting
+        self.request(options, requestCallback);
+        // Re-boot the settings...
+        break;
 
-          break;
-
-        // Next case...
-
-      } // End switch block
-
-    } // End if block
+    } // End switch block
 
   } // End for loop
 

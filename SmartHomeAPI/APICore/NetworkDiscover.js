@@ -7,13 +7,17 @@ var exec = require('child_process').exec;
 var APIConfig = require('../APICore/APIConfig.js');
 var console   = require('../APICore/APIUtil.js').console;
 
+
+/**
+ * Get's the local IPv4 address of the current machine
+ * @return An array of IP addresses
+ */
 function getLocalIP () {
 
   var interfaces = os.networkInterfaces();
   var addresses = [];
 
   for (var k in interfaces) {
-
     for (var n in interfaces[k]) {
       var address = interfaces[k][n];
       if (address.family === 'IPv4' && !address.internal) {
@@ -29,22 +33,28 @@ function getLocalIP () {
 } // End getLocalIP()
 
 
-
+/**
+ * Parse NMap output for the SmartHome API
+ * @return - A list of network devices
+ */
 function cleanNMap (nmap) {
 
+  // Holds all devices
   var devices = {}
 
-  if(os.platform() != 'win32') { // RegExp reacts different on different OS's
+  if(os.platform() != 'win32') { // If Windows... RegExp reacts different on different OS's... weird!
+
     nmap = nmap
-      .replace(/Starting(.*)(\n+)?/i, '')
-      .replace(/Nmap scan report for(\s+)?(.*?)(\n+)/gi, '$2,')
+      .replace(/Starting(.*)(\n+)?/i, '') // Strip out the starting line.
+      .replace(/Nmap scan report for(\s+)?(.*?)(\n+)/gi, '$2,') // Strip out 
       .replace(/Host is up.*(\n+)?/gi, '')
       .replace(/MAC Address:(\s+)?(.*?)(\s+)?\((.*?)\)/ig, '$2,$4')
       .replace(/Nmap done:.*(\n+)?/, '')
       .replace(/\s\s+/ig, '')
       .split(/\n/);
   }
-  else {
+  else { // Linux or Mac
+
     nmap = nmap
       .replace(/Starting(.*)(\n+)?/i, '')
       .replace(/Nmap scan report for (.*?)(\n+)?/ig, '$1')
@@ -53,7 +63,8 @@ function cleanNMap (nmap) {
       .replace(/Nmap done:.*(\n+)?/, '')
       .replace(/\s\s+/ig, '')
       .split(/\|/);
-  }
+
+  } // End if/else block
 
   for(var i in nmap) {
     var d = nmap[i].split(/,/ig);
@@ -66,6 +77,10 @@ function cleanNMap (nmap) {
 
 
 // <------------------------------ EXECUTE NAMP ------------------------------> //
+
+/**
+ * Executes NMap, get's the list of devices, and pings each one to verify existence and connection.
+ */
 var NetworkDiscover = function (bar) {
 
   bar.tick(5);
@@ -78,6 +93,7 @@ var NetworkDiscover = function (bar) {
   // Execute NMap
   exec("nmap -sP " + getLocalIP() + "/24", function (error, stdout, stderr) {
 
+    // Tick the progress bar 5%...
     bar.tick(5);
     devices = cleanNMap(stdout);
 
@@ -88,6 +104,7 @@ var NetworkDiscover = function (bar) {
       exec("ping " + (os.platform() == 'win32' ? "-n 3" : "-c 3 ") + devices[i].address, function (error, stdout, stderr) {
 
         bar.tick(5);
+
         if(!(error || stderr)) {
           
           // The percentage of packet loss:
@@ -97,7 +114,10 @@ var NetworkDiscover = function (bar) {
           if(loss > APIConfig.devices.packetLossThreshold) delete devices[i];
           
         }
+
         bar.tick(5);
+
+        // Emit the event that this device was pinged
         self.emit("pinged");
 
       }); // End exec(ping)
@@ -105,16 +125,28 @@ var NetworkDiscover = function (bar) {
 
     } // End for loop
 
+    // Increment the number of devices pinged
     self.on("pinged", function () {
       pingsComplete++;
     })
 
+    // Check the number of devices pings every 60 ms.
+    // If the number of devices pinged == the number of devices, then discovery is complete.
     var pingInterval = setInterval(function() {
+
       if(pingsComplete >= Object.keys(devices).length) {
+
+        // Emit the "discovery complete" event
         self.emit("discovery complete", devices);
+
+        // Reset the number of pings to each device for the next network discovery.
         pingsComplete = 0;
+
+        // Clear the interval, so it stops checking
         clearInterval(pingInterval);
-      }
+
+      } // End if block
+
     }, 60);
 
   }); // End exec(nmap)
@@ -125,4 +157,5 @@ var NetworkDiscover = function (bar) {
 // Inherit from the "EventEmitter" so we can emit events:
 require('util').inherits(NetworkDiscover, require('events').EventEmitter);
 
+// Export the object as a function named "scan":
 exports.scan = NetworkDiscover;

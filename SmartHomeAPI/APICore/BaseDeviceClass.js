@@ -13,8 +13,11 @@ var DriverIDs = -1;
 
 var diff      = require("deep-diff").diff;
 
-var Users = {};
+var Users     = require("./Users.js");
 
+/**
+ * Set's two objects equal by iterating through each key.
+ */
 if(!Object.setEqual) {
     Object.defineProperty(Object.prototype, "setEqual", {
     value: function (obj) { for(var i in obj) this[i] = obj[i]; },
@@ -27,25 +30,31 @@ if(!Object.setEqual) {
 // The last "non-conflict" change was made by user:
 var lastSuccessfulChangeUserName;
 
-
+// The last setting for each user...
 var lastUserSetting = {}
 
 // The base device object... to be inherited
-var BaseDeviceObject = function (name, address, mac) {
+var BaseDeviceObject = function (name, address, mac, port) {
 
-  var name    = name;
-  var address = address;
-  var mac     = mac;
+  var name    = name;           // The device's name
+  var address = address;        // The device's IP address
+  var mac     = mac;            // The device's MAC address
+  var port    = port || "N/A";  // The device's port, if needed (e.g. for WeMo devices)
 
+  // For scoping in callbacks
   var self = this;
 
+  // The following arguments are required, and will throw if not present:
   if(!name)     throw new Error("Parameter 'name' is a required argument."  );
   if(!address)  throw new Error("Parameter 'address' is a required argument.");
   if(!mac)      throw new Error("Parameter 'mac' is a required argument.");
 
+
   if(!Devices[mac]) Devices[mac] = this;
   
-  Object.defineProperty(this, "id",
+  // <----------------------------------- DEFINE PROPERTIES AND THEIR OPTIONS ----------------------------------->
+
+  Object.defineProperty(this, "id", // The device's SmartHome API ID
     {
       value: mac,
       configurable: false,
@@ -54,7 +63,7 @@ var BaseDeviceObject = function (name, address, mac) {
     }
   );
 
-  Object.defineProperty(this, "name",
+  Object.defineProperty(this, "name", // The device's human frienly name
     {
       value: name.toLowerCase().replace(/[^a-z0-9_]|\s+/g, '_'),
       configurable: false,
@@ -63,7 +72,7 @@ var BaseDeviceObject = function (name, address, mac) {
     }
   );
 
-  Object.defineProperty(this, "address",
+  Object.defineProperty(this, "address", // The device's IPv4 address
     {
       value: address,
       configurable: false,
@@ -72,7 +81,7 @@ var BaseDeviceObject = function (name, address, mac) {
     }
   );
 
-  Object.defineProperty(this, "mac",
+  Object.defineProperty(this, "mac", // The device's MAC address
     {
       value: mac,
       configurable: false,
@@ -81,8 +90,17 @@ var BaseDeviceObject = function (name, address, mac) {
     }
   );
 
+  Object.defineProperty(this, "port", // The device's port
+    {
+      value: port,
+      configurable: false,
+      writable: false,
+      enumerable: true,
+    }
+  );
 
-  Object.defineProperty(this, "settings",
+
+  Object.defineProperty(this, "settings", // The device's settings, to be set by the constructor!
     {
       value: {},
       configurable: false,
@@ -91,10 +109,10 @@ var BaseDeviceObject = function (name, address, mac) {
     }
   );
 
-  Object.defineProperty(this, "toString",
+  Object.defineProperty(this, "toString", // The toString() method, called on when outputting information on the device
     {
       value: function () {
-        return "Device (ID:" + this.id + ")\n   Name: " + this.name + "\n   Local Address: " + this.address + "\n   MAC: " + this.mac;
+        return "Device (ID:" + this.id + ")\n   Name: " + this.name + "\n   Local Address: " + this.address + "\n   MAC: " + this.mac + "\n   Port: " + this.port;
       },
       configurable: false,
       writable: false,
@@ -102,7 +120,7 @@ var BaseDeviceObject = function (name, address, mac) {
     }
   );
 
-  Object.defineProperty(this, "firebase",
+  Object.defineProperty(this, "firebase", // The device's firebase object, bound to the device's firebase path.
     {
       value: new Firebase(APIConfig.general.firebaseRootURI + '/' + APIConfig.general.firebaseDevicePath + '/' + this.mac + '/settings'),
       configurable: false,
@@ -111,7 +129,7 @@ var BaseDeviceObject = function (name, address, mac) {
     }
   );
 
-  Object.defineProperty(this, "firebaseUsers",
+  Object.defineProperty(this, "firebaseUsers", // The firebase user's object, bound to the user's firebase path.
     {
       value: new Firebase(APIConfig.general.firebaseRootURI + '/' + APIConfig.general.firebaseUserPath),
       configurable: false,
@@ -120,22 +138,7 @@ var BaseDeviceObject = function (name, address, mac) {
     }
   );
 
-  Object.defineProperty(this, "firebaseUsersURI",
-    {
-      value: APIConfig.general.firebaseRootURI + '/' + APIConfig.general.firebaseUserPath,
-      configurable: false,
-      writable: false,
-      enumerable: true,
-    }
-  );
-
-  Object.defineProperty(this, "users",
-    {
-      get: function () { return Users; },
-    }
-  );
-
-  Object.defineProperty(this, "firebaseURI",
+  Object.defineProperty(this, "firebaseURI", // The device's firebase URI
     {
       value: APIConfig.general.firebaseRootURI + '/' + APIConfig.general.firebaseDevicePath + '/' + this.mac,
       configurable: false,
@@ -144,7 +147,33 @@ var BaseDeviceObject = function (name, address, mac) {
     }
   );
 
-  Object.defineProperty(this, "lastState",
+  Object.defineProperty(this, "firebaseUsersURI", // The user's firebase URI
+    {
+      value: APIConfig.general.firebaseRootURI + '/' + APIConfig.general.firebaseUserPath,
+      configurable: false,
+      writable: false,
+      enumerable: true,
+    }
+  );
+
+  Object.defineProperty(this, "discoverable",
+  // If discoverable, then the API will try to use the device's "discover" method to find devices of this type.
+    {
+      value: false,
+      configurable: false,
+      writable: true,
+      enumerable: true,
+    }
+  );
+
+  Object.defineProperty(this, "users", // The user's object.
+    {
+      get: function () { return Users; },
+    }
+  );
+
+
+  Object.defineProperty(this, "lastState", // The lastState of the device, before new data was received.
     {
       value: {},
       configurable: false,
@@ -153,14 +182,24 @@ var BaseDeviceObject = function (name, address, mac) {
     }
   );
 
-  Object.defineProperty(this, "init",
+  Object.defineProperty(this, "init", // The base constructor
     {
       value: function () {
+
+        // Call the device instance constructor, with the following callback:
         if(this.construct) this.construct.call(this, function () {
+
+          // Update the firebase settings for the device
           self.firebase.parent().update({ name: this.name, address: this.address, mac: this.mac, settings: this.settings });
+
+          // Set the lastState to the initial state
           this.lastState.setEqual(this.settings);
+
+          // Emit the "ready" event, signifying that the device is loaded and ready
           self.emit("ready");
-        });
+
+        }); // End this.init()
+
       },
       configurable: false,
       writable: false,
@@ -168,9 +207,9 @@ var BaseDeviceObject = function (name, address, mac) {
     }
   );
 
-  Object.defineProperty(this, "updateStatus",
+  Object.defineProperty(this, "updateStatus", // Updates the status of the device in firebase with the current device's settings
     {
-      value: function (status, message) {
+      value: function (status, message) { // Takes either a string or integer status code...
 
         if(typeof status == "string") status = status.toLowerCase();
 
@@ -186,8 +225,11 @@ var BaseDeviceObject = function (name, address, mac) {
             break;
         }
 
+        // If it's an unidentified status, then the status is therefore "unknown".
         if(status != "pending" && status != "success" && status != "error") status = "unknown";
         var user = lastSuccessfulChangeUserName;
+
+        // Update the status in firebase
         self.firebase.parent().update({"last_change": {
           status: status || "unknown",
           message: message || "success",
@@ -201,60 +243,84 @@ var BaseDeviceObject = function (name, address, mac) {
       enumerable: true,
     }
   );
-
+  
+  /**
+   * Private helper function that sets the device's state in firebase
+   * @param data - the data from the user that changed a setting
+   * @param user - the user object that changed the data
+   */
   var setState = function (data, user) {
 
     var d = data;
 
     // Update the previous state, so we can detect changes...
-    for(var i in self.settings) if(d[i]) self.settings[i] = d[i];
+    for(var i in self.settings) if(d && d[i]) self.settings[i] = d[i];
 
+    // Update the firebase settings
     self.firebase.update(self.settings, function (error) {
 
-      if(error) {
+      if(error) { // Print the error silently
         console.notice("Firebase Error:\n" + error);
       }
-      else {
+      else { // No error
 
+        // Holds the changes made by the user
         var changeStr = [];
 
         var changesMade = false;
-        for(var i in self.settings) {
-          if(self.settings[i] != self.lastState[i]) {
-            changeStr.push("   ---> " + (self.lastState[i] ? "~ " + i + " => " : "+ " + i + " => ")  + d[i]);
+
+        // The difference between the lastState and the setings as a difference array
+        // @see the deep-diff module
+        var difference = diff(self.lastState, self.settings);
+
+        // Iterate through the differences
+        for(var i in difference) {
+
+          // If the difference of the lastState and new state are different (edited)
+          if(difference[i].lhs && difference[i].rhs && difference[i].lhs != difference[i].rhs) {
+            changeStr.push("   " + difference[i].path.join("/") + " ---> ~ " + difference[i].lhs + " => " + difference[i].rhs);
             changesMade = true;
           }
-          if(!self.lastState[i]) {
-            changeStr.push("   ---> " + "- " + i + " <= " + self.lastState[i]);
+          else if(!difference[i].lhs) { // If the value doesn't exist in the lastState (new value)
+            changeStr.push("   " + difference[i].path.join("/") + " ---> + " + difference[i].rhs);
+            changesMade = true;
+          }
+          else if(!difference[i].rhs) { // If the value doesn't exist in the new state (value deleted)
+            changeStr.push("   " + difference[i].path.join("/") + " <--- - " + difference[i].lhs);
             changesMade = true;
           }
         }
 
-        if(changesMade) console.notice("Firebase Settings State Change for: " + self.toString() + "\n" + (changeStr.length > 1 ? changeStr.join("\n") : "") + "\n\nMade by user '" + user + "'.\n");
+        // If changes were made, print them for the user.
+        if(changesMade) console.notice("Firebase Settings State Change for: " + self.toString() + "\n\n" + (changeStr.length > 0 ? changeStr.join("\n") : "") + "\n\nMade by user '" + user + "'.\n");
 
         // Update the "last" state
         self.lastState.setEqual(self.settings);
-      }
 
-    });
+      } // End if/else block
 
+    }); // End self.firebase.update()
 
   } // End setState()
 
-  this.on("ready", function () { // Must wait until the device has been setup...
 
+  // Once the device driver is ready, perform the following function:
+  this.once("ready", function () { // Must wait until the device has been setup...
+
+    // Get the user's firebase object
     self.firebaseUsers.once('value', function (data) {
 
-      Users = data.val();
+      // Set the Users variable to the user's object in firebase
+      Users.setEqual(data.val());
 
-      for(var i in Users) {
+      for(var i in Users) { // Iterate through the users...
 
-        // If the users doesn't have any settings, give them the current device's settings
-        if(!Users[i][APIConfig.general.firebaseUserSettingsPath] || Users[i][APIConfig.general.firebaseUserSettingsPath] == null) {
+        // If the users doesn't have any settings for this device, give them the current device's settings
+        if(!Users[i][APIConfig.general.firebaseUserSettingsPath]) {
           Users[i][APIConfig.general.firebaseUserSettingsPath] = {};
         }
 
-        if(!Users[i][APIConfig.general.firebaseUserSettingsPath][self.mac] || [APIConfig.general.firebaseUserSettingsPath][self.mac] == null) {
+        if(!Users[i][APIConfig.general.firebaseUserSettingsPath][self.mac]) {
           Users[i][APIConfig.general.firebaseUserSettingsPath][self.mac] = {};
           Users[i][APIConfig.general.firebaseUserSettingsPath][self.mac].setEqual(self.settings);
 
@@ -262,28 +328,43 @@ var BaseDeviceObject = function (name, address, mac) {
           self.firebaseUsers.update(Users);
         }
 
+        // Set the lastUserSetting for this user as the user's current settings (initialize)
         lastUserSetting[i] = Users[i][APIConfig.general.firebaseUserSettingsPath][self.mac];
 
+        /**
+         * Make changes for the device based on conflict resolution
+         * @see the APICore/ConflictResolve.js module.
+         * @param userSetting - The user's setting for the device
+         */
         var makeChanges = function (userSetting) {
 
           // The 'this' keyword is bound to the user firebase reference.
           var user = this;
+          var userSetting = userSetting.val(); // Get the actual firebase values
 
-          var userSetting = userSetting.val();
+          // The new settings based on the conflic resolution
           var newSettings = Conflict.resolve(Users, userSetting, self.settings);
 
           if(newSettings.setting == userSetting) { // The user's settings passed conflict resolution
 
+            // The last successful change was made by user:
             lastSuccessfulChangeUserName = user.name();
+
+            // Call the device instance's onFirebaseData method to see how to handle the new data within the device itself,
+            // then call the anon-callback below:
             self.onFirebaseData(diff(self.lastState, newSettings.setting), newSettings.setting, self.lastState, function (code, msg) {
+
+              // Update the status of the last request
               self.updateStatus(code, msg);
 
+              // *** Revert the user's settings back if the onFirebaseData method returned an error ***
+
               if(typeof code === "string") code = code.toLowerCase();
-              if(code == "success" || code == 0) {
+              if(code == "success" || code == 0) { // The onFirebaseData method returned a successful change
                 setState(newSettings.setting, user.name());
                 lastUserSetting[user.name()] = newSettings.setting;
               }
-              else { // Revert the user's setting back to it's last state...
+              else if (lastUserSetting[user.name()]){ // Revert the user's setting back to it's last state...
                 user
                 .ref()
                 .child(APIConfig.general.firebaseUserSettingsPath)
@@ -303,8 +384,10 @@ var BaseDeviceObject = function (name, address, mac) {
           }
           else { // The user's settings we're rejected...
 
+            // Notify the end user
             console.notice("Firebase Settings State Change for: " + self.toString() + "\n\nMade by user '" + this.name() + "' have been rejected due to the conflict:\n\n" + newSettings.msg + "\n");
-          }
+          
+          } // End if(newSettings.setting == userSetting)/else
 
           this.child("last_request").update({ // Update the user's last_change status...
             status: newSettings.msg,
@@ -315,6 +398,7 @@ var BaseDeviceObject = function (name, address, mac) {
 
         var user = self.firebaseUsers.child(i);
 
+        // Call the makeChanges() method when the user updates a value in firebase:
         var deviceSettingRef = user
           .ref()
           .child(APIConfig.general.firebaseUserSettingsPath)
@@ -326,6 +410,83 @@ var BaseDeviceObject = function (name, address, mac) {
     }); // End self.firebaseUsers.once('value')
 
   }); // End this.on("ready")
+  
+
+  // If a new setting is added to the device, add it to each user's setting.
+  self.firebase.on("value", function (data) {
+
+    for(var i in Users) { // Iterate through the users object
+
+      var user = self.firebaseUsers.child(i);
+
+      // A reference to the device's settings within the current user context:
+      var userRef = user
+        .child(APIConfig.general.firebaseUserSettingsPath)
+        .child(self.mac)
+        .once("value", (function (uData) {
+
+          var user = this;
+
+          // The difference between the user's settings and the actual device's settings
+          var uDiff = diff(uData.val(), data.val());
+          
+          for(var n in uDiff) { // Loop through the user's settings for this device
+
+            if(uDiff[n].kind == 'N' && !uDiff[n].lhs) { // If the device contains a *new* value, not in the user's settings:
+
+              // Decide where to stick the new setting in the user's setting
+
+              var path = uDiff[n].path; // The path of the setting, relative to the device's context.
+              var obj = {};
+
+              if(uDiff[n].path.length > 1) { // The path isn't a the device settings root.
+
+                var obj = {}
+                obj[path.slice(-1)[0]] = uDiff[n].rhs;
+
+                // Update the user's settings with the new value
+                user
+                  .child(APIConfig.general.firebaseUserSettingsPath)
+                  .child(self.mac)
+                  .child(path.slice(0, -1).join('/')).update(obj);
+
+              }
+              else { // The path is a sub-path of other paths...
+
+                var obj = {}
+                obj[path[0]] = uDiff[n].rhs;
+
+                // Update the user's settings with the new value
+                user
+                  .child(APIConfig.general.firebaseUserSettingsPath)
+                  .child(self.mac)
+                  .update(obj);
+
+              } // End if(uDiff[n].path.length > 1)
+
+            } // End if(uDiff[n].kind == 'N' && !uDiff[n].lhs)
+
+          } // End for loop
+
+        }).bind(user)); // End userRef.once()
+
+    } // End for(var i in Users)
+
+  }); // End self.firebase.on
+  
+  // If a user is added, add the user to the Users var.
+  self.firebaseUsers.on("child_added", function (child) {
+    Users[child.name()] = child.val();
+    Users[child.name()][APIConfig.general.firebaseUserSettingsPath] = {};
+    Users[child.name()][APIConfig.general.firebaseUserSettingsPath][self.mac] = {}
+    Users[child.name()][APIConfig.general.firebaseUserSettingsPath][self.mac].setEqual(self.settings);
+    self.firebaseUsers.update(Users);
+  });
+
+  // Delete a user...
+  self.firebaseUsers.on("child_removed", function (child) {
+    delete Users[child.name()];
+  });
 
   // Call the constructor(s)
   self.on("instantiated", self.init);

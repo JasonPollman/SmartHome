@@ -111,6 +111,10 @@
 
 // Ohhh, pretty colors...
 var console = require('../APICore/APIUtil.js').console;
+var APIConfig = require('../APICore/APIConfig.js');
+
+// Use the WeMo Module
+var wemo = require('wemo');
 
 // A great module for making easy requests:
 var request = require('request');
@@ -125,10 +129,10 @@ var BelkinWemo = require("../APICore/BaseDeviceClass.js");
 // This defines the information used by the API to store/retrieve drivers.
 // Will throw an error if non-existent.
 BelkinWemo.driverDetails = {
-  make    : "Belkin",        // REQUIRED
-  model   : "Wemo",            // REQUIRED
-  version : "1.0.0",          // REQUIRED
-  type    : "power",       // REQUIRED
+  make    : "Belkin",   // REQUIRED
+  model   : "Wemo",     // REQUIRED
+  version : "1.0.0",    // REQUIRED
+  type    : "power",    // REQUIRED
 }
 
 
@@ -136,12 +140,47 @@ BelkinWemo.driverDetails = {
 // This defines the information used by the API to pair drivers to devices.
 // Will throw an error if non-existent.
 BelkinWemo.driverKeywords = [
-  "belkin wemo switch+motion"
+  "belkin international"
 ]
+
+// If discoverable is true, use the discover method rather than
+// using keywords (more reliable).
+BelkinWemo.discoverable = true;
+
+/**
+ * Discover WeMo Devices
+ * @param cb - The callback that will get executed when the device is discovered,
+ *             you must pass back an object with the following keys:
+ *                - address
+ *                - name
+ *                - port
+ *             ...in order for the device to be paired correctly.
+ */
+BelkinWemo.discover = function (driver, cb) {
+
+  // Create a new WeMo Client
+  var client = wemo.Search();
+  // When the client is found, call the callback...
+  client.on('found', function(device) {
+
+    // Object to pass to the callback, with the device's properties...
+    var deviceInfo = {
+      address: device.ip,
+      port: device.port,
+      name: device.friendlyName
+    }
+
+    // Call the callback
+    if(cb instanceof Function) cb.call(null, driver, deviceInfo);
+
+  }); // End of client.on()
+ 
+} // End BelkinWemo.discover()
 
 
 /**
  * Sets the settings in the devices: "device_data/[MAC]/settings" firebase object.
+ * Make sure you set self.settings!!!
  */
 BelkinWemo.prototype.setSettings = function (cb) {
 
@@ -149,59 +188,84 @@ BelkinWemo.prototype.setSettings = function (cb) {
   // now we can use 'self' to refer to this in a callback.
   var self = this;
 
-  var options = {
-    method : "GET",
-    uri    : "http://" + self.address + "/api/SmartHomeAPI/"
-  }
+  self.wemoDevice = new wemo(self.address, self.port);
 
-  // Make a request with options...
-  this.request(options, function (error, response) {
-    (error) ? console.error(error) : self.settings = JSON.parse(response);
+  // Get the device's state
+  self.wemoDevice.getBinaryState(function (error, result) {
+
+    if(error) { // If there's an error, print the error silently and return
+      console.error("Unable to get device state for device: " + self.toString());
+      return;
+    }
+
+    // To pass to firebase
+    var settings = {
+      state: result,
+      type: self.name.toLowerCase().replace(/\s+/ig, "_"),
+    }
+
+    // Update the device's settings
+    self.settings = settings;
+
+    // Call the callback which the base device will call and emit the ready event.
     if(cb instanceof Function) cb.call(self);
-  });
+
+    // Emit the device found event
+    self.emit("device found");
+
+  }); // End wemoDevice()
+
+  // Set an interval to update the motion status for a WeMo Motion
+  self.once("device found", function () {
+
+    if(self.settings.type == "wemo_motion") { // If it's a wemo motion...
+
+      // Emit that we have set this interval... since the network will be scanned and refreshed every XX seconds,
+      // we have to clear the previous interval, so that we don't set multiple intervals...
+      self.emit("setting new motion interval");
+
+      self.on("setting new motion interval", function () {
+        clearInterval(self.motionInterval); // The old motion interval...
+      });
+
+      // Set the new motion interval
+      self.motionInterval = setInterval(function () {
+
+         self.wemoDevice.getBinaryState(function (error, result) { // Get the WeMo Motion's state
+
+            if(error) { // If there's an error, print the error silently and return
+              console.error("Unable to get device state for device: " + self.toString());
+              return;
+            }
+
+            if(result != self.settings.state) { // If the result from the device doesn't match the state in firebase...
+
+              // Report that a motion detection was changed...
+              console.notice("Device " + self.toString() + "\n\n...Motion detection state changed to: '" + ((result == 1) ? "on" : "off") + "'.");
+              
+              // Update the firebase device_data state...
+              self.settings.state = result;
+              
+              // Update the users' states...
+              for(var i in self.users) self.users[i][APIConfig.general.firebaseUserSettingsPath][self.mac] = self.settings;
+              self.firebase.update(self.settings);
+              self.firebaseUsers.update(self.users);
+
+            } // End if block
+
+          }); // End wemoDevice()
+
+      }, 1000); // End setInterval() ** That's every second **
+
+    } // End if block 
+
+  }); // End self.once()
 
 } // End setSettings()
 
+
 // The constructor for this device is setSettings()!
 BelkinWemo.prototype.construct = BelkinWemo.prototype.setSettings;
-
-
-/**
- * Make a request to the Hue API.
- * @param options - The request options, must include 'method' and 'uri'.
- * @param cb      - The callback to be executed upon completion.
- */
-BelkinWemo.prototype.request = function (options, cb) {
-
-  var self = this;
-
-  // Check that we have a URI and a Method...
-  if(!options && !options.uri && !options.method) {
-    // If we don't call the callback and pass it the error.
-    if(cb && cb instanceof Function) cb.call(self, "Missing options key: 'uri' and 'method' are required.", undefined);
-    return;
-  }
-
-  // Check that the method is valid...
-  if(options.method != "GET" && options.method != "PUT" && options.method != "POST" && options.method != "DELETE") {
-    // If not call the callback, with an error.
-    if(cb && cb instanceof Function) cb.call(self, "Unauthorized method: '" + options.method + "'.", undefined);
-    return;
-  }
-
-  // Make a request with the method 'options.method'.
-  request[options.method.toLowerCase()](options, function (error, response, body) {
-
-    if(error) { // Call the callback with the error message...
-      if(cb && cb instanceof Function) cb.call(self, error, undefined);
-    }
-    else { // Call the callback with the request body...
-      if(cb && cb instanceof Function) cb.call(self, undefined, body);
-    }
-
-  }); // End request.method()
-
-} // End this.request()
 
 
 /**
@@ -234,47 +298,30 @@ BelkinWemo.prototype.onFirebaseData = function (diff, data, lastState, updateSta
   
   for(var i in diff) { // Loop through all the differences...
 
-    if(diff[i].kind == 'E') { // Kind 'E' means edited.
+    // If it's not a wemo_motion
+    if(self.settings.type != "wemo_motion" && diff[i].kind == 'E') { // Kind 'E' means edited.
 
-      switch(true) { // If it's true execute it... 
+      switch(true) { 
 
-        // A specific power state was changed...
+        case diff[i].path && diff[i].path.join('-').match(/state/g) != null: // The WeMo device's state was changed
 
-        /* //I need to start looking into what's returned to configure with firebase**
-        
-        case diff[i].path.join("-").match(/lights-(\d+)-state-(.*)/g) != null:
+          if(diff[i].rhs > 1) diff[i].rhs = 1; // Anything > 0 is a one...
+          if(diff[i].rhs < 0) diff[i].rhs = 0; // Anything < 0 is a zero...
 
-          var requestBody = {};
-          requestBody[diff[i].path[3]] = diff[i].rhs;
+          // Set the device's state
+          self.wemoDevice.setBinaryState(diff[i].rhs, function(error, result) {
+            
+            // Update the status, which will push the changes to firebase
+            (error != null) ? updateStatus(1, error) : updateStatus(0, result);
 
-          var options = {
-            method : "PUT",
-            uri    : "http://" + self.address + "/api/SmartHomeAPI/lights/" + diff[i].path[1] + "/state",
-            body   : JSON.stringify(requestBody)
-          }
-
-          // Make a request to change the setting
-          this.request(options, function (error, response) {
-
-            if(error) {
-
-              // If there was an error update the status with code 1 ("error") and exit the function.
-              // Also, pass the error with the error message.
-
-              updateStatus(1, error); // updateStatus(code, message)
-              return;
-            }
-
-            // If the device response wasn't an error, update the status as "success" and pass the response.
-            (JSON.parse(response)[0].error) ? updateStatus(1, response) : updateStatus(0, response);
-        
-          }); // End request()
-
+          });
           break;
-   */     
-        // Next case...
 
-      } // End switch block
+        default:
+          updateStatus(0, "Successfully Updated");
+          break;
+
+     } // End switch block
 
     } // End if block
 
@@ -282,37 +329,6 @@ BelkinWemo.prototype.onFirebaseData = function (diff, data, lastState, updateSta
 
 } // End onFirebaseData()
 
-
-/**
- * Used by the API to ensure that the actual device can connect using this API
- */
-BelkinWemo.prototype.connect = function () {
-  
-  var self = this;
-
-  var options = {
-    url: 'http://' + self.address + '/api/',
-    body: JSON.stringify({ devicetype: "SmartHomeAPI", username: "SmartHomeAPI" }),
-  }
-
-  request.post(options, function (error, response, body) {
-
-    if(error) {
-      console.error("Error: " + self.toString() + "\n\nUnable to connect to device...\n\n" + error);
-      return;
-    }
-
-    var response = JSON.parse(body);
-
-    for(var i in response) {
-      if(response[i].error && response[i].error.type == 101 && response[i].error.description == "link button not pressed") {
-        // @todo Ask the user to press the link button...
-      }
-    }
-
-  });
-
-} // End connect()
 
 /**
  * @todo
