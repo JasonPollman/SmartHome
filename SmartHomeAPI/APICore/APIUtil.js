@@ -74,16 +74,75 @@ module.exports.pad = function (e, len) {
   return ("000000000000000000000000000000000000" + e).slice(-len || e.length);
 }
 
+
+/**
+ * Capitalize the first letter of a string
+ */
 module.exports.cap = function (s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
 
 /**
  * Set's two objects equal by iterating through each key.
+ * Added to the Object prototype!
  */
 if(!Object.setEqual) {
+
     Object.defineProperty(Object.prototype, "setEqual", {
-    value: function (obj) { for(var i in obj) this[i] = obj[i]; },
-    enumerable: false,
-    writable: false,
-    configurable: false
-  });
-}
+
+      value: function (obj) { for(var i in obj) this[i] = obj[i]; },
+      enumerable: false,
+      writable: false,
+      configurable: false
+
+  }); // End Object.defineProperty
+
+} // End if block
+
+/**
+ * For debugging, print a long line to the screen
+ */
+module.exports.mark = function (name) { console.log("<-------------------------- MARKER: " + (name || Date.now().toString()).toUpperCase() + " -------------------------->"); }
+
+/**
+ * Gets/Sets a descendant property of an object
+ */
+module.exports.getSetDescendantProp = function (obj, desc, value) {
+
+  var arr = desc ? desc.split(".") : [];
+
+  while (arr.length && obj) {
+    var comp = arr.shift();
+    var match = new RegExp("(.+)\\[([0-9]*)\\]").exec(comp);
+
+    // Handle Arrays
+    if ((match !== null) && (match.length == 3)) {
+
+      var arrayData = { arrName: match[1], arrIndex: match[2] };
+
+      if (obj[arrayData.arrName] !== undefined) {
+
+        if (value && arr.length === 0) obj[arrayData.arrName][arrayData.arrIndex] = value;
+        obj = obj[arrayData.arrName][arrayData.arrIndex];
+
+      } else {
+        obj = undefined;
+
+      } // End if/else block
+
+      continue;
+
+    } // End outer if block
+
+    // Handle Primitive Objects
+    if (value) {
+      if (obj[comp] === undefined) obj[comp] = {};
+      if (arr.length === 0) obj[comp] = value;
+    }
+
+    obj = obj[comp];
+
+  } // End while loop
+
+  return obj;
+
+} // End getSetDescendantProp()

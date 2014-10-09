@@ -1,9 +1,9 @@
 "use strict"
 
 var APIConfig = require('./APIConfig');
-var Conflict  = require('./ConflictResolution.js');
+var Conflict  = require('./ConflictResolution');
 
-var console   = require('./APIUtil.js').console;
+var console   = require('./APIUtil').console;
 var cap       = require('./APIUtil').cap;
 
 var Firebase  = require("firebase");
@@ -11,9 +11,9 @@ var Devices   = {};
 
 var DriverIDs = -1;
 
-var diff      = require("deep-diff").diff;
-
-var UserConfig = require("./Users.js");
+var diff       = require("deep-diff").diff;
+var UserConfig = require("./Users");
+var Rules      = require("./Rules");
 
 // The last "non-conflict" change was made by user:
 var lastSuccessfulChangeUserName;
@@ -320,9 +320,10 @@ var BaseDeviceObject = function (name, address, mac, port) {
         // Update the status of the last request
         self.updateStatus(code, msg);
 
-        // *** Revert the user's settings back if the onFirebaseData method returned an error ***
+        // *** Revert the user's settings back if the onFirebaseData method returned an error *** //
 
         if(typeof code === "string") code = code.toLowerCase();
+
         if(code == "success" || code == 0) { // The onFirebaseData method returned a successful change
           setState(newSettings.setting, user.name());
           lastUserSetting[user.name()] = newSettings.setting;
@@ -341,7 +342,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
           timestamp: Date.now(),
         });
 
-      });
+      }); // End self.onFirebaseData
       
 
     }
@@ -356,6 +357,8 @@ var BaseDeviceObject = function (name, address, mac, port) {
       status: newSettings.msg,
       timestamp: Date.now(),
     });
+
+    // Check the rules to see if the new changes implement a rule:
 
   } // End makeChanges()
 
