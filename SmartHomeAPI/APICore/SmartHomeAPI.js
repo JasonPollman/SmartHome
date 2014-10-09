@@ -6,9 +6,9 @@ try { // Load required Node Modules
   var cli      = require('cli-color');                    // So we can output colors to a tty
   var os       = require('os');                           // The OS Module
 
-  var APIUtil      = require('./APIUtil.js');             // API Utility Function
-  var APIConfig    = require('./APIConfig.js');           // API Configuration
-  var BaseDevice   = require('./BaseDeviceClass.js');     // The Base Device Class
+  var APIUtil      = require('./APIUtil.js');             // The SmartHome API Utility Function Module
+  var APIConfig    = require('./APIConfig.js');           // The SmartHome API Configuration Module
+  var BaseDevice   = require('./BaseDeviceClass.js');     // The SmartHome API Base Device Class
   var Firebase     = require("firebase");                 // The Firebase Module
   var ProgressBar  = require('progress');                 // The Progress Module
 
@@ -65,7 +65,7 @@ var SmartHome = function() {
   var DriverIDs = -1;
   var nextDriverID = function () { return '0x' + ((++DriverIDs).toString(16)); }
 
-  var Devices = [];
+  var Devices = {};
 
   // The firebase location for all devices connected to the network...
   var deviceFirebase = new Firebase(APIConfig.general.firebaseRootURI + '/' + APIConfig.general.firebaseAllDevicesPath);
@@ -327,13 +327,12 @@ var SmartHome = function() {
    */
    function devicesInit (networkDevices) {
 
-    // Clear the list of supported devices
-    Devices = {};
-
     var numDriversChecked = 0;
     var foundSupportedDevice = false;
 
     for(var i in drivers) { // Loop through all the device drivers that have loaded
+
+      numDriversChecked++;
 
       // If the driver implements it's own discvoer method, use it rather than using keywords:
       if(drivers[i].discoverable == true && drivers[i].discover && (drivers[i].discover instanceof Function)) {
@@ -348,7 +347,7 @@ var SmartHome = function() {
             // Loop through the networkDevices until we find a device with the same address as this device:
             for(var k in networkDevices) if(discovered.address == networkDevices[k].address) discoveredMAC = networkDevices[k].mac;
 
-            if(discoveredMAC) { // Instantiate the new device
+            if(discoveredMAC && !Devices[discoveredMAC]) { // Instantiate the new device
               Devices[discoveredMAC] = new drivers[getDriverID(discoveredDriver.driverDetails.make, discoveredDriver.driverDetails.model, discoveredDriver.driverDetails.version)](discovered.name.toLowerCase().replace(/\s+/ig, '_'), discovered.address, discoveredMAC, discovered.port);
               console.notice("Found Supported " + Devices[discoveredMAC].toString());
 
@@ -370,13 +369,14 @@ var SmartHome = function() {
               // Emit the "instantiated" event
               Devices[discoveredMAC].emit("instantiated");
               foundSupportedDevice = true;
-              numDriversChecked++;
-
             }
-            else { // Print an error
+            else if(!Devices[discoveredMAC]) { // Print an error
               console.error("Unable to pair driver (" + discoveredDriver.driverDetails.make + ":" + discoveredDriver.driverDetails.model + ":" + discoveredDriver.driverDetails.version + ") discovered device with correct MAC address for device @ " + discovered.address);
-              numDriversChecked++;
-            } // End if block
+            } 
+            else {
+              // End if block
+              foundSupportedDevice = true;
+            }
 
           } // End inner if block
         
@@ -387,11 +387,9 @@ var SmartHome = function() {
 
         for(var n in networkDevices) { // Loop through all the network devices
 
-          console.log("ASDSAD" + n);
-
           for(var k in drivers[i].driverKeywords) { // Loop through the device keywords
 
-            if(networkDevices[n].name.match(RegExp(drivers[i].driverKeywords[k], 'ig'))) { // If the device's name matche's a keyword:
+            if(!Devices[networkDevices[n].mac] && networkDevices[n].name.match(RegExp(drivers[i].driverKeywords[k], 'ig'))) { // If the device's name matche's a keyword:
 
               // Instantiate the device
               Devices[networkDevices[n].mac] = new drivers[getDriverID(drivers[i].driverDetails.make, drivers[i].driverDetails.model, drivers[i].driverDetails.version)](networkDevices[n].name, networkDevices[n].address, networkDevices[n].mac);
@@ -414,26 +412,11 @@ var SmartHome = function() {
               
               // Emit the "instantiated" event
               Devices[networkDevices[n].mac].emit("instantiated");
-              foundSupportedDevice = true;
-              numDriversChecked++;
+              if(Devices[networkDevices[n].mac]) foundSupportedDevice = true;
 
               // We found a driver via keyword, break the keyword search loop
               break;
             }
-            else { // This device isn't supported
-
-              numDriversChecked++;
-
-              // Update the device in firebase
-              deviceFirebase.child(networkDevices[n].mac).set({
-                name: networkDevices[n].name,
-                address: networkDevices[n].address,
-                mac: networkDevices[n].mac,
-                supported: false,
-                driver: "none"
-              }); // End set()
-
-            } // End if/else block
 
           } // End for(var k in drivers[i].driverKeywords)
 
@@ -445,6 +428,8 @@ var SmartHome = function() {
 
     // Check to see that supported devices exits
     var devCheckInterval = setInterval(function () {
+
+      console.log(numDriversChecked);
       
       if(numDriversChecked >= Object.keys(drivers).length) { // We have iterated through all the drivers
 
@@ -455,8 +440,28 @@ var SmartHome = function() {
           console.warn("Devices paired to drivers.\nNext network discovery scan in: " + APIConfig.devices.scanInterval + " ms.");
         }
 
+        // Add all unsupported devices to the "connected_devices" firebase...
+        for(var n in networkDevices) {
+          if(!Devices[networkDevices[n].mac]) {
+            deviceFirebase.child(networkDevices[n].mac).set({
+              name: networkDevices[n].name,
+              address: networkDevices[n].address,
+              mac: networkDevices[n].mac,
+              supported: false,
+              driver: "none"
+            }); // End set()
+          }
+        }
+
+        // Devices are loaded... load the Rules now...
+        //var Rules = require("./Rules.js"); // The SmartHome API Rules Modules
+
+        self.emit("devices loaded");
+
+        // Clear this interval to stop checking
         clearInterval(devCheckInterval);
-      }
+
+      } // End if block
 
     }, 60); // End timeout
 
@@ -521,6 +526,15 @@ var SmartHome = function() {
     return undefined;
 
   } // End getDriverID()
+
+  
+  Object.defineProperty(this, "Devices", // The Devices object, so other modules can use it...
+    {
+      get: function () { return Devices; },
+      configurable: false,
+      enumerable: true,
+    }
+  );
 
 
 } // --------------------------> End SmartHome Object Function

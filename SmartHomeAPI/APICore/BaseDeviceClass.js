@@ -13,19 +13,7 @@ var DriverIDs = -1;
 
 var diff      = require("deep-diff").diff;
 
-var Users     = require("./Users.js");
-
-/**
- * Set's two objects equal by iterating through each key.
- */
-if(!Object.setEqual) {
-    Object.defineProperty(Object.prototype, "setEqual", {
-    value: function (obj) { for(var i in obj) this[i] = obj[i]; },
-    enumerable: false,
-    writable: false,
-    configurable: false
-  });
-}
+var UserConfig = require("./Users.js");
 
 // The last "non-conflict" change was made by user:
 var lastSuccessfulChangeUserName;
@@ -168,7 +156,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
 
   Object.defineProperty(this, "users", // The user's object.
     {
-      get: function () { return Users; },
+      get: function () { return UserConfig.users; },
     }
   );
 
@@ -194,6 +182,9 @@ var BaseDeviceObject = function (name, address, mac, port) {
 
           // Set the lastState to the initial state
           this.lastState.setEqual(this.settings);
+
+          // Update the user's settings if need be...
+          UserConfig.update(self);
 
           // Emit the "ready" event, signifying that the device is loaded and ready
           self.emit("ready");
@@ -303,111 +294,87 @@ var BaseDeviceObject = function (name, address, mac, port) {
 
   } // End setState()
 
+   /**
+   * Make changes for the device based on conflict resolution
+   * @see the APICore/ConflictResolve.js module.
+   * @param userSetting - The user's setting for the device
+   */
+  var makeChanges = function (userSetting) {
+
+    // The 'this' keyword is bound to the user firebase reference.
+    var user = this;
+    var userSetting = userSetting.val(); // Get the actual firebase values
+
+    // The new settings based on the conflic resolution
+    var newSettings = Conflict.resolve(UserConfig.users, userSetting, self.settings);
+
+    if(newSettings.setting == userSetting) { // The user's settings passed conflict resolution
+
+      // The last successful change was made by user:
+      lastSuccessfulChangeUserName = user.name();
+
+      // Call the device instance's onFirebaseData method to see how to handle the new data within the device itself,
+      // then call the anon-callback below:
+      self.onFirebaseData(diff(self.lastState, newSettings.setting), newSettings.setting, self.lastState, function (code, msg) {
+
+        // Update the status of the last request
+        self.updateStatus(code, msg);
+
+        // *** Revert the user's settings back if the onFirebaseData method returned an error ***
+
+        if(typeof code === "string") code = code.toLowerCase();
+        if(code == "success" || code == 0) { // The onFirebaseData method returned a successful change
+          setState(newSettings.setting, user.name());
+          lastUserSetting[user.name()] = newSettings.setting;
+        }
+        else if (lastUserSetting[user.name()]){ // Revert the user's setting back to it's last state...
+          user
+          .ref()
+          .child(APIConfig.general.firebaseUserSettingsPath)
+          .child(self.mac)
+          .update(lastUserSetting[user.name()]);
+        }
+
+        user.child("last_request/device_response").update({ // Update the user's last_change status...
+          status: code,
+          message: msg,
+          timestamp: Date.now(),
+        });
+
+      });
+      
+
+    }
+    else { // The user's settings we're rejected...
+
+      // Notify the end user
+      console.notice("Firebase Settings State Change for: " + self.toString() + "\n\nMade by user '" + this.name() + "' have been rejected due to the conflict:\n\n" + newSettings.msg + "\n");
+    
+    } // End if(newSettings.setting == userSetting)/else
+
+    this.child("last_request").update({ // Update the user's last_change status...
+      status: newSettings.msg,
+      timestamp: Date.now(),
+    });
+
+  } // End makeChanges()
+
 
   // Once the device driver is ready, perform the following function:
   this.once("ready", function () { // Must wait until the device has been setup...
 
-    // Get the user's firebase object
-    self.firebaseUsers.once('value', function (data) {
+    for(var i in UserConfig.users) {
 
-      // Set the Users variable to the user's object in firebase
-      Users.setEqual(data.val());
+      var user = self.firebaseUsers.child(i);
 
-      for(var i in Users) { // Iterate through the users...
+      // Call the makeChanges() method when the user updates a value in firebase:
+      var deviceSettingRef = user
+        .ref()
+        .child(APIConfig.general.firebaseUserSettingsPath)
+        .child(self.mac)
+        .on("value", makeChanges.bind(user)); // End .on("value")
 
-        // If the users doesn't have any settings for this device, give them the current device's settings
-        if(!Users[i][APIConfig.general.firebaseUserSettingsPath]) {
-          Users[i][APIConfig.general.firebaseUserSettingsPath] = {};
-        }
-
-        if(!Users[i][APIConfig.general.firebaseUserSettingsPath][self.mac]) {
-          Users[i][APIConfig.general.firebaseUserSettingsPath][self.mac] = {};
-          Users[i][APIConfig.general.firebaseUserSettingsPath][self.mac].setEqual(self.settings);
-
-          // Update the user's object in Firebase...
-          self.firebaseUsers.update(Users);
-        }
-
-        // Set the lastUserSetting for this user as the user's current settings (initialize)
-        lastUserSetting[i] = Users[i][APIConfig.general.firebaseUserSettingsPath][self.mac];
-
-        /**
-         * Make changes for the device based on conflict resolution
-         * @see the APICore/ConflictResolve.js module.
-         * @param userSetting - The user's setting for the device
-         */
-        var makeChanges = function (userSetting) {
-
-          // The 'this' keyword is bound to the user firebase reference.
-          var user = this;
-          var userSetting = userSetting.val(); // Get the actual firebase values
-
-          // The new settings based on the conflic resolution
-          var newSettings = Conflict.resolve(Users, userSetting, self.settings);
-
-          if(newSettings.setting == userSetting) { // The user's settings passed conflict resolution
-
-            // The last successful change was made by user:
-            lastSuccessfulChangeUserName = user.name();
-
-            // Call the device instance's onFirebaseData method to see how to handle the new data within the device itself,
-            // then call the anon-callback below:
-            self.onFirebaseData(diff(self.lastState, newSettings.setting), newSettings.setting, self.lastState, function (code, msg) {
-
-              // Update the status of the last request
-              self.updateStatus(code, msg);
-
-              // *** Revert the user's settings back if the onFirebaseData method returned an error ***
-
-              if(typeof code === "string") code = code.toLowerCase();
-              if(code == "success" || code == 0) { // The onFirebaseData method returned a successful change
-                setState(newSettings.setting, user.name());
-                lastUserSetting[user.name()] = newSettings.setting;
-              }
-              else if (lastUserSetting[user.name()]){ // Revert the user's setting back to it's last state...
-                user
-                .ref()
-                .child(APIConfig.general.firebaseUserSettingsPath)
-                .child(self.mac)
-                .update(lastUserSetting[user.name()]);
-              }
-
-              user.child("last_request/device_response").update({ // Update the user's last_change status...
-                status: code,
-                message: msg,
-                timestamp: Date.now(),
-              });
-
-            });
-            
-
-          }
-          else { // The user's settings we're rejected...
-
-            // Notify the end user
-            console.notice("Firebase Settings State Change for: " + self.toString() + "\n\nMade by user '" + this.name() + "' have been rejected due to the conflict:\n\n" + newSettings.msg + "\n");
-          
-          } // End if(newSettings.setting == userSetting)/else
-
-          this.child("last_request").update({ // Update the user's last_change status...
-            status: newSettings.msg,
-            timestamp: Date.now(),
-          });
-
-        } // End makeChanges()
-
-        var user = self.firebaseUsers.child(i);
-
-        // Call the makeChanges() method when the user updates a value in firebase:
-        var deviceSettingRef = user
-          .ref()
-          .child(APIConfig.general.firebaseUserSettingsPath)
-          .child(self.mac)
-          .on("value", makeChanges.bind(user)); // End .on("value")
-
-      } // End for loop
-
-    }); // End self.firebaseUsers.once('value')
+    } // End for loop
 
   }); // End this.on("ready")
   
@@ -415,7 +382,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
   // If a new setting is added to the device, add it to each user's setting.
   self.firebase.on("value", function (data) {
 
-    for(var i in Users) { // Iterate through the users object
+    for(var i in UserConfig.users) { // Iterate through the users object
 
       var user = self.firebaseUsers.child(i);
 
@@ -473,20 +440,6 @@ var BaseDeviceObject = function (name, address, mac, port) {
     } // End for(var i in Users)
 
   }); // End self.firebase.on
-  
-  // If a user is added, add the user to the Users var.
-  self.firebaseUsers.on("child_added", function (child) {
-    Users[child.name()] = child.val();
-    Users[child.name()][APIConfig.general.firebaseUserSettingsPath] = {};
-    Users[child.name()][APIConfig.general.firebaseUserSettingsPath][self.mac] = {}
-    Users[child.name()][APIConfig.general.firebaseUserSettingsPath][self.mac].setEqual(self.settings);
-    self.firebaseUsers.update(Users);
-  });
-
-  // Delete a user...
-  self.firebaseUsers.on("child_removed", function (child) {
-    delete Users[child.name()];
-  });
 
   // Call the constructor(s)
   self.on("instantiated", self.init);

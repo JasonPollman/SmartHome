@@ -75,3 +75,15 @@ module.exports.pad = function (e, len) {
 }
 
 module.exports.cap = function (s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+/**
+ * Set's two objects equal by iterating through each key.
+ */
+if(!Object.setEqual) {
+    Object.defineProperty(Object.prototype, "setEqual", {
+    value: function (obj) { for(var i in obj) this[i] = obj[i]; },
+    enumerable: false,
+    writable: false,
+    configurable: false
+  });
+}
