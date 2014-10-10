@@ -13,7 +13,6 @@ var DriverIDs = -1;
 
 var diff       = require("deep-diff").diff;
 var UserConfig = require("./Users");
-var Rules      = require("./Rules");
 
 // The last "non-conflict" change was made by user:
 var lastSuccessfulChangeUserName;
@@ -183,7 +182,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
           // Set the lastState to the initial state
           this.lastState.setEqual(this.settings);
 
-          // Update the user's settings if need be...
+          // Ensure the user has data for this device:
           UserConfig.update(self);
 
           // Emit the "ready" event, signifying that the device is loaded and ready
@@ -288,13 +287,18 @@ var BaseDeviceObject = function (name, address, mac, port) {
         // Update the "last" state
         self.lastState.setEqual(self.settings);
 
+        // Enforce rules set by the new settings, if need be...
+        var Rules = require("./Rules");
+        Rules.verifyEnforcement(self);
+
       } // End if/else block
 
     }); // End self.firebase.update()
 
   } // End setState()
 
-   /**
+
+  /**
    * Make changes for the device based on conflict resolution
    * @see the APICore/ConflictResolve.js module.
    * @param userSetting - The user's setting for the device
@@ -336,7 +340,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
           .update(lastUserSetting[user.name()]);
         }
 
-        user.child("last_request/device_response").update({ // Update the user's last_change status...
+        user.child(APIConfig.general.firebaseUserSettingsChangesPath + "/" + self.mac + "/device_response").update({ // Update the user's last_change status...
           status: code,
           message: msg,
           timestamp: Date.now(),
@@ -353,7 +357,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
     
     } // End if(newSettings.setting == userSetting)/else
 
-    this.child("last_request").update({ // Update the user's last_change status...
+    this.child(APIConfig.general.firebaseUserSettingsChangesPath + "/" + self.mac).update({ // Update the user's last_change status...
       status: newSettings.msg,
       timestamp: Date.now(),
     });
@@ -362,9 +366,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
 
   } // End makeChanges()
 
-
-  // Once the device driver is ready, perform the following function:
-  this.once("ready", function () { // Must wait until the device has been setup...
+  self.on("ready", function () {
 
     for(var i in UserConfig.users) {
 
@@ -374,75 +376,18 @@ var BaseDeviceObject = function (name, address, mac, port) {
       var deviceSettingRef = user
         .ref()
         .child(APIConfig.general.firebaseUserSettingsPath)
-        .child(self.mac)
-        .on("value", makeChanges.bind(user)); // End .on("value")
+        .child(self.mac);
+
+      var requestSettingRef = user
+        .ref()
+        .child(APIConfig.general.firebaseUserSettingsChangesPath)
+        .child(self.mac);
+
+      deviceSettingRef.on("value", makeChanges.bind(user)); // End .on("value")
 
     } // End for loop
 
-  }); // End this.on("ready")
-  
-
-  // If a new setting is added to the device, add it to each user's setting.
-  self.firebase.on("value", function (data) {
-
-    for(var i in UserConfig.users) { // Iterate through the users object
-
-      var user = self.firebaseUsers.child(i);
-
-      // A reference to the device's settings within the current user context:
-      var userRef = user
-        .child(APIConfig.general.firebaseUserSettingsPath)
-        .child(self.mac)
-        .once("value", (function (uData) {
-
-          var user = this;
-
-          // The difference between the user's settings and the actual device's settings
-          var uDiff = diff(uData.val(), data.val());
-          
-          for(var n in uDiff) { // Loop through the user's settings for this device
-
-            if(uDiff[n].kind == 'N' && !uDiff[n].lhs) { // If the device contains a *new* value, not in the user's settings:
-
-              // Decide where to stick the new setting in the user's setting
-
-              var path = uDiff[n].path; // The path of the setting, relative to the device's context.
-              var obj = {};
-
-              if(uDiff[n].path.length > 1) { // The path isn't a the device settings root.
-
-                var obj = {}
-                obj[path.slice(-1)[0]] = uDiff[n].rhs;
-
-                // Update the user's settings with the new value
-                user
-                  .child(APIConfig.general.firebaseUserSettingsPath)
-                  .child(self.mac)
-                  .child(path.slice(0, -1).join('/')).update(obj);
-
-              }
-              else { // The path is a sub-path of other paths...
-
-                var obj = {}
-                obj[path[0]] = uDiff[n].rhs;
-
-                // Update the user's settings with the new value
-                user
-                  .child(APIConfig.general.firebaseUserSettingsPath)
-                  .child(self.mac)
-                  .update(obj);
-
-              } // End if(uDiff[n].path.length > 1)
-
-            } // End if(uDiff[n].kind == 'N' && !uDiff[n].lhs)
-
-          } // End for loop
-
-        }).bind(user)); // End userRef.once()
-
-    } // End for(var i in Users)
-
-  }); // End self.firebase.on
+  }); // End self.on()
 
   // Call the constructor(s)
   self.on("instantiated", self.init);

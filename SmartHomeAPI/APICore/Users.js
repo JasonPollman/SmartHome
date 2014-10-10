@@ -50,6 +50,8 @@ var UserConfig = function () {
 
         UsersFirebase.on("child_added", function (child) {
 
+          console.log("CHILD ADDED");
+
           var childData = child.val();
           // If there's no "device_configs" key for the user, create it:
           if(!childData[APIConfig.general.firebaseUserSettingsPath]) childData[APIConfig.general.firebaseUserSettingsPath] = {};

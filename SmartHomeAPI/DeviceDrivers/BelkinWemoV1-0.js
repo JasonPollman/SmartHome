@@ -305,11 +305,11 @@ BelkinWemo.prototype.onFirebaseData = function (diff, data, lastState, updateSta
 
         case diff[i].path && diff[i].path.join('-').match(/state/g) != null: // The WeMo device's state was changed
 
-          if(diff[i].rhs > 1) diff[i].rhs = 1; // Anything > 0 is a one...
-          if(diff[i].rhs < 0) diff[i].rhs = 0; // Anything < 0 is a zero...
+
+          var rhs = (diff[i].rhs > 1) ? 1 : (diff[i].rhs < 0) ? 0 : diff[i].rhs; // Anything > 0 is a one, anything < 0 is a zero...
 
           // Set the device's state
-          self.wemoDevice.setBinaryState(diff[i].rhs, function(error, result) {
+          self.wemoDevice.setBinaryState(rhs, function(error, result) {
             
             // Update the status, which will push the changes to firebase
             (error != null) ? updateStatus(1, error) : updateStatus(0, result);

@@ -35,10 +35,11 @@ module.exports = {
 
     firebaseRootURI          : "https://smarthomeapp.firebaseio.com",
 
-    firebaseDevicePath       : "device_data",
-    firebaseUserPath         : "users",
-    firebaseUserSettingsPath : "device_configs",
-    firebaseAllDevicesPath   : "connected_devices",
+    firebaseDevicePath              : "device_data",
+    firebaseUserPath                : "users",
+    firebaseUserSettingsPath        : "device_configs",
+    firebaseAllDevicesPath          : "connected_devices",
+    firebaseUserSettingsChangesPath : "last_request",
 
     logPath: "smarthomelog.log",
 
@@ -48,6 +49,13 @@ module.exports = {
 
     requiredFields: [ "make", "model", "version", "func" ],
 
-  }
+  },
+
+  rules: {
+    firebaseRulesPath: "rules",
+    firebaseDeviceRulesPath: "device_rules",
+    firebaseUserRulesPath: "user_rules",
+
+  } // End rules
 
 } // End module.exports
