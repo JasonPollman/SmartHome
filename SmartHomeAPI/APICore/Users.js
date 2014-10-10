@@ -10,6 +10,8 @@ var UserConfig = function () {
   // Object which will synchronize with the Firebase User's Object
   var Users = {};
 
+  var DevicesRegistered = [];
+
   // The Firebase location for users as defined in configuration:
   var UsersFirebase = new Firebase(APIConfig.general.firebaseRootURI + '/' + APIConfig.general.firebaseUserPath);
 
@@ -28,6 +30,30 @@ var UserConfig = function () {
   UsersFirebase.on("child_removed", function (child) {
     delete Users[child.name()];
   });
+
+  UsersFirebase.on("child_added", function (child) {
+
+    if(!(child.val() instanceof Object)) {
+      console.warn("User '" + child.name() + "' is invalid. Users must be an object.");
+      return;
+    }
+
+    var childData = child.val();
+    // If there's no "device_configs" key for the user, create it:
+    if(!childData[APIConfig.general.firebaseUserSettingsPath]) childData[APIConfig.general.firebaseUserSettingsPath] = {};
+
+    for(var i in DevicesRegistered) {
+      // If there's no "device_configs/[mac]" key for the user and device, create it:
+      if(!childData[APIConfig.general.firebaseUserSettingsPath][DevicesRegistered[i].mac]) {
+        childData[APIConfig.general.firebaseUserSettingsPath][DevicesRegistered[i].mac] = {};
+        childData[APIConfig.general.firebaseUserSettingsPath][DevicesRegistered[i].mac].setEqual(DevicesRegistered[i].settings);
+      }
+    }
+
+    Users[child.name()] = childData;
+    UsersFirebase.update(Users);
+
+  }); // End UsersFirebase.on()
 
   // this.Users = Users
   // Non-configurable, writable, but enumerable
@@ -48,22 +74,7 @@ var UserConfig = function () {
 
       value: function (device) {
 
-        UsersFirebase.on("child_added", function (child) {
-
-          var childData = child.val();
-          // If there's no "device_configs" key for the user, create it:
-          if(!childData[APIConfig.general.firebaseUserSettingsPath]) childData[APIConfig.general.firebaseUserSettingsPath] = {};
-
-          // If there's no "device_configs/[mac]" key for the user and device, create it:
-          if(!childData[APIConfig.general.firebaseUserSettingsPath][device.mac]) {
-            childData[APIConfig.general.firebaseUserSettingsPath][device.mac] = {};
-            childData[APIConfig.general.firebaseUserSettingsPath][device.mac].setEqual(device.settings);
-          }
-
-          Users[child.name()] = childData;
-          UsersFirebase.update(Users);
-
-        }); // End UserFirebase.on()
+        DevicesRegistered.push(device);
 
       }, // End value()
 

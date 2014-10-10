@@ -110,8 +110,10 @@
 
 
 // Ohhh, pretty colors...
-var console = require('../APICore/APIUtil.js').console;
-var APIConfig = require('../APICore/APIConfig.js');
+var console    = require('../APICore/APIUtil.js').console;
+
+var APIConfig  = require('../APICore/APIConfig.js');
+var UserConfig = require("../APICore/Users");
 
 // Use the WeMo Module
 var wemo = require('wemo');
@@ -134,7 +136,6 @@ BelkinWemo.driverDetails = {
   version : "1.0.0",    // REQUIRED
   type    : "power",    // REQUIRED
 }
-
 
 // Must include driver's keywords!
 // This defines the information used by the API to pair drivers to devices.
@@ -247,9 +248,9 @@ BelkinWemo.prototype.setSettings = function (cb) {
               self.settings.state = result;
               
               // Update the users' states...
-              for(var i in self.users) self.users[i][APIConfig.general.firebaseUserSettingsPath][self.mac] = self.settings;
+              for(var i in UsersConfig.users) UsersConfig.users[i][APIConfig.general.firebaseUserSettingsPath][self.mac] = self.settings;
               self.firebase.update(self.settings);
-              self.firebaseUsers.update(self.users);
+              self.firebaseUsers.update(UsersConfig.users);
 
             } // End if block
 

@@ -153,13 +153,6 @@ var BaseDeviceObject = function (name, address, mac, port) {
     }
   );
 
-  Object.defineProperty(this, "users", // The user's object.
-    {
-      get: function () { return UserConfig.users; },
-    }
-  );
-
-
   Object.defineProperty(this, "lastState", // The lastState of the device, before new data was received.
     {
       value: {},
@@ -368,24 +361,13 @@ var BaseDeviceObject = function (name, address, mac, port) {
 
   self.on("ready", function () {
 
-    for(var i in UserConfig.users) {
-
-      var user = self.firebaseUsers.child(i);
-
-      // Call the makeChanges() method when the user updates a value in firebase:
-      var deviceSettingRef = user
-        .ref()
-        .child(APIConfig.general.firebaseUserSettingsPath)
-        .child(self.mac);
-
-      var requestSettingRef = user
-        .ref()
-        .child(APIConfig.general.firebaseUserSettingsChangesPath)
-        .child(self.mac);
-
-      deviceSettingRef.on("value", makeChanges.bind(user)); // End .on("value")
-
-    } // End for loop
+    // When a new user 
+    self.firebaseUsers.on("child_added", function (child) {
+      child.ref()
+      .child(APIConfig.general.firebaseUserSettingsPath)
+      .child(self.mac)
+      .on("value", makeChanges.bind(child.ref()));
+    });
 
   }); // End self.on()
 
