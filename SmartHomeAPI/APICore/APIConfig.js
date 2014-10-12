@@ -33,7 +33,8 @@ module.exports = {
 
     requireAuthentication: false,
 
-    firebaseRootURI          : "https://smarthomeapp.firebaseio.com",
+    firebaseRootURI   : "https://smarthomeapp.firebaseio.com",
+    firebaseAPIStatus : "api_status",
 
     firebaseDevicePath              : "device_data",
     firebaseUserPath                : "users",
@@ -56,6 +57,11 @@ module.exports = {
     firebaseDeviceRulesPath: "device_rules",
     firebaseUserRulesPath: "user_rules",
 
-  } // End rules
+  }, // End rules
+
+  schedules: {
+    firebaseSchedulesPath: "schedules",
+
+  } // End schedules
 
 } // End module.exports

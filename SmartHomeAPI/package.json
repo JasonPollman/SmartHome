@@ -14,7 +14,9 @@
     "progress": ">=1.1.8",
     "request": ">=2.44",
     "deep-diff": ">=0.2.0",
-    "wemo": ">=0.1.1"
+    "wemo": ">=0.1.1",
+    "external-ip": ">=0.2.3",
+    "forever": ">=0.11.1"
   },
   "devDependencies": {
     "mocha": ">=1.21.4",

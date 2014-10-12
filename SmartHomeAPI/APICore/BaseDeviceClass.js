@@ -50,7 +50,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
     }
   );
 
-  Object.defineProperty(this, "name", // The device's human frienly name
+  Object.defineProperty(this, "name", // The device's human friendly name
     {
       value: name.toLowerCase().replace(/[^a-z0-9_]|\s+/g, '_'),
       configurable: false,
@@ -215,7 +215,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
         // Update the status in firebase
         self.firebase.parent().update({"last_change": {
           status: status || "unknown",
-          message: message || "success",
+          message: message || "none specified",
           timestamp: Date.now(),
           user: user || "native device settings"
         }});
@@ -282,13 +282,15 @@ var BaseDeviceObject = function (name, address, mac, port) {
 
         // Enforce rules set by the new settings, if need be...
         var Rules = require("./Rules");
-        Rules.verifyEnforcement(self);
+        Rules.verifyEnforcement(self, difference);
 
       } // End if/else block
 
     }); // End self.firebase.update()
 
   } // End setState()
+
+  this.setState = setState;
 
 
   /**
@@ -297,6 +299,8 @@ var BaseDeviceObject = function (name, address, mac, port) {
    * @param userSetting - The user's setting for the device
    */
   var makeChanges = function (userSetting) {
+
+    console.log(userSetting.val());
 
     // The 'this' keyword is bound to the user firebase reference.
     var user = this;
@@ -361,12 +365,14 @@ var BaseDeviceObject = function (name, address, mac, port) {
 
   self.on("ready", function () {
 
-    // When a new user 
+    // When a child is added to the firebase users path, (or when initialized)
+    // attach the following function to the firebase users...
     self.firebaseUsers.on("child_added", function (child) {
       child.ref()
       .child(APIConfig.general.firebaseUserSettingsPath)
-      .child(self.mac)
-      .on("value", makeChanges.bind(child.ref()));
+      .on("child_changed", function (userSetting) {
+        if(userSetting.name() == self.mac) makeChanges.call(child.ref(), userSetting);
+      });
     });
 
   }); // End self.on()

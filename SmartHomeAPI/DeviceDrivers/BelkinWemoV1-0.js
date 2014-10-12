@@ -219,7 +219,7 @@ BelkinWemo.prototype.setSettings = function (cb) {
   // Set an interval to update the motion status for a WeMo Motion
   self.once("device found", function () {
 
-    if(self.settings.type == "wemo_motion") { // If it's a wemo motion...
+    if(self.name == "wemo_motion") { // If it's a wemo motion...
 
       // Emit that we have set this interval... since the network will be scanned and refreshed every XX seconds,
       // we have to clear the previous interval, so that we don't set multiple intervals...
@@ -248,10 +248,15 @@ BelkinWemo.prototype.setSettings = function (cb) {
               self.settings.state = result;
               
               // Update the users' states...
-              for(var i in UsersConfig.users) UsersConfig.users[i][APIConfig.general.firebaseUserSettingsPath][self.mac] = self.settings;
-              self.firebase.update(self.settings);
-              self.firebaseUsers.update(UsersConfig.users);
-
+              for(var i in UserConfig.users) {
+                if(UserConfig.users[i][APIConfig.general.firebaseUserSettingsPath] && 
+                  UserConfig.users[i][APIConfig.general.firebaseUserSettingsPath][self.mac]) {
+                  UserConfig.users[i][APIConfig.general.firebaseUserSettingsPath][self.mac] = self.settings;
+                  self.firebase.update(self.settings);
+                  self.firebaseUsers.update(UserConfig.users);
+                }
+              }
+              
             } // End if block
 
           }); // End wemoDevice()
@@ -295,27 +300,38 @@ BelkinWemo.prototype.construct = BelkinWemo.prototype.setSettings;
  */
 BelkinWemo.prototype.onFirebaseData = function (diff, data, lastState, updateStatus) {
 
+  console.log("diff:");
+  
   var self = this;
+  console.log(self.name);
   
   for(var i in diff) { // Loop through all the differences...
 
     // If it's not a wemo_motion
-    if(self.settings.type != "wemo_motion" && diff[i].kind == 'E') { // Kind 'E' means edited.
+    if(diff[i].kind == 'E') { // Kind 'E' means edited.
 
       switch(true) { 
 
         case diff[i].path && diff[i].path.join('-').match(/state/g) != null: // The WeMo device's state was changed
 
-
           var rhs = (diff[i].rhs > 1) ? 1 : (diff[i].rhs < 0) ? 0 : diff[i].rhs; // Anything > 0 is a one, anything < 0 is a zero...
 
           // Set the device's state
-          self.wemoDevice.setBinaryState(rhs, function(error, result) {
-            
-            // Update the status, which will push the changes to firebase
-            (error != null) ? updateStatus(1, error) : updateStatus(0, result);
+          if(self.name != "wemo_motion") {
+            console.log("-------------------------");
+            console.log(rhs);
+            self.wemoDevice.setBinaryState(rhs.toString(), function(error, result) {
 
-          });
+            // !!! Note Belkin requires a string for some stupid reason. !!! //
+              
+              // Update the status, which will push the changes to firebase
+              (error != null) ? updateStatus(1, error) : updateStatus(0, result);
+
+            });
+          }
+          else {
+            updateStatus(0, "Motion Detection Successful...");
+          }
           break;
 
         default:

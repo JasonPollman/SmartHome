@@ -10,7 +10,7 @@ try { // Load required Node Modules
   var APIConfig    = require('./APIConfig.js');           // The SmartHome API Configuration Module
   var BaseDevice   = require('./BaseDeviceClass.js');     // The SmartHome API Base Device Class
   var Firebase     = require("firebase");                 // The Firebase Module
-  var ProgressBar  = require('progress');                 // The Progress Module
+  var WANIP        = require('external-ip')();            // The external-ip module
 
   var NetworkDiscover = require('./NetworkDiscover.js');  // The SmartHome NetworkDiscover Module
 
@@ -36,11 +36,33 @@ var SmartHome = function() {
 
   var console = APIUtil.console;
 
-  // So we don't kill the process on an uncaught exception...
-  // Just in case...
- /* process.on('uncaughtException', function (err) {
-      console.error(err);
-  }); */
+  // Inform firebase that the API is starting up...
+  var APIStatus = new Firebase(APIConfig.general.firebaseRootURI + "/" + APIConfig.general.firebaseAPIStatus);
+  APIStatus.update({ last_startup: Date.now(), status: "startup pending", code: 0 });
+
+  // What to do on uncaught exceptions....
+  process.on("uncaughtException", function (e) {
+    console.error("An uncaught exception has occured:\n" + e.toString() + "\n\nThe API will now restart.");
+    APIStatus.update({ code: 1, status: "Error: " + e.message.toString(), reachable: false });
+    throw e;
+  });
+
+  // Update the last_msg_received field anytime there is a value received from firebase...
+  var firebaseRoot = new Firebase(APIConfig.general.firebaseRootURI)
+  firebaseRoot.on("value", function () {
+    APIStatus.update({ last_msg_received: Date.now() });
+  })
+
+  // On program exit, we need to notify firebase, and cleanup...
+  var exitNotification = function (code) {
+
+    console.warn("\n\nSmart Home API Server v" + APIConfig.general.version + " Shutting Down...");
+    APIStatus.update({ reachable: false, last_shutdown_status: 0, last_shutdown: Date.now() }, function () {
+      process.exit(0);
+    });
+  }
+
+  process.on("SIGINT", exitNotification);
 
   // <!------------------------- PRIVATE GLOBAL VARIABLES -------------------------!>
 
@@ -72,7 +94,6 @@ var SmartHome = function() {
 
   // All network devices
   var networkDevices = undefined;
-
 
 
   Object.defineProperty(this, "Devices", // The Devices object, so other modules can use it...
@@ -116,8 +137,24 @@ var SmartHome = function() {
 
   // #6 ---> Setup the devices, based on the network devices connected:
   self.on("drivers loaded", function () {
-    var Rules = require("./Rules"); // The SmartHome Rules Module
+
+    var Rules     = require("./Rules");     // The SmartHome Rules Module
+    //var Schedules = require("./Schedules"); // The SmartHome Schedules Module
+
+    // Get the network's WAN IP...
+    WANIP(function (err, ip) {
+
+      if (err) {
+        console.error("WAN IP Retrieval Failed!");
+        return;
+      }
+
+      // Update the firebase "api_status" object...
+      APIStatus.update({ wan_ip: ip, status: "Got Network WAN IPv4", code: 0, reachable: true });
+    });
+
     scanNetwork.call();
+    
   });
 
   // Set an interval to continuiously re-scan the network:
@@ -129,20 +166,16 @@ var SmartHome = function() {
   /**
    * Scans the network for all connected devices by using nmap and ping commands (works on win and unix)
    */
-   var scan;
+  var scan;
   function scanNetwork() {
 
+    APIStatus.update({ status: "Scanning Network for Connected Devices", code: 0, reachable: true });
+
     // Progress bar animation... 
-    var bar = new ProgressBar(cli.xterm(124)('     Network Scan In Progress [:bar] :percent :etas'), {
-        complete: '=',
-        incomplete: ' ',
-        width: 30,
-        total: 100
-    });
+    var bar = require('progress-bar').create(process.stdout);
 
     // Notify the user we are scanning the network...
-    console.notice("Scanning network for connected devices...");
-    console.log('', true);
+    console.warn("Scanning network for connected devices. Please wait...");
 
     // Call the NetworkDiscover module, pass it the progress bar so it can animate its progress:
     scan = new NetworkDiscover.scan(bar);
@@ -150,9 +183,6 @@ var SmartHome = function() {
     // When the discovery is complete, perform the anon-function:
     scan.on("discovery complete", function (dev) {
 
-      // Make sure bar progress is 100%
-      bar.tick(100);
-      console.log('', true);
 
       var devString = [];
       for(var i in dev) devString.push('    - ' + dev[i].name);
@@ -341,15 +371,19 @@ var SmartHome = function() {
    */
    function devicesInit (networkDevices) {
 
+    APIStatus.update({ status: "Pairing Devices with Drivers" });
+
     // Push all devices to the "connected_devices" firebase object...
     for(var n in networkDevices) {
-      deviceFirebase.child(networkDevices[n].mac).set({
-        name: networkDevices[n].name,
-        address: networkDevices[n].address,
-        mac: networkDevices[n].mac,
-        supported: false,
-        driver: "none"
-      }); // End set()
+      if(!Devices[networkDevices[n].mac]) {
+        deviceFirebase.child(networkDevices[n].mac).set({
+          name: networkDevices[n].name,
+          address: networkDevices[n].address,
+          mac: networkDevices[n].mac,
+          supported: false,
+          driver: "none"
+        }); // End set()
+      }
     }
 
     var supportedDevices = 0;
@@ -371,7 +405,7 @@ var SmartHome = function() {
 
             if(discoveredMAC && !Devices[discoveredMAC]) { // Instantiate the new device
               Devices[discoveredMAC] = new drivers[getDriverID(discoveredDriver.driverDetails.make, discoveredDriver.driverDetails.model, discoveredDriver.driverDetails.version)](discovered.name.toLowerCase().replace(/\s+/ig, '_'), discovered.address, discoveredMAC, discovered.port);
-              console.notice("Found Supported " + Devices[discoveredMAC].toString());
+              console.warn("Found Supported " + Devices[discoveredMAC].toString());
 
               // Add the device to firebase
               deviceFirebase.child(discoveredMAC).set({
@@ -415,7 +449,7 @@ var SmartHome = function() {
 
               // Instantiate the device
               Devices[networkDevices[n].mac] = new drivers[getDriverID(drivers[i].driverDetails.make, drivers[i].driverDetails.model, drivers[i].driverDetails.version)](networkDevices[n].name, networkDevices[n].address, networkDevices[n].mac);
-              console.notice("Found Supported " + Devices[networkDevices[n].mac].toString());
+              console.warn("Found Supported " + Devices[networkDevices[n].mac].toString());
               
               // Add the device to firebase
               deviceFirebase.child(networkDevices[n].mac).set({
@@ -458,6 +492,8 @@ var SmartHome = function() {
         if(supportedDevices <= 0) { // Warn the user that no supported devices were found:
             console.warn("No supported devices were found!\nNext network discovery scan will occur again in: " + APIConfig.devices.scanInterval + " ms.");
         }
+
+        APIStatus.update({ status: "API Ready", last_startup_status: 0, code: 0 });
 
         // Clear this interval to stop checking
         clearInterval(devCheckInterval);

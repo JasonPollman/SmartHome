@@ -4,6 +4,7 @@ var cli = require('cli-color');
 var fs  = require('fs');
 
 var APIConfig = require('./APIConfig.js');
+var Firebase  = require('firebase');
 
 
 /**
@@ -38,11 +39,16 @@ var log = function(msg, color, noTimestamp, lvl) {
       return;
     }
 
+    // Log all messages to firebase...
+    var APIStatus = new Firebase(APIConfig.general.firebaseRootURI + "/" + APIConfig.general.firebaseAPIStatus);
+    APIStatus.update({ status: (msg || "undefined message"), code: ((lvl < 3) ? 1 : 0) });
+
     if(typeof msg == 'string' && !noTimestamp) msg = msg.replace(/\n/g, "\n                        ");
     msg = ((!noTimestamp) ? (module.exports.pad(d.getMonth() + 1, 2) + '/' + module.exports.pad(d.getDate(), 2) + '/' + module.exports.pad(d.getFullYear(), 2) + ' ' + module.exports.pad(d.getHours(), 2) + ":" + module.exports.pad(d.getMinutes(), 2) + ":" + module.exports.pad(d.getSeconds(), 2) + ":" + module.exports.pad(d.getMilliseconds(), 3) + " > ") : "") + msg + '\n';
     
     // Log all messages to file
     fs.writeFile(APIConfig.general.logPath, msg, { flag: 'a', encoding: 'utf-8', mode: "0777" });
+
 
     if(APIConfig.general.reporting >= lvl) process.stdout.write(cli.xterm(color || 39)(msg));
 
@@ -58,7 +64,7 @@ module.exports.console = {
 
   clear   : function () {
     process.stdout.write('\u001B[2J\u001B[0;0f');
-    if(process.stdout.getWindowSize()[0] > 108) process.stdout.write(cli.xterm(39)("███████╗███╗   ███╗ █████╗ ██████╗ ████████╗    ██╗  ██╗ ██████╗ ███╗   ███╗███████╗     █████╗ ██████╗ ██╗\n██╔════╝████╗ ████║██╔══██╗██╔══██╗╚══██╔══╝    ██║  ██║██╔═══██╗████╗ ████║██╔════╝    ██╔══██╗██╔══██╗██║\n███████╗██╔████╔██║███████║██████╔╝   ██║       ███████║██║   ██║██╔████╔██║█████╗      ███████║██████╔╝██║\n╚════██║██║╚██╔╝██║██╔══██║██╔══██╗   ██║       ██╔══██║██║   ██║██║╚██╔╝██║██╔══╝      ██╔══██║██╔═══╝ ██║\n███████║██║ ╚═╝ ██║██║  ██║██║  ██║   ██║       ██║  ██║╚██████╔╝██║ ╚═╝ ██║███████╗    ██║  ██║██║     ██║\n╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝       ╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝╚══════╝    ╚═╝  ╚═╝╚═╝     ╚═╝\n\n"));
+    process.stdout.write(cli.xterm(39)("███████╗███╗   ███╗ █████╗ ██████╗ ████████╗    ██╗  ██╗ ██████╗ ███╗   ███╗███████╗     █████╗ ██████╗ ██╗\n██╔════╝████╗ ████║██╔══██╗██╔══██╗╚══██╔══╝    ██║  ██║██╔═══██╗████╗ ████║██╔════╝    ██╔══██╗██╔══██╗██║\n███████╗██╔████╔██║███████║██████╔╝   ██║       ███████║██║   ██║██╔████╔██║█████╗      ███████║██████╔╝██║\n╚════██║██║╚██╔╝██║██╔══██║██╔══██╗   ██║       ██╔══██║██║   ██║██║╚██╔╝██║██╔══╝      ██╔══██║██╔═══╝ ██║\n███████║██║ ╚═╝ ██║██║  ██║██║  ██║   ██║       ██║  ██║╚██████╔╝██║ ╚═╝ ██║███████╗    ██║  ██║██║     ██║\n╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝       ╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝╚══════╝    ╚═╝  ╚═╝╚═╝     ╚═╝\n\n"));
   
   } // End clear()
 
@@ -89,7 +95,16 @@ if(!Object.setEqual) {
 
     Object.defineProperty(Object.prototype, "setEqual", {
 
-      value: function (obj) { for(var i in obj) this[i] = obj[i]; },
+      value: function (obj) { 
+
+        function clone(obj) {
+          return JSON.parse(JSON.stringify(obj));
+        }
+
+        for(var i in obj) this[i] = clone(obj[i]);
+        return this;
+
+      },
       enumerable: false,
       writable: false,
       configurable: false
@@ -102,6 +117,7 @@ if(!Object.setEqual) {
  * For debugging, print a long line to the screen
  */
 module.exports.mark = function (name) { console.log("<-------------------------- MARKER: " + (name || Date.now().toString()).toUpperCase() + " -------------------------->"); }
+
 
 /**
  * Gets/Sets a descendant property of an object

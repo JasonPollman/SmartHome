@@ -81,9 +81,8 @@ function cleanNMap (nmap) {
 /**
  * Executes NMap, get's the list of devices, and pings each one to verify existence and connection.
  */
-var NetworkDiscover = function (bar) {
+var NetworkDiscover = function () {
 
-  bar.tick(5);
   var self = this;
   var pingsComplete = 0;
 
@@ -91,19 +90,18 @@ var NetworkDiscover = function (bar) {
   var devices;
 
   // Execute NMap
+  console.warn("Executing NMap on Local Network " + getLocalIP() + "...");
   exec("nmap -sP " + getLocalIP() + "/24", function (error, stdout, stderr) {
 
-    // Tick the progress bar 5%...
-    bar.tick(5);
     devices = cleanNMap(stdout);
+
+    console.warn("Pinging " + Object.keys(devices).length + " devices to verify connectivity...");
 
     // Ping each device to make sure we can connect to it.
     for(var i in devices) {
 
-      bar.tick(5);
-      exec("ping " + (os.platform() == 'win32' ? "-n 3" : "-c 3 ") + devices[i].address, function (error, stdout, stderr) {
 
-        bar.tick(5);
+      exec("ping " + (os.platform() == 'win32' ? "-n 3" : "-c 3 ") + devices[i].address, function (error, stdout, stderr) {
 
         if(!(error || stderr)) {
           
@@ -115,8 +113,7 @@ var NetworkDiscover = function (bar) {
           
         }
 
-        bar.tick(5);
-
+        console.notice("Ping Results:\n\n'" + stdout);
         // Emit the event that this device was pinged
         self.emit("pinged");
 
