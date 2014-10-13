@@ -157,10 +157,6 @@ PhilipsHue.discover = function (driver, cb) {
   // Send a request to discover all hues on the local network using the PhilipsHue discovery site
   request('https://www.meethue.com/api/nupnp', function (error, response, body) {
 
-    console.log("HERE");
-    console.log(response);
-    console.log(error);
-
     if(error || response.statusCode != 200) { // Got an error from the request
       console.error("Unable to connect to 'https://www.meethue.com/api/nupnp' for Philips Hue device discovery....\ntrying keyword method.");
       return;
