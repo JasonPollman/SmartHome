@@ -7,7 +7,6 @@ var console   = require('./APIUtil.js').console;
 var getSetD   = require('./APIUtil.js').getSetDescendantProp;
 var mark      = require('./APIUtil.js').mark;
 var diff      = require("deep-diff").diff;
-var getSetD   = require('./APIUtil.js').getSetDescendantProp;
 
 var Schedules = function () {
 
@@ -32,18 +31,13 @@ var Schedules = function () {
   console.notice("Schedules loading complete...");
 
 
+  /**
+   * Set a schedule based on firebase values
+   * @param schedule - The firbase schedule object
+   */
   function setSchedule(schedule) {
 
     var scheduleData = schedule.val();
-
-    if(!Devices[scheduleData.device]) {
-      console.warn("The target device for schedule '" + schedule.name() + "' doesn't exist of isn't connected to the network.");
-      firebaseSchedules.child(schedule.name()).child("status").update({ code: 1, message: "Error: The device doesn't exist or is not connected.", timestamp: Date.now() });
-      return;
-    }
-
-    var dontSetIntervalAgain = false;
-    if(Schedules[schedule.name()] != undefined) dontSetIntervalAgain = true;
 
     // A schedule must pass the following field verification:
     if(scheduleData.device                           &&
@@ -51,64 +45,95 @@ var Schedules = function () {
        scheduleData.time.d != null                   &&
        (scheduleData.time.d instanceof Array)        &&
        scheduleData.time.h != null                   &&
-       scheduleData.time.m != null                     ) {
+       scheduleData.time.m != null                   &&
+       scheduleData.setting_path                     &&
+       scheduleData.setting_value                       ) {
 
+      // Push the schedule into the Schedules object
       Schedules[schedule.name()] = scheduleData; 
-
-      if(!dontSetIntervalAgain) {
-
-        var deviceSettingsClone = {};
-        deviceSettingsClone.setEqual(Devices[scheduleData.device]);
-
-        for(var i in scheduleData.setting_path) {
-          // Set the clone settings with the specified schedule settings
-          getSetD(deviceSettingsClone, scheduleData.setting_path[i], scheduleData.setting_values[i]);
-        }   
-
-        // Set an interval to check the schuedule to see if it is time to implement it.
-        setInterval(function () {
-
-          var now = new Date();
-
-          if(Devices[scheduleData.device]                                 && // Check that the device actually exists
-             Schedules[schedule.name()].time.d.indexOf(now.getDay()) > -1 && // Check that the schedule is for today
-             Schedules[schedule.name()].time.h == now.getHours()          && // Check that it is the current hour
-             Schedules[schedule.name()].time.m == now.getMinutes()) {
-            console.log(":asdf");
-          // fix this...
-            Devices[scheduleData.device].onFirebaseData(
-
-              diff(Devices[scheduleData.device].lastState, deviceSettingsClone),
-              deviceSettingsClone,
-              Devices[scheduleData.device],
-
-              function (code, msg) {
-
-                // Update the status of the last request
-                Devices[scheduleData.device].updateStatus(code, msg);
-
-                // Set the new device's state:
-                Devices[scheduleData.device].setState(deviceSettingsClone, "Schedule: \"" + schedule.name() + "\".");
-                  
-              } // End anon-function
-
-            ); // End .onFirebaseData()
-
-          } // End if(Devices[scheduleData.device]...
-
-        }, 60); // Checks every minute!!!, End setInterval()
-
-      } // End if block
-
-      firebaseSchedules.child(schedule.name()).child("status").update({ code: 0, message: "Schedule Set", timestamp: Date.now() });
 
     }
     else { // Warn the user that they have a malformed schedule
+
       console.warn("Schedule '" + schedule.name() + "' is missing a required key or is malformed.");
       firebaseSchedules.child(schedule.name()).child("status").update({ code: 1, message: "Error: This schedule is malformed.", timestamp: Date.now() });
-    } 
+
+    } // End if/else block
 
   } // End setSchedule()
+
+  /**
+   * Called when a device is initialized and sets an interval for each schedule if the schedule's device exists.
+   * @param device - The device calling the method
+   */
+  this.enforceSchedule = function (device) {
+
+    if(!device && !(typeof device == "object")) return;
+    
+    for(var i in Schedules) { // Iterate through the scheduels
+
+      if(Schedules[i].device == device.mac) { // If the schedule MAC == the device's MAC
+
+        (function (i) { // Wrap in function so that we can preserve i
+
+          // Set an interval to check the schuedule to see if it is time to implement it.
+          setInterval(function () {
+
+            // Grab a cloned copy of the device's settings...
+            var deviceSettingsClone = {};
+            deviceSettingsClone.setEqual(Devices[device.mac].settings);
+
+            for(var n in Schedules[i].setting_path) {
+
+              // Set the clone settings with the specified schedule settings
+              getSetD(deviceSettingsClone, Schedules[i].setting_path[n], Schedules[i].setting_value[n]);
+
+            } // End for loop
+
+            // Grab the time
+            var now = new Date();
+
+            if( // If the schedule's time in now (within a minute)
+
+              Schedules[i].time.d.indexOf(now.getDay()) > -1 && // Check that the schedule is for today
+              Schedules[i].time.h == now.getHours()          && // Check that it is the current hour
+              Schedules[i].time.m == now.getMinutes()) {        // Check that it is the current minute
+
+              console.notice("Schedule '" + i + "' implemented.");
+              firebaseSchedules.child(i).child("status").update({ code: 0, message: "Schedule last enforced @ " + Date.now() + ".", timestamp: Date.now() });
+
+              // Change the device's setting:
+              Devices[device.mac].onFirebaseData(
+
+                diff(Devices[device.mac].lastState, deviceSettingsClone),
+                deviceSettingsClone,
+                Devices[device.mac],
+
+                function (code, msg) {
+
+                  // Update the status of the last request
+                  Devices[device.mac].updateStatus(code, msg, "SmartHome Schedules API");
+
+                  // Set the new device's state:
+                  Devices[device.mac].setState(deviceSettingsClone, "Schedule: \"" + i + "\".");
+                    
+                } // End anon-function
+
+              ); // End .onFirebaseData()
+
+            } // End if(Devices[scheduleData.device]...
+
+          }, 60000); // Checks every minute!!!, End setInterval()
+
+          firebaseSchedules.child(i).child("status").update({ code: 0, message: "Schedule Set", timestamp: Date.now() });
+        
+        })(i); // Pass i by value...
+
+      } // End if(Schedules[i].device == Devices[device.mac])
+
+    } // End for loop
+
+  } // End enforceSchedule()
 
 } // End Schedules Module
 

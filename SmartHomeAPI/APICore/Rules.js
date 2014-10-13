@@ -39,7 +39,6 @@ var Rules = function () {
    */
   self.verifyEnforcement = function (sourceDevice, lastStateCurrentDifference) {
 
-    console.log(lastStateCurrentDifference);
     if(!sourceDevice && !lastStateCurrentDifference) return;
 
     // Iterate through the rules, and check to see if any rule should be enforced.
@@ -67,7 +66,7 @@ var Rules = function () {
 
         if(rule.source_mac == sourceDevice.mac) { // Only implement rules for this device
 
-          if(Devices[rule.target_mac] == undefined) { // Ensure that the target device is connected to the network
+          if(!Devices[rule.target_mac]) { // Ensure that the target device is connected to the network
 
             console.warn("The target device for rule '" + i + "' doesn't exist or is not connected.\nThis rule will be ignored.");
             firebaseRules.child(i).child("status").update({ code: 1, message: "Error: Target Device does not exits or is not connected.", timestamp: Date.now() });
@@ -121,7 +120,7 @@ var Rules = function () {
                 function (code, msg) {
 
                   // Update the status of the last request
-                  Devices[rule.target_mac].updateStatus(code, msg);
+                  Devices[rule.target_mac].updateStatus(code, msg, "SmartHome Rules API");
 
                   // Set the new device's state:
                   Devices[rule.target_mac].setState(targetDeviceSettingsClone, "Rule: \"" + i + "\".");

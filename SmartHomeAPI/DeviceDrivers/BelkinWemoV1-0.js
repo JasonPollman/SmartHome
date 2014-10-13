@@ -299,11 +299,8 @@ BelkinWemo.prototype.construct = BelkinWemo.prototype.setSettings;
  *               See: https://www.npmjs.org/package/deep-diff for more info.
  */
 BelkinWemo.prototype.onFirebaseData = function (diff, data, lastState, updateStatus) {
-
-  console.log("diff:");
   
   var self = this;
-  console.log(self.name);
   
   for(var i in diff) { // Loop through all the differences...
 
@@ -318,8 +315,7 @@ BelkinWemo.prototype.onFirebaseData = function (diff, data, lastState, updateSta
 
           // Set the device's state
           if(self.name != "wemo_motion") {
-            console.log("-------------------------");
-            console.log(rhs);
+
             self.wemoDevice.setBinaryState(rhs.toString(), function(error, result) {
 
             // !!! Note Belkin requires a string for some stupid reason. !!! //

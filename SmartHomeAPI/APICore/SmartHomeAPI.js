@@ -139,7 +139,7 @@ var SmartHome = function() {
   self.on("drivers loaded", function () {
 
     var Rules     = require("./Rules");     // The SmartHome Rules Module
-    //var Schedules = require("./Schedules"); // The SmartHome Schedules Module
+    var Schedules = require("./Schedules"); // The SmartHome Schedules Module
 
     // Get the network's WAN IP...
     WANIP(function (err, ip) {

@@ -178,6 +178,10 @@ var BaseDeviceObject = function (name, address, mac, port) {
           // Ensure the user has data for this device:
           UserConfig.update(self);
 
+          // Set the schedules for this device:
+          var Schedules = require("./Schedules");
+          Schedules.enforceSchedule(self);
+
           // Emit the "ready" event, signifying that the device is loaded and ready
           self.emit("ready");
 
@@ -192,7 +196,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
 
   Object.defineProperty(this, "updateStatus", // Updates the status of the device in firebase with the current device's settings
     {
-      value: function (status, message) { // Takes either a string or integer status code...
+      value: function (status, message, predefinedUser) { // Takes either a string or integer status code...
 
         if(typeof status == "string") status = status.toLowerCase();
 
@@ -217,7 +221,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
           status: status || "unknown",
           message: message || "none specified",
           timestamp: Date.now(),
-          user: user || "native device settings"
+          user: predefinedUser || user || "native device settings"
         }});
 
       },
@@ -290,6 +294,8 @@ var BaseDeviceObject = function (name, address, mac, port) {
 
   } // End setState()
 
+
+  // Alias for setState function...
   this.setState = setState;
 
 
@@ -300,7 +306,8 @@ var BaseDeviceObject = function (name, address, mac, port) {
    */
   var makeChanges = function (userSetting) {
 
-    console.log(userSetting.val());
+    // Remove any forced changes...
+    userSetting.ref().child("push").remove();
 
     // The 'this' keyword is bound to the user firebase reference.
     var user = this;
