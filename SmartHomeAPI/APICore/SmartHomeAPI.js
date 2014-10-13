@@ -491,7 +491,7 @@ var SmartHome = function() {
       if((Date.now() - scan.lastScan > APIConfig.devices.deviceDiscoverTimeout)) { 
 
         if(supportedDevices <= 0) { // Warn the user that no supported devices were found:
-            console.warn("No supported devices were found!\nNext network discovery scan will occur again in: " + (Date.now() - scan.lastScan - APIConfig.devices.scanInterval) + " ms.");
+            console.warn("No supported devices were found!\nNext network discovery scan will occur again in: " + APIConfig.devices.scanInterval + " ms.");
         }
 
         APIStatus.update({ status: "API Ready", last_startup_status: 0, code: 0 });
