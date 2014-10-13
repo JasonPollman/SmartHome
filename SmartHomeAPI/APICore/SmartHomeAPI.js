@@ -177,11 +177,7 @@ var SmartHome = function() {
     // Notify the user we are scanning the network...
     console.warn("Scanning network for connected devices. Please wait...");
 
-<<<<<<< HEAD
-    // Call the NetworkDiscover module
-=======
-    // Call the NetworkDiscover module, pass it the progress bar so it can animate its progress:
->>>>>>> 19749284de5835e68a70b6432ee4c8629ef0aefd
+    // Call the NetworkDiscover module,
     scan = new NetworkDiscover.scan();
 
     // When the discovery is complete, perform the anon-function:
