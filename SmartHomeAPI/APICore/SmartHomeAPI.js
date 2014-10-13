@@ -42,7 +42,7 @@ var SmartHome = function() {
 
   // What to do on uncaught exceptions....
   process.on("uncaughtException", function (e) {
-    console.error("An uncaught exception has occured:\n" + e.toString() + "\n\nThe API will now restart.");
+    console.error("An uncaught exception has occured:\n" + e.toString() + "\n\nThe API cannot continue.");
     APIStatus.update({ code: 1, status: "Error: " + e.message.toString(), reachable: false });
     throw e;
   });
@@ -138,9 +138,6 @@ var SmartHome = function() {
   // #6 ---> Setup the devices, based on the network devices connected:
   self.on("drivers loaded", function () {
 
-    var Rules     = require("./Rules");     // The SmartHome Rules Module
-    var Schedules = require("./Schedules"); // The SmartHome Schedules Module
-
     // Get the network's WAN IP...
     WANIP(function (err, ip) {
 
@@ -154,11 +151,17 @@ var SmartHome = function() {
     });
 
     scanNetwork.call();
+
+    // Once the network scan is complete load rules and schedules...
+    self.once("network scan complete", function () {
+      var Schedules = require("./Schedules"); // The SmartHome Schedules Module  
+      var Rules     = require("./Rules");     // The SmartHome Rules Module
+    });
     
   });
 
   // Set an interval to continuiously re-scan the network:
-  setInterval(scanNetwork, APIConfig.devices.scanInterval);
+  setInterval(scanNetwork, APIConfig.devices.scanInterval); 
 
   
   // <!----------------------------- END PROGRAM FLOW -----------------------------!>
@@ -171,18 +174,14 @@ var SmartHome = function() {
 
     APIStatus.update({ status: "Scanning Network for Connected Devices", code: 0, reachable: true });
 
-    // Progress bar animation... 
-    var bar = require('progress-bar').create(process.stdout);
-
     // Notify the user we are scanning the network...
     console.warn("Scanning network for connected devices. Please wait...");
 
-    // Call the NetworkDiscover module, pass it the progress bar so it can animate its progress:
-    scan = new NetworkDiscover.scan(bar);
+    // Call the NetworkDiscover module
+    scan = new NetworkDiscover.scan();
 
     // When the discovery is complete, perform the anon-function:
     scan.on("discovery complete", function (dev) {
-
 
       var devString = [];
       for(var i in dev) devString.push('    - ' + dev[i].name);
@@ -195,6 +194,8 @@ var SmartHome = function() {
 
       // Init all devices
       devicesInit(dev);
+
+      self.emit("network scan complete");
 
     });
   }
@@ -487,10 +488,10 @@ var SmartHome = function() {
     // Check to see that supported devices exits
     var devCheckInterval = setInterval(function () {
 
-      if((Date.now() - scan.lastScan > APIConfig.scanInterval)) { 
+      if((Date.now() - scan.lastScan > APIConfig.devices.deviceDiscoverTimeout)) { 
 
         if(supportedDevices <= 0) { // Warn the user that no supported devices were found:
-            console.warn("No supported devices were found!\nNext network discovery scan will occur again in: " + APIConfig.devices.scanInterval + " ms.");
+            console.warn("No supported devices were found!\nNext network discovery scan will occur again in: " + (Date.now() - scan.lastScan - APIConfig.devices.scanInterval) + " ms.");
         }
 
         APIStatus.update({ status: "API Ready", last_startup_status: 0, code: 0 });

@@ -9,8 +9,10 @@ module.exports = {
 
     packetLossThreshold: 20, // In percent (%)
 
-    scanInterval: 300000 // 5 Minutes in ms.
+    scanInterval: 300000, // 5 Minutes in ms.
 
+    deviceDiscoverTimeout: 1000 * 60 // 1 Minute
+    
   }, // End devices
 
   general: {

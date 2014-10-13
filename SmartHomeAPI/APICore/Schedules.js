@@ -29,6 +29,7 @@ var Schedules = function () {
   });
 
   console.notice("Schedules loading complete...");
+  self.emit("ready");
 
 
   /**

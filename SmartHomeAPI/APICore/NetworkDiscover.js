@@ -86,34 +86,53 @@ var NetworkDiscover = function () {
   var self = this;
   var pingsComplete = 0;
 
+  self.lastScan = Date.now();
+
   // Holds each device on the network:
   var devices;
 
+  var localIP = getLocalIP();
+  if(localIP instanceof Array) localIP = localIP[localIP.length -1];
+
   // Execute NMap
-  console.warn("Executing NMap on Local Network " + getLocalIP() + "...");
-  exec("nmap -sP " + getLocalIP() + "/24", function (error, stdout, stderr) {
+  console.warn("Executing NMap on Local Network " + localIP + "...");
+  exec("nmap -sP " + localIP + "/24", function (error, stdout, stderr) {
+
+    if(error) {
+      console.error(error);
+      return;
+    }
+
+    if(stderr) {
+      console.error(stderr);
+      return;
+    }
 
     devices = cleanNMap(stdout);
 
-    console.warn("Pinging " + Object.keys(devices).length + " devices to verify connectivity...");
+    console.warn("Pinging " + Object.keys(devices).length + " device(s) to verify connectivity...");
 
     // Ping each device to make sure we can connect to it.
     for(var i in devices) {
 
-
-      exec("ping " + (os.platform() == 'win32' ? "-n 3" : "-c 3 ") + devices[i].address, function (error, stdout, stderr) {
+      exec("ping " + (os.platform() == 'win32' ? "-n 3 " : "-c 3 ") + devices[i].address, function (error, stdout, stderr) {
 
         if(!(error || stderr)) {
           
           // The percentage of packet loss:
-          var loss = Number(stdout.match(/(\d+(\.\d+)?)\% packet loss/)[0].replace(/\% packet loss/, ''));
+          if(os.platform() == 'win32') {
+            var loss = Number(stdout.match(/(\d+(\.\d+)?)\% loss/ig)[0].replace(/\% loss/, ''));
+          }
+          else {
+            var loss = Number(stdout.match(/(\d+(\.\d+)?)\% packet loss/ig)[0].replace(/\% packet loss/, ''));
+          }
 
           // Drop the device, if the loss is above the threshold.
           if(loss > APIConfig.devices.packetLossThreshold) delete devices[i];
           
         }
 
-        console.notice("Ping Results:\n\n'" + stdout);
+        console.notice("Ping Results for " + devices[i].name + ":\n\n" + stdout);
         // Emit the event that this device was pinged
         self.emit("pinged");
 

@@ -32,6 +32,7 @@ var Rules = function () {
   });
 
   console.notice("Rules loading complete...");
+  self.emit("ready");
 
   /**
    * When a user changes a setting, if that setting matches a rule, implement the rule.
