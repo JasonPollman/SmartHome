@@ -132,7 +132,7 @@ var NetworkDiscover = function () {
           
         }
 
-        console.notice("Ping Results for " + ((devices[i] && devices[i].name) ? devices[i].name : "???") + ":\n\n" + stdout);
+        console.notice("Ping Results:\n\n" + stdout);
         // Emit the event that this device was pinged
         self.emit("pinged");
 
