@@ -171,14 +171,11 @@ var SmartHome = function() {
 
     APIStatus.update({ status: "Scanning Network for Connected Devices", code: 0, reachable: true });
 
-    // Progress bar animation... 
-    var bar = require('progress-bar').create(process.stdout);
-
     // Notify the user we are scanning the network...
     console.warn("Scanning network for connected devices. Please wait...");
 
     // Call the NetworkDiscover module, pass it the progress bar so it can animate its progress:
-    scan = new NetworkDiscover.scan(bar);
+    scan = new NetworkDiscover.scan();
 
     // When the discovery is complete, perform the anon-function:
     scan.on("discovery complete", function (dev) {
