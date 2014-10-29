@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <script src="js/jquery/jquery-2.1.1.min.js"></script>
+    <script src="js/jquery/jquery.mobile-1.4.4/jquery.mobile-1.4.4.min.js"></script>
+    <link rel="stylesheet" href="js/jquery/jquery.mobile-1.4.4/jquery.mobile-1.4.4.min.css">
+    <script src="https://cdn.firebase.com/js/client/1.1.2/firebase.js"></script>
+    <script src="js/firebaseHelper.js"></script>
+    <title></title>
+</head>
+<body>
+
+<div data-role="page" data-theme="b">
+    <div role="main" class="ui-content jqm-content">
+        <h2 id="deviceName"></h2>
+        <!--<div data-demo-html="true">
+            <form>
+                <label for="flip-2">Flip toggle switch:</label>
+                <select name="flip-2" id="flip-2" data-role="flipswitch" data-theme="b">
+                    <option value="off">Off</option>
+                    <option value="on">On</option>
+                </select>
+            </form>
+        </div>
+
+        <div data-demo-html="true">-->
+        <form>
+            <label for="powerToggle">Device on/off: </label>
+            <select id="powerToggle" name="powerToggle" data-role="flipswitch" class="ui-flipswitch" data-theme="b">
+                <option selected="" value="false">Off</option>
+                <option value="true">On</option>
+            </select>
+        </form>
+
+        <!--<form>
+            <label for="dimmer">Dimmer: </label>
+            <input type="range" name="dimmer" id="dimmer" data-highlight="true" min="0" max="255" value="255">
+        </form>
+
+        <form>
+            <label for="h">Hue: </label>
+            <div id="swatch" class="ui-widget-content ui-corner-all"></div>
+            <label for="h">h: </label>
+            <input type="range" name="h" id="h" data-highlight="true" min="0" max="359" value="359">
+            <label for="s">s: </label>
+            <input type="range" name="s" id="s" data-highlight="true" min="0" max="100" value="100">
+            <label for="l">l: </label>
+            <input type="range" name="l" id="l" data-highlight="true" min="0" max="100" value="100">
+        </form>-->
+        <!--</div>
+
+        <form>
+            <label for="flip-2">Flip toggle switch:</label>
+            <select name="flip-2" id="flip-2" data-role="flipswitch" data-theme="b">
+                <option value="off">Off</option>
+                <option value="on">On</option>
+            </select>
+        </form>-->
+
+        <!--<form>
+            <label for="power">Device on/off: </label>
+            <select name="power" id="power" data-role="flipswitch" data-theme="b">
+                <option value="false">Off</option>
+                <option value="true">On</option>
+            </select>
+        </form>-->
+    </div>
+</div>
+</body>
+<script src="js/widgets.js"></script>
+</html>

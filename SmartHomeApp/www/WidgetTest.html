@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <script src="js/jquery/jquery-2.1.1.min.js"></script>
+    <script src="js/jquery/jquery.mobile-1.4.4/jquery.mobile-1.4.4.min.js"></script>
+    <link rel="stylesheet" href="js/jquery/jquery.mobile-1.4.4/jquery.mobile-1.4.4.min.css">
+    <script src="https://cdn.firebase.com/js/client/1.1.2/firebase.js"></script>
+    <script src="js/firebaseHelper.js"></script>
+    <title></title>
+    <style>
+        #swatch {
+        width: 100%;
+        height: .5em;
+        background-image: none;
+      }
+    </style>
+</head>
+<body>
+
+<div data-role="page" data-theme="b">
+    <div role="main" class="ui-content jqm-content">
+        <h2 id="deviceName"></h2>
+        <!--<div data-demo-html="true">
+            <form>
+                <label for="flip-2">Flip toggle switch:</label>
+                <select name="flip-2" id="flip-2" data-role="flipswitch" data-theme="b">
+                    <option value="off">Off</option>
+                    <option value="on">On</option>
+                </select>
+            </form>
+        </div>
+
+        <div data-demo-html="true">-->
+        <form>
+            <label for="powerToggle">Device on/off: </label>
+            <select id="powerToggle" name="powerToggle" data-role="flipswitch" class="ui-flipswitch" data-theme="b">
+                <option selected="" value="false">Off</option>
+                <option value="true">On</option>
+            </select>
+        </form>
+
+        <!--<form>
+            <label for="dimmer">Dimmer: </label>
+            <input type="range" name="dimmer" id="dimmer" data-highlight="true" min="0" max="255" value="255">
+        </form>-->
+
+        <form>
+            <label for="h">Hue: </label>
+            <div id="swatch" class="ui-widget-content ui-corner-all ui-field-contain ui-grid-solo"></div>
+            <!--<label style="margin-right: 0;" for="h">h: </label>-->
+            <input type="range" name="h" id="h" data-highlight="true" min="0" max="65535" step="1"> 
+            <!--<label style="margin-right: 0;" for="s">s: </label>-->
+            <input type="range" name="s" id="s" data-highlight="true" min="0" max="100" step="1">
+            <!--<label style="margin-right: 0;" for="l">l: </label>-->
+            <input type="range" name="l" id="l" data-highlight="true" min="0" max="100" step="1">
+        </form>
+        
+        
+        
+        <fieldset data-role="controlgroup" data-type="horizontal">
+            <legend>Schedule:</legend>
+            <label for="day">Day</label>
+            <select name="day" id="day">
+                <option value="">Day</option>
+                <option value="0">M</option>
+                <option value="1">T</option>
+                <option value="2">W</option>
+                <option value="3">TH</option>
+                <option value="4">F</option>
+                <option value="5">SA</option>
+                <option value="6">S</option>
+            </select>
+            <label for="hour">Hour</label>
+            <select name="hour" id="hour">
+                <option value="">Hour</option>                
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+            </select>
+            <label for="minute">Minute</label>
+            <select name="minute" id="minute">
+                <option value="">Minute</option>
+                <option value="0">0</option>
+                <option value="15">15</option>
+                <option value="30">30</option>
+                <option value="30">45</option>
+            </select>
+            <label for="ampm">AMPM</label>
+            <select name="ampm" id="apmn">
+                <option value="am">AM</option>
+                <option value="pm">PM</option>
+            </select>
+        </fieldset>
+        
+        
+       <!-- <form>
+            <fieldset data-role="controlgroup" data-type="horizontal">
+                <legend>Schedule:</legend>
+                <input type="checkbox" name="m" id="m">
+                <label for="m">M</label>
+                <input type="checkbox" name="t" id="t">
+                <label for="t">T</label>
+                <input type="checkbox" name="w" id="w">
+                <label for="w">W</label>
+                <input type="checkbox" name="th" id="th">
+                <label for="th">T</label>
+                <input type="checkbox" name="f" id="f">
+                <label for="f">F</label>
+                <input type="checkbox" name="sa" id="sa">
+                <label for="sa">S</label>
+                <input type="checkbox" name="su" id="su">
+                <label for="su">S</label>
+            </fieldset>
+            <div data-role="rangeslider" data-track-theme="b" data-theme="b">
+                <label for="start">Time:</label>
+                <input type="range" name="start" id="start" min="0" max="1439" value="20">
+                <label for="stop">Time:</label>
+                <input type="range" name="stop" id="stop" min="0" max="1439" value="100">
+            </div>
+        </form>
+        <!--</div>
+
+        <form>
+            <label for="flip-2">Flip toggle switch:</label>
+            <select name="flip-2" id="flip-2" data-role="flipswitch" data-theme="b">
+                <option value="off">Off</option>
+                <option value="on">On</option>
+            </select>
+        </form>-->
+
+        <!--<form>
+            <label for="power">Device on/off: </label>
+            <select name="power" id="power" data-role="flipswitch" data-theme="b">
+                <option value="false">Off</option>
+                <option value="true">On</option>
+            </select>
+        </form>-->
+    </div>
+</div>
+</body>
+<script src="js/widgets.js"></script>
+</html>
