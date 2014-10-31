@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
-    <meta charset="UTF-8">
+    <!--<meta charset="UTF-8">-->
     <script src="js/jquery/jquery-2.1.1.min.js"></script>
     <script src="js/jquery/jquery.mobile-1.4.4/jquery.mobile-1.4.4.min.js"></script>
     <link rel="stylesheet" href="js/jquery/jquery.mobile-1.4.4/jquery.mobile-1.4.4.min.css">
@@ -20,7 +20,16 @@
 
 <div data-role="page" data-theme="b">
     <div role="main" class="ui-content jqm-content">
-        <h2 id="deviceName"></h2>
+       
+        <a  href="#popup"  style="color: #ffffff; text-decoration: none;display: block; font-size: 1.5em; font-weight: bold;" id="deviceName" data-rel="popup" data-transition="pop"></a>
+        <div data-role="popup" id="popup" lass="ui-corner-all">
+                <div style="padding: 10px;">
+                    <input type="text" name="newDeviceName" id="newDeviceName" placeholder="" data-theme="b">
+                 </div>
+        </div>
+        
+        
+        
         <!--<div data-demo-html="true">
             <form>
                 <label for="flip-2">Flip toggle switch:</label>

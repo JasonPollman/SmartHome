@@ -5,7 +5,7 @@ $(document).ready(function(){
 
     var user = "lismail";
     var deviceMAC = "00:17:88:14:C7:78";
-    var deviceDataPath = "/device_data/" + deviceMAC + "/";
+    var deviceDataPath = '/users/' + user + "/device_configs/" + deviceMAC + "/" +"config/";
     var lightConfigPath = '/users/' + user + "/device_configs/" + deviceMAC + "/" + "groups/1/action/";
     var WeMoMACs= ["08:86:3B:6D:95:25", "08:86:3B:71:32:A1"];
     console.log("Path: " + firebaseRef + lightConfigPath);
@@ -17,6 +17,18 @@ $(document).ready(function(){
     
     firebaseRef.child(deviceDataPath).once('value', function(data) {
         $('#deviceName').text(data.val().name);
+        $('#newDeviceName').attr("placeholder", data.val().name);
+    });
+    
+    /*On device name change via popup update header and firebase*/
+    
+    $('#newDeviceName').change(function() {
+        if ($('#deviceName').text() !== $('#newDeviceName').val()) {
+            $('#deviceName').text($('#newDeviceName').val())
+            firebaseRef.child(deviceDataPath).update({
+            name : $('#newDeviceName').val()
+            });
+        }
     });
 
     /*Power button toggle switch*/
