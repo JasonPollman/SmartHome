@@ -1,0 +1,11 @@
+/* Give something a drop shadow */
+.shadowed {
+    -webkit-filter: drop-shadow(0 10px 10px rgba(0,0,0,0.9));
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.9));
+    -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=10, Color='#444')";
+    filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=10, Color='#444')";
+}
+/* "SmartHome Red" */
+.smart-red {
+    color: #cc4125;
+}

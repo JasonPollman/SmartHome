@@ -40,3 +40,6 @@ Thumbs.db
 ###############
 bin/
 node_modules/
+
+# WebStorm Stuff #
+.idea/

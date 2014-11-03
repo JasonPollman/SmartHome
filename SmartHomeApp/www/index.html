@@ -1,46 +1,72 @@
 <!DOCTYPE html>
-<!--
-    Copyright (c) 2012-2014 Adobe Systems Incorporated. All rights reserved.
 
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-     KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
--->
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="msapplication-tap-highlight" content="no" />
-        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-        <link rel="stylesheet" type="text/css" href="css/index.css" />
-        <title>Hello World</title>
-    </head>
-    <body>
-        <div class="app">
-            <h1>PhoneGap</h1>
-            <div id="deviceready" class="blink">
-                <p class="event listening">Connecting to Device</p>
-                <p class="event received">Device is Ready</p>
-            </div>
-        </div>
-        <script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
-        <script type="text/javascript">
-            app.initialize();
-        </script>
-    </body>
+
+<head>
+	<title>SmartHome</title>
+
+	<meta charset="utf-8">
+	<meta name="viewport" id="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+	<link rel="stylesheet" href="themes/SmartHome.min.css" />
+	<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+	<link rel="stylesheet" href="lib/jquery/mobile/jquery.mobile.structure-1.4.5.min.css" />
+
+	<!-- Load various SmartHome stylesheets -->
+	<link rel="stylesheet" href="css/my-devices.css" />
+	<link rel="stylesheet" href="css/devices.css" />
+	<link rel="stylesheet" href="css/loading.css" />
+	<link rel="stylesheet" href="css/global.css" />
+
+	<!-- Load PhoneGap Libraries -->
+	<script src="scripts/index.js"></script>
+	<script>app.initialize();</script>
+
+	<!-- Using Local Copies of jQuery -->
+	<script src="lib/jquery/jquery-1.11.1.min.js"></script>
+	<script src="lib/jquery/mobile/jquery.mobile-1.4.5.min.js"></script>
+
+	<!-- Load the Firebase Library -->
+	<script src="lib/firebase/firebase.js"></script>
+
+	<!-- Load the SmartHome JS Library *** After Everything Else! *** -->
+	<script src="scripts/smarthome.js"></script>
+
+	<!-- Load the SmartHome Application Actions *** -->
+	<script src="scripts/actions.js"></script>
+
+	<!-- Bootstrap the App *** This script should only be present within the index.html file *** -->
+	<script src="scripts/bootstrap.js"></script>
+
+	<script>
+		/**
+		 * Makes the jQuery Mobile "Content" Page portion exhume the rest of the screen...
+		 */
+		$(function () {
+			var screen = $.mobile.getScreenHeight(),
+					header = $(".ui-header").hasClass("ui-header-fixed") ? $(".ui-header").outerHeight() - 1 : $(".ui-header").outerHeight(),
+					footer = $(".ui-footer").hasClass("ui-footer-fixed") ? $(".ui-footer").outerHeight() - 1 : $(".ui-footer").outerHeight(),
+					contentCurrent = $(".ui-content").outerHeight() - $(".ui-content").height(),
+					content = screen - header - footer - contentCurrent;
+			$(".ui-content").height(content);
+
+		});
+	</script>
+
+</head>
+<body>
+
+	<!-- The "Loading" Page -->
+	<div data-role="page" data-theme="a" id="loading-page">
+		<div data-role="content" data-theme="a">
+			<div id="content-wrapper">
+				<img id="hero" class="shadowed" src="img/loading-img.png" />
+				<h1>Smart<span class="smart-red">Home</span></h1>
+				<!-- Bootstrapping Messages Go Here -->
+				<div id="bootstrap-msg"></div>
+			</div>
+		</div>
+	</div>
+
+</body>
 </html>

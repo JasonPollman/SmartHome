@@ -1,0 +1,25 @@
+img.device-icon {
+    width: 64px;
+    height: 64px;
+}
+div.device-icon-wrapper {
+    text-align: center;
+    margin: 10px;
+    display: inline-block;
+}
+div#my-devices-page,
+div#my-devices-content {
+    text-align: center;
+}
+div.not-connected img {
+    -webkit-filter: grayscale(100%);
+    -moz-filter: grayscale(100%);
+    filter: grayscale(100%);
+    opacity: .6;
+}
+p.device-icon-text {
+    font-size: 12px;
+}
+#my-devices a {
+    text-decoration: none;
+}

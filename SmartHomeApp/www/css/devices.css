@@ -1,0 +1,8 @@
+.color-swatch {
+
+    width: auto;
+    margin: 25px auto auto auto;
+
+    min-width: 100px;
+    min-height: 25px;
+}
