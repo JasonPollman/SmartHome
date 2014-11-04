@@ -48,7 +48,7 @@ var messageInterval = setInterval(function () {
     }
     else {
         Bootstrap.ready = true;
-        $.mobile.changePage('pages/' + MY_DEVICES_PAGE);
+        $.mobile.changePage(MY_DEVICES_PAGE);
         clearInterval(messageInterval);
     }
 
@@ -108,11 +108,9 @@ $(function () {
 
         } // End if/else block
 
-        FIREBASE_OBJ.once("value", function (data) {
+        FIREBASE_OBJ.on("value", function (data) {
 
             data = data.val();
-
-            console.log(data);
 
             Bootstrap.push("Loading Users...");
             global[USERS_GLOBAL] = data.users;

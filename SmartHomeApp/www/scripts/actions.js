@@ -22,8 +22,6 @@ $(function () { // Wait until the DOM is ready ==> $()
             var to = $.mobile.path.parseUrl(to).filename.replace(/(.*)\.(.*)/ig, '$1');
             var from = $(from).attr("id");
 
-            console.log(to, from);
-
             if (from !== 'loading-page' && to === 'index') {
 
                 e.preventDefault();

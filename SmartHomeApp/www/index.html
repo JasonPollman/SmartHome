@@ -8,11 +8,15 @@
 	<meta charset="utf-8">
 	<meta name="viewport" id="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-	<link rel="stylesheet" href="themes/SmartHome.min.css" />
-	<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
 	<link rel="stylesheet" href="lib/jquery/mobile/jquery.mobile.structure-1.4.5.min.css" />
+	<link rel="stylesheet" href="lib/jquery/mobile/jquery.mobile.icons-1.4.5.min.css" />
+	<link rel="stylesheet" href="lib/native-droid/css/jquerymobile.nativedroid.css" />
+	<link rel="stylesheet" href="lib/native-droid/css/jquerymobile.nativedroid.dark.css" />
+	<link rel="stylesheet" href="lib/native-droid/css/jquerymobile.nativedroid.color.green.css" />
+	<link rel="stylesheet" href="lib/native-droid/css/font-awesome.min.css" />
 
 	<!-- Load various SmartHome stylesheets -->
+	<link rel="stylesheet" href="css/reset.css" />
 	<link rel="stylesheet" href="css/my-devices.css" />
 	<link rel="stylesheet" href="css/devices.css" />
 	<link rel="stylesheet" href="css/loading.css" />
@@ -48,7 +52,9 @@
 					footer = $(".ui-footer").hasClass("ui-footer-fixed") ? $(".ui-footer").outerHeight() - 1 : $(".ui-footer").outerHeight(),
 					contentCurrent = $(".ui-content").outerHeight() - $(".ui-content").height(),
 					content = screen - header - footer - contentCurrent;
-			$(".ui-content").height(content);
+			$(".ui-content").each(function () {
+				$(this).height(content);
+			});
 
 		});
 	</script>
@@ -57,13 +63,13 @@
 <body>
 
 	<!-- The "Loading" Page -->
-	<div data-role="page" data-theme="a" id="loading-page">
-		<div data-role="content" data-theme="a">
+	<div data-role="page" data-theme="b" id="loading-page">
+		<div data-role="content" data-theme="b">
 			<div id="content-wrapper">
-				<img id="hero" class="shadowed" src="img/loading-img.png" />
-				<h1>Smart<span class="smart-red">Home</span></h1>
+				<img id="hero" class="shadowed" src="img/loading-2.gif" />
+				<h1>Smart<span class="smart-color">Home</span></h1>
 				<!-- Bootstrapping Messages Go Here -->
-				<div id="bootstrap-msg"></div>
+				<div id="bootstrap-msg">Bootstrapping SmartHome v1.0</div>
 			</div>
 		</div>
 	</div>

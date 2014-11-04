@@ -44,7 +44,27 @@ function injectWidgets(page, params) {
 
         var widgets = data.val();
 
-        for(var i in widgets) {
+        var aWidgets = [];
+        for(var q in widgets) {
+            aWidgets.push([q, widgets[q]]);
+        }
+
+        aWidgets.sort(function (a, b) {
+
+            aZ = a[1].z || 0;
+            bZ = b[1].z || 0;
+
+            if(aZ < bZ) return -1;
+            if(bZ < aZ) return 1;
+            return 0;
+        });
+
+        var sWidgets = {};
+        for(var o in aWidgets) {
+            sWidgets[aWidgets[o][0]] = aWidgets[o][1];
+        }
+
+        for(var i in sWidgets) {
 
             var swatch = {};
 
@@ -56,12 +76,19 @@ function injectWidgets(page, params) {
                 throw new Error("A 'type' property is required for widget '" + i + '".');
             }
 
-            if(widgets[i].path.match(/\*/g)) { // Multiple Paths
+            if(!widgets[i].info) {
+                throw new Error("An 'info' property is required for widget '" + i + '".');
+            }
 
-                var path = widgets[i].path.split(/\//g); // Split by '/'
+            if(!widgets[i].name) {
+                throw new Error("A 'name' property is required for widget '" + i + '".');
+            }
 
-                var REF  = '';
+            var path = widgets[i].path.split(/\//g); // Split by '/'
 
+            var REF  = '';
+
+            if(path.length > 1) {
                 for(var n in path) {
 
                     if (path[n] == '*') {
@@ -72,19 +99,31 @@ function injectWidgets(page, params) {
                         path[n] = null;
                     }
 
-                } // End inner for loop
+                }
+            } // End inner for loop
 
-                (function (i, path) {
+            (function (i, path) {
 
-                    var pathRef = FIREBASE_USER_DATA_OBJ.child(device.mac + "/" + REF);
+                var pathRef = (path.length <= 1) ? FIREBASE_USER_DATA_OBJ.child(device.mac) : FIREBASE_USER_DATA_OBJ.child(device.mac + "/" + REF);
 
-                    FIREBASE_USER_DATA_OBJ.child(device.mac + "/" + REF).once("value", function (data) {
+                pathRef.once("value", function (data) {
 
-                        var REFS = [];
+                    var REFS = [];
 
-                        var i = this;
+                    var i = this;
 
-                        var paths = data.val();
+                    var paths = data.val();
+
+                    if(path.length <= 1) {
+                        var obj = {};
+
+                        obj.path = pathRef;
+                        obj.delta = 0;
+                        obj.title = UCFirst(pathRef.child(path[0]).name());
+                        obj.set = path[0];
+                        REFS.push(obj);
+                    }
+                    else {
                         for (var k in paths) {
 
                             var obj = {};
@@ -95,11 +134,13 @@ function injectWidgets(page, params) {
                             REFS.push(obj);
 
                         }
+                    }
 
-                        for (var r in REFS) {
+                    for (var r in REFS) {
 
-                            swatch[r] = {};
+                        swatch[r] = {};
 
+                        if(path.length > 1) {
                             for (var x in path) {
                                 if (path[x] != null && path[x] != "*" && x != path.length - 1) {
                                     REFS[r].path += "/" + path[x];
@@ -108,167 +149,113 @@ function injectWidgets(page, params) {
                                     REFS[r].set = path[x];
                                 }
                             }
+                        }
 
-                            REFS[r].path += "/";
+                        REFS[r].path += "/";
 
-                            $(".widgets-wrapper").append('<div data-role="collapsible-set" class="widget-container" id="widget-' + i + "-" + r + '"></div>');
+                        $(".widgets-wrapper").append('<div class="widget-container" id="widget-' + i + "-" + r + '"></div>');
 
-                            if(!$("#" + device.name + "-" + REFS[r].delta).length) {
 
-                                $('.widgets-wrapper #widget-' + i + "-" + r)
-                                    .prepend('<div data-role="collapsible" data-collapsed="true" id="' + device.name + "-" + REFS[r].delta + '"></div>');
+                        if(!$("#" + device.name + "-" + REFS[r].delta).length) {
 
-                                $("#" + device.name + "-" + REFS[r].delta)
-                                    .append('<h3>' + REFS[r].title + " " + REFS[r].delta + '</h3>')
-                            }
+                            $('.widgets-wrapper #widget-' + i + "-" + r)
+                                .prepend('<div data-content-theme="b" data-role="collapsible" data-collapsed="true" id="' + device.name + "-" + REFS[r].delta + '"></div>');
 
                             $("#" + device.name + "-" + REFS[r].delta)
-                                .append('<label for="' +  device.name + "-" + REFS[r].delta + '-' + i + '">' + UCFirst(REFS[r].set) +'</label>')
-                                .append('<div class="widget-wrapper-' + i + '"></div>');
+                                .append('<h3 class="ui-bar-b">' + REFS[r].title + ((REFS.length > 1) ? " " + REFS[r].delta : "" ) + '</h3>');
+                        }
 
-                            $("#" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i).load("../widgets/" + widgets[i].type + ".html", function (data) {
-
-                                var i = this[0];
-                                var r = this[1];
-
-                                $(".widgets-wrapper").trigger("create");
-
-                                var e_plain = "#" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i + ' .widget';
-                                var e = $("#" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i + ' .widget');
-
-                                $(e).attr("name", i + "-" + REFS[r].delta);
-                                $(e).attr("id", "widget-" + i + "-" + REFS[r].delta + '-' + i);
-                                $(e).attr("data-highlight", true);
-                                $(e).attr("min", widgets[i].min);
-                                $(e).attr("max", widgets[i].max);
-                                $(e).attr("step", widgets[i].step);
-                                $(e).addClass(i + " delta-" + r);
-
-                                // *** USE .on("slidestop") ON SLIDERS SO THAT  WE DON'T FLOOD THE DEVICES! *** //
-                                if($(e).attr("data-type") == "range") {
-
-                                    $(e).on("slidestop", function () {
-                                        var obj = {}
-                                        obj[i] = $(this).val();
-                                        new Firebase(REFS[r].path).update(obj);
-                                    });
-
-                                }
-                                else {
-                                    $(e).change(function () {
-                                        var obj = {}
-                                        obj[i] = $(this).val();
-                                        new Firebase(REFS[r].path).update(obj);
-                                    });
-                                }
+                        $("#" + device.name + "-" + REFS[r].delta)
+                            .append('<div></div><h4>' + UCFirst(widgets[i].name) +'</h4>' +
+                                '<p><i class="fa fa-info-circle"></i>' + widgets[i].info +'</p>' +
+                                '<div class="widget-wrapper-' + i + '"></div></div>');
 
 
-                                if(widgets[i].swatch) swatch[r][i] = $(e);
+                        $("#" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i).load(WIDGETS_DIRECTORY + "/" + widgets[i].type + ".html", function (data) {
 
-                                // Set the current value as default slider value...
-                                new Firebase(REFS[r].path + i).once("value", function(data) {
-                                    $(e).val(data.val().toString());
-                                    if($(e).slider) $(e).slider("refresh");
-                                    initializeSwatches();
+                            var i = this[0];
+                            var r = this[1];
+
+                            $("#" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i).trigger("create");
+
+                            var e = $("#" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i + ' .widget');
+
+                            $(e).attr("name", i + "-" + REFS[r].delta);
+                            $(e).attr("id", "widget-" + i + "-" + REFS[r].delta + '-' + i);
+                            $(e).attr("data-highlight", true);
+                            $(e).attr("min", widgets[i].min);
+                            $(e).attr("max", widgets[i].max);
+                            $(e).attr("step", widgets[i].step);
+                            $(e).addClass(i + " delta-" + r);
+                            $(e).addClass("z-" + widgets[i].z);
+
+                            // *** USE .on("slidestop") ON SLIDERS SO THAT  WE DON'T FLOOD THE DEVICES! *** //
+                            if($(e).attr("data-type") == "range") {
+
+                                $(e).on("slidestop", function () {
+                                    var obj = {}
+                                    obj[i] = $(this).val();
+                                    new Firebase(REFS[r].path).update(obj);
                                 });
 
-                                if(swatch[r].hue && swatch[r].sat && swatch[r].bri)
+                            }
+                            else {
+                                $(e).change(function () {
+                                    var obj = {};
+                                    obj[REFS[r].set] = $(this).val();
+                                    new Firebase(REFS[r].path).update(obj);
+                                });
+                            }
+
+
+                            if(widgets[i].swatch) swatch[r][i] = $(e);
+
+                            // Set the current value as default slider value...
+                            // Using "on" for 2-way data binding
+                            new Firebase(REFS[r].path + REFS[r].set).once("value", function(data) {
+                                $(e).val(data.val().toString());
+                                if($(e).attr("data-type") == "range") $(e).slider("refresh");
+
+                                if(swatch[r].hue && swatch[r].sat && swatch[r].bri) {
                                     buildSwatch(swatch[r], "#" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i);
+                                }
+                            });
 
-                            }.bind([i, r])); // End $.get()
+                            new Firebase(REFS[r].path).on("value", function(data) {
+                                var val = data.val();
+                                for(var m in val) {
+                                    if (m == REFS[r].set) {
+                                        $(e).val(val[m]);
+                                        if($(e).attr("data-type") == "range") $(e).slider("refresh");
+                                    }
+                                }
+                            });
 
-
-                        } // End for(var r in REFS)
-
-
-
-
-                    }.bind(i));
-
-                    $(".widgets-wrapper").trigger("create");
-
-                })(i, path); // End Anon-Function
-
-            }
-            else {
-
-                $(".widgets-wrapper").append('<div class="widget-container" id="widget-' + i + "-" + "0" + '"></div>');
-
-                $(".widgets-wrapper #widget-" + i + "-" + "0").load("../widgets/" + widgets[i].type + ".html", function (data) {
-
-                    var pathRef = FIREBASE_USER_DATA_OBJ.child(device.mac + "/");
-
-                    var i = this;
-
-                    var path = widgets[i].path.split(/\//g); // Split by '/'
-
-                    var e = $(".widgets-wrapper .widget");
-
-                    var e = $(".widgets-wrapper #widget-" + i + "-" + "0 .widget");
-                    $(e).attr("name", i);
-                    $(e).attr("id", "widget-" + i);
-                    $(e).attr("data-highlight", true);
-                    $(e).addClass(i);
-
-                    if(widgets[i].min) $(e).attr("min", widgets[i].min);
-                    if(widgets[i].max) $(e).attr("max", widgets[i].max);
-                    if(widgets[i].max) $(e).attr("max", widgets[i].max);
-                    if(widgets[i].step) $(e).attr("step", widgets[i].step);
+                        }.bind([i, r])); // End $.get()
 
 
-                    if(!$("#" + device.name).length) {
-                        $(".widgets-wrapper")
-                            .prepend('<div id="' + device.name + '"></div>');
-                    }
+                    } // End for(var r in REFS)
 
-                    $("#" + device.name)
-                        .append('<label for="' + i +'">' + UCFirst(i) +'</label>')
+                }.bind(i));
 
-                    // Set the current value as default slider value...
-                    new Firebase(pathRef + "/" + i).once("value", function(data) {
-                        $(e).val(data.val().toString()).slider("refresh");
-                    });
+            })(i, path); // End Anon-Function
 
-                    // *** USE .on("slidestop") ON SLIDERS SO THAT  WE DON'T FLOOD THE DEVICES! *** //
-                    if($(e).attr("data-type") == "range") {
-
-                        $(e).on("slidestop", function () {
-                            var obj = {}
-                            obj[i] = $(this).val();
-                            new Firebase(pathRef + "/" + path.slice(0, -1).join("/")).update(obj);
-                        });
-
-                    }
-                    else {
-                        $(e).change(function () {
-                            var obj = {}
-                            obj[i] = $(this).val();
-                            new Firebase(pathRef + "/" + path.slice(0, -1).join("/")).update(obj);
-                        });
-                    }
-
-                    $(".widgets-wrapper #widget-" + i + "-" + "0").trigger("create");
-
-                }.bind(i)); // End $.get()
-
-            } // End for(widgets)
-
-        }
-
+        } // End for(widgets)
 
     });
 
-    var swatches = [];
     function buildSwatch(swatch, container) {
 
-        $("<div>").load("../widgets/color-swatch.html", function() {
+        $("<div>").load(WIDGETS_DIRECTORY + "/color-swatch.html", function() {
 
             $(container).append($(this));
 
             var swatchElem = this;
-            swatches.push({ swatchElement: this, swatchData: swatch });
 
             for(var i in swatch) {
+
+                $(this).find(".color-swatch").css("background-color", "hsl(" + ($(swatch.hue).val()/182.04) + "," + ($(swatch.sat).val()/2.55) + "%," + ($(swatch.bri).val()/2.55) + "%)");
+
                 $(swatch[i]).on("change", function () {
                     $(swatchElem).find(".color-swatch").css("background-color", "hsl(" + ($(swatch.hue).val()/182.04) + "," + ($(swatch.sat).val()/2.55) + "%," + ($(swatch.bri).val()/2.55) + "%)");
                 });
@@ -277,16 +264,6 @@ function injectWidgets(page, params) {
         });
 
     } // End buildSwatch()
-
-
-    function initializeSwatches() {
-        for(var i in swatches) {
-            var swatch = swatches[i].swatchData;
-            $(swatches[i].swatchElement).find(".color-swatch").css("background-color", "hsl(" + ($(swatch.hue).val()/182.04) + "," + ($(swatch.sat).val()/2.55) + "%," + ($(swatch.bri).val()/2.55) + "%)");
-        }
-    }
-
-
 
 
 } // End injectWidgets

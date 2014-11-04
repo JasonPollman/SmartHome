@@ -1,11 +1,33 @@
 /* Give something a drop shadow */
+body {
+    background-color: black;
+}
 .shadowed {
     -webkit-filter: drop-shadow(0 10px 10px rgba(0,0,0,0.9));
     filter: drop-shadow(0 10px 10px rgba(0,0,0,0.9));
-    -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=10, Color='#444')";
-    filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=10, Color='#444')";
+}
+.shadowed-close {
+    -webkit-filter: drop-shadow(0 3px 3px rgba(0,0,0,0.9));
+    filter: drop-shadow(0 3px 3px rgba(0,0,0,0.9));
 }
 /* "SmartHome Red" */
-.smart-red {
-    color: #cc4125;
+.smart-color {
+    color: #B6DB49;
+}
+.fa:before {
+    padding-right: 10px;
+}
+.em {
+    font-style: oblique;
+}
+.ui-btn:after {
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.blIcon {
+    margin-right: 0 !important;
+}
+.ui-slider-switch .ui-slider-label-b {
+    position: relative;
+    display: block;
 }

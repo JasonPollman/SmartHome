@@ -1,0 +1,40 @@
+<!-- The "My Devices" Page -->
+<div data-role="page" data-theme="b" id="my-devices">
+
+    <div data-role="header" data-position="fixed" role="banner" data-theme="b" data-tap-toggle="false">
+        <a href="#" data-rel="back" data-role="button" role="button"><i class="fa fa-arrow-circle-left"></i></a>
+        <h1>My SmartDevices</h1>
+    </div>
+
+    <div data-role="content" data-theme="b" id="my-devices-content">
+        <!-- Inject Device Icons -->
+    </div>
+
+    <div data-role="footer" class="ui-bar-b" data-position="fixed" data-theme="b" data-role="footer" role="contentinfo" data-tap-toggle="false">
+        <div data-role="navbar" role="navigation" data-tap-toggle="false">
+            <ul>
+                <li>
+                    <a href="my-devices.html" class="ui-btn-active" data-transition="slide">
+                        <i class="blIcon fa fa-cog"></i><br />
+                        <span>My Devices</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="schedules.html" data-transition="slide">
+                        <i class="blIcon fa fa-calendar"></i><br />
+                        <span>Schedules</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="rules.html" data-transition="slide">
+                        <i class="blIcon fa fa-wrench"></i><br />
+                        <span>Rules</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Load the device icons -->
+    <script src="scripts/loadDevices.js"></script>
+</div>

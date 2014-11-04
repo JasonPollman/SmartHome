@@ -31,6 +31,8 @@ var BOOTSTRAP_MSG_ELEMENT      = "#bootstrap-msg";
 var DEVICE_ICON_DIR            = "img/device-icons";
 var DEFAULT_DEVICE_ICON        = "default.png";
 
+var WIDGETS_DIRECTORY          = "widgets";
+
 
 // <------------------------------------------- USEFUL METHODS -------------------------------------------> //
 // *** NOTE THAT ALL FUNCTIONS ARE PREFIXED WITH '$SH_' TO PREVENT NAMESPACE ISSUES! ***

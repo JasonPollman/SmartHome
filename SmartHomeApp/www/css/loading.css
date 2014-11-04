@@ -1,25 +1,13 @@
-@import url(http://fonts.googleapis.com/css?family=Oswald:400,700,300);
-
-body {
-    background-image: url("../img/bkg.png");
-}
 #loading-page,
 #loading-page div {
     margin: auto;
     text-align: center;
     text-shadow: none !important;
-    font-size: 14px;
-}
-#loading-page .ui-content {
-    background-image: url("../img/bkg.jpg");
-    background-size: cover;
-    color: white;
 }
 #loading-page img#hero {
     width:  50%;
     height: 50%;
     max-width: 390px;
-    margin-bottom: 5%;
 }
 #loading-page h1 {
     text-shadow: 0px 5px 10px rgba(0, 0, 0, 1); !important;
@@ -35,4 +23,12 @@ body {
     -webkit-transform: translateY(-50%);
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
+}
+#loading-page #content-wrapper #bootstrap-msg {
+    font-size: 12px;
+    white-space: nowrap;
+    max-width: 90%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: #f081f0;
 }

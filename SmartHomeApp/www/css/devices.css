@@ -1,8 +1,18 @@
 .color-swatch {
 
     width: auto;
-    margin: 25px auto auto auto;
+    margin: 25px auto 10px auto;
 
     min-width: 100px;
     min-height: 25px;
+
+    border-radius: 10px;
+
+}
+.widgets-wrapper {
+    padding: 10px;
+}
+.ui-collapsible-inset.ui-collapsible-themed-content .ui-collapsible-content {
+    border: none !important;
+    padding: 10px;
 }
