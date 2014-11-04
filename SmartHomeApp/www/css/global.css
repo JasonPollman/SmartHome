@@ -31,3 +31,6 @@ body {
     position: relative;
     display: block;
 }
+.center {
+    text-align: center;
+}

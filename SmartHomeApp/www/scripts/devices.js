@@ -225,7 +225,7 @@ function injectWidgets(page, params) {
                                 var val = data.val();
                                 for(var m in val) {
                                     if (m == REFS[r].set) {
-                                        $(e).val(val[m]);
+                                        $(e).val(val[m]).trigger("change");
                                         if($(e).attr("data-type") == "range") $(e).slider("refresh");
                                     }
                                 }

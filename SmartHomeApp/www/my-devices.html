@@ -4,6 +4,9 @@
     <div data-role="header" data-position="fixed" role="banner" data-theme="b" data-tap-toggle="false">
         <a href="#" data-rel="back" data-role="button" role="button"><i class="fa fa-arrow-circle-left"></i></a>
         <h1>My SmartDevices</h1>
+        <a href='#about' data-rel='popup' data-position-to='window' data-role='button' data-transition='pop' data-inline='true'>
+            <i class="fa fa-bolt"></i>
+        </a>
     </div>
 
     <div data-role="content" data-theme="b" id="my-devices-content">
@@ -35,6 +38,23 @@
         </div>
     </div>
 
+    <!-- The "About" Page -->
+    <div data-role='popup' id='about' data-theme='b'>
+        <div data-role='header' data-theme='b'>
+          <h1>The SmartHome Project</h1>
+        </div>
+        <div data-role='content' data-theme='b'>
+            <h2>About</h2>
+            <p>Project developed by Jason Pollman, Michael Battaglia, Lawrence Ismail & Patrick Sinnot.</p>
+          <div class='center'>
+           <a href='#' data-rel='back' data-role='button' data-inline='true'>
+            <i class="fa fa-check-circle-o"></i>Okay</a>
+          </div>
+        </div>
+    </div>
+
+
     <!-- Load the device icons -->
     <script src="scripts/loadDevices.js"></script>
+
 </div>

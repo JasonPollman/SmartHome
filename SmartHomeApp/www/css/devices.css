@@ -16,3 +16,11 @@
     border: none !important;
     padding: 10px;
 }
+img#motion-indicator {
+    margin-top: 10px;
+    width: 50%;
+    max-width: 379px;
+}
+.motion-widget-wrapper {
+    text-align: center;
+}
