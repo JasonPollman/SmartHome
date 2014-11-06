@@ -1,17 +1,25 @@
-"use strict"
+"use strict";
 
 var ConflictResolution = function () {
 
-  var lastUsersObj = {};
+  var lastUsersObject = {};
 
   Object.defineProperty(this, "resolve",
     {
-      value: function (usersObj, userSetting, currentSettings) {
+      value: function (usersObject, userSetting, currentSettings) {
 
+
+        self.emit("Conflict Resolution", usersObject, userSetting);
+        
         // Pre-State
-        if(lastUsersObj == {} || Object.keys(lastUsersObj) == 0) lastUsersObj = usersObj;
+        // Save original state for testing reference
+        var preState = usersObject;
+        
+        // Logic to initialize the object if it is empty
+        if(lastUsersObject == {} || Object.keys(lastUsersObject) == 0) lastUsersObject = usersObject;
 
         // DO SOMETHING...
+        // TODO: Conflict Resolution code here.
 
         // Return the currentSettings,
         // Modified currentSettings,
@@ -20,16 +28,21 @@ var ConflictResolution = function () {
         var message = "message";
 
         // Post-State
-        lastUsersObj = usersObj;
+        // Save state to LastUserObject after 
+        // conflict resolution logic resolves the issue
+        lastUsersObject = usersObject;
+        
+        //Save post-state for testing reference
+        var postState = usersObject;
 
         return { setting: newSetting, msg: message }
       },
       configurable: false,
       writable: false,
-      enumerable: false,
+      enumerable: false
     }
   );
 
-}
+};
 
 module.exports = new ConflictResolution();
