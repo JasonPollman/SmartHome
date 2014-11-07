@@ -1,5 +1,8 @@
-.color-swatch {
+/**
+ * CSS for any widgets should go here...
+ */
 
+.color-swatch {
     width: auto;
     margin: 25px auto 10px auto;
 
@@ -7,7 +10,7 @@
     min-height: 25px;
 
     border-radius: 10px;
-
+    border: 2px solid rgba(255, 255, 255, 0.14902);
 }
 .widgets-wrapper {
     padding: 10px;

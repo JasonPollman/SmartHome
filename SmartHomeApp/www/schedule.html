@@ -1,0 +1,162 @@
+<!-- So this page cannot be directly accessed -->
+<head>
+    <script>
+        window.location.href = "index.html";
+    </script>
+</head>
+
+
+<!-- The Device-Schedule Page -->
+<div data-role="page" data-theme="b" id="schedule" data-content-theme="b">
+
+    <!-- Page Header -->
+    <div data-role="header" id="schedule-page-header" data-position="fixed" data-theme="b" data-tap-toggle="false">
+        <a href="#" data-rel="back" data-role="button" role="button"><i class="fa fa-arrow-circle-left"></i></a>
+        <h1 data-theme="b" class="schedule-name"><!-- Inject Schedule Name --></h1>
+        <a href='#schedule-message' data-rel='popup' data-position-to='window' data-role='button' data-transition='pop' data-inline='true'>
+            <i class="fa fa-times"></i>
+        </a>
+    </div>
+
+    <div data-role="content" data-theme="b" data-content-theme="b" id="schedule-content">
+
+        <div class="wrapper input-wrapper" data-theme="b">
+            <div data-theme="b" data-role="collapsible">
+                <h3 data-theme="b" data-tap-toggle="false">
+                    Schedule Settings
+                </h3>
+
+                <form>
+
+                    <input type="text" name="schedule-input-name" id="schedule-input-name" value="" data-clear-btn="true" placeholder="Schedule Name...">
+
+                    <label for="schedule-input-device">Device</label>
+                    <select id="schedule-input-device" name="schedule-input-device">
+                        <!-- Inject Device Options -->
+                    </select>
+
+                    <label for="days-checkboxes">Day/Time:</label>
+                    <br />
+                    <div id="days-checkboxes" class="ui-controlgroup-controls">
+
+                        <div>
+                            <label for="sun">Sunday</label>
+                            <input type="checkbox" name="sun" id="sun" checked="" value="0">
+                        </div>
+                        <div>
+                            <label for="mon">Monday</label>
+                            <input type="checkbox" name="mon" id="mon" checked="" value="1">
+                        </div>
+                        <div>
+                            <label for="tue">Tuesday</label>
+                            <input type="checkbox" name="tue" id="tue" checked="" value="2">
+                        </div>
+                        <div>
+                            <label for="wed">Wednesday</label>
+                            <input type="checkbox" name="wed" id="wed" checked="" value="3">
+                        </div>
+                        <div>
+                            <label for="thu">Thrusday</label>
+                            <input type="checkbox" name="thu" id="thu" checked="" value="4">
+                        </div>
+                        <div>
+                            <label for="fri">Friday</label>
+                            <input type="checkbox" name="fri" id="fri" checked="" value="5">
+                        </div>
+                        <div>
+                            <label for="sat">Saturday</label>
+                            <input type="checkbox" name="sat" id="sat" checked="" value="6">
+                        </div>
+
+                    </div>
+
+                    <label for="schedule-input-hour">Hour</label>
+                    <select name="schedule-input-hour" id="schedule-input-hour">
+                        <option id="hour-1">1</option>
+                        <option id="hour-2">2</option>
+                        <option id="hour-3">3</option>
+                        <option id="hour-4">4</option>
+                        <option id="hour-5">5</option>
+                        <option id="hour-6">6</option>
+                        <option id="hour-7">7</option>
+                        <option id="hour-8">8</option>
+                        <option id="hour-9">9</option>
+                        <option id="hour-10">10</option>
+                        <option id="hour-11">11</option>
+                        <option id="hour-12">12</option>
+                    </select>
+
+                    <label for="schedule-input-minute">Minute</label>
+                    <select name="schedule-input-minute" id="schedule-input-minute">
+                        <option id="minute-00">00</option>
+                        <option id="minute-05">05</option>
+                        <option id="minute-10">10</option>
+                        <option id="minute-15">15</option>
+                        <option id="minute-20">20</option>
+                        <option id="minute-25">25</option>
+                        <option id="minute-30">30</option>
+                        <option id="minute-35">35</option>
+                        <option id="minute-40">40</option>
+                        <option id="minute-45">45</option>
+                        <option id="minute-50">50</option>
+                        <option id="minute-55">55</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        <div class="wrapper">
+            <div data-theme="b" data-role="collapsible">
+                <h3 data-theme="b" data-tap-toggle="false" style="font-weight: normal">
+                    Device Settings
+                </h3>
+                <div class="widgets-wrapper">
+                    <!-- Inject Widgets -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Popup -->
+        <div data-role="popup" data-theme="b" id="schedule-message">
+            <div data-role="header" data-theme="b">
+                <h1 id="#schedule-message-h1">Delete Schedule?</h1>
+            </div>
+            <div data-role="content" data-theme="b" class="popup">
+                <p id="schedule-message-content">Are you sure you want to delete this schedule?</p>
+                <p>This action cannot be undone.</p>
+                <a href='#' id="delete-schedule" data-theme="b" data-rel='back' data-iconpos='left' data-role='button' data-inline='true'>
+                    <i class="fa fa-check"></i>Delete</a>
+                <a href='schedules.html' data-theme="b" data-iconpos='left' data-role='button' data-inline='true'>
+                    <i class="fa fa-times"></i>Cancel
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Page Footer -->
+    <div data-role="footer" class="ui-bar-b" data-position="fixed" data-theme="b" data-role="footer" role="contentinfo" data-tap-toggle="false">
+        <div data-role="navbar" role="navigation" data-tap-toggle="false">
+            <ul>
+                <li>
+                    <a href="my-devices.html" data-transition="slide" data-direction="reverse">
+                        <i class="blIcon fa fa-cog"></i><br />
+                        <span>My Devices</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="schedules.html" data-transition="slide">
+                        <i class="blIcon fa fa-calendar"></i><br />
+                        <span>Schedules</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="rules.html" data-transition="slide">
+                        <i class="blIcon fa fa-wrench"></i><br />
+                        <span>Rules</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

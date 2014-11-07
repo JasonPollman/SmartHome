@@ -16,19 +16,29 @@
 	<link rel="stylesheet" href="lib/native-droid/css/font-awesome.min.css" />
 
 	<!-- Load various SmartHome stylesheets -->
-	<link rel="stylesheet" href="css/reset.css" />
 	<link rel="stylesheet" href="css/my-devices.css" />
 	<link rel="stylesheet" href="css/devices.css" />
 	<link rel="stylesheet" href="css/loading.css" />
 	<link rel="stylesheet" href="css/global.css" />
+	<link rel="stylesheet" href="css/schedules.css" />
+	<link rel="stylesheet" href="css/rules.css" />
 
 	<!-- Load PhoneGap Libraries -->
 	<script src="scripts/index.js"></script>
-	<script>app.initialize();</script>
 
 	<!-- Using Local Copies of jQuery -->
 	<script src="lib/jquery/jquery-1.11.1.min.js"></script>
 	<script src="lib/jquery/mobile/jquery.mobile-1.4.5.min.js"></script>
+
+	<script type="text/javascript">
+		// jQuery Mobile supports PhoneGap!
+		// We just need to set a few values:
+		$.support.cors = true;
+		$(document).bind("mobileinit", function(){
+			$.mobile.phonegapNavigationEnabled = true;
+			$.mobile.allowCrossDomainPages = true;
+		});
+	</script>
 
 	<!-- Load the Firebase Library -->
 	<script src="lib/firebase/firebase.js"></script>
@@ -42,22 +52,20 @@
 	<!-- Bootstrap the App *** This script should only be present within the index.html file *** -->
 	<script src="scripts/bootstrap.js"></script>
 
-	<script>
-		/**
-		 * Makes the jQuery Mobile "Content" Page portion exhume the rest of the screen...
-		 */
-		$(function () {
-			var screen = $.mobile.getScreenHeight(),
-					header = $(".ui-header").hasClass("ui-header-fixed") ? $(".ui-header").outerHeight() - 1 : $(".ui-header").outerHeight(),
-					footer = $(".ui-footer").hasClass("ui-footer-fixed") ? $(".ui-footer").outerHeight() - 1 : $(".ui-footer").outerHeight(),
-					contentCurrent = $(".ui-content").outerHeight() - $(".ui-content").height(),
-					content = screen - header - footer - contentCurrent;
-			$(".ui-content").each(function () {
-				$(this).height(content);
-			});
+	<!-- For the "My Devices" Page -->
+	<script src="scripts/loadDevices.js"></script>
 
-		});
-	</script>
+	<!-- For the "Device" Page -->
+	<script src="scripts/devices.js"></script>
+
+	<!-- For the "Schedules" Page -->
+	<script src="scripts/schedules.js"></script>
+
+	<!-- For the "Schedule" Page -->
+	<script src="scripts/schedule.js"></script>
+
+	<!-- For the "Rules" Page -->
+	<script src="scripts/rules.js"></script>
 
 </head>
 <body>
@@ -65,14 +73,28 @@
 	<!-- The "Loading" Page -->
 	<div data-role="page" data-theme="b" id="loading-page">
 		<div data-role="content" data-theme="b">
+
 			<div id="content-wrapper">
 				<img id="hero" class="shadowed" src="img/loading-2.gif" />
-				<h1>Smart<span class="smart-color">Home</span></h1>
+				<h1 id="hero-text">Smart<span class="smart-color">Home</span></h1>
 				<!-- Bootstrapping Messages Go Here -->
 				<div id="bootstrap-msg">Bootstrapping SmartHome v1.0</div>
 			</div>
+
+			<!-- Error Popup -->
+			<div data-role="popup" data-theme="b" id="error-message">
+				<div data-role="header" data-theme="b">
+					<h1>SmartHome App Error</h1>
+				</div>
+				<div data-role="content" data-theme="b" class="popup">
+					<p id="error-message-content"></p>
+					<a href='#' data-theme="b" data-rel='back' data-iconpos='left' data-role='button' data-inline='true'>Okay</a>
+				</div>
+			</div>
+
 		</div>
 	</div>
+
 
 </body>
 </html>

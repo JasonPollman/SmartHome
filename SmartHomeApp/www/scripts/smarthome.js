@@ -3,6 +3,7 @@ var global = window;
 
 
 // <------------------------------------------- GLOBAL SETTINGS ------------------------------------------> //
+
 var PAGE_TRANSITION_TYPE       = "slide";
 var GET_PARAMETERS_GLOBAL_NAME = "$SH_GetParams";
 
@@ -12,21 +13,32 @@ var SCHEDULES_GLOBAL    = "$SH_Schedules";
 var DEVICES_GLOBAL      = "$SH_Devices";
 var CONN_DEVICES_GLOBAL = "$SH_Conn_Devices";
 
-var USER                    = "jason";
-var FIREBASE_USER_DATA      = "https://smarthomeapp.firebaseio.com/users/" + USER + "/device_configs/";
-var FIREBASE_USER_DATA_OBJ  = new Firebase(FIREBASE_USER_DATA);
+var FIREBASE_ROOT              = "https://smarthomeapp.firebaseio.com/";
+var FIREBASE_OBJ               = new Firebase(FIREBASE_ROOT);
+var FIREBASE_DEVICE_DATA       = FIREBASE_ROOT + "device_data";
+var FIREBASE_DEVICE_DATA_OBJ   = new Firebase(FIREBASE_DEVICE_DATA);
+var FIREBASE_CONN_DATA         = FIREBASE_ROOT + "connected_devices";
+var FIREBASE_CONN_DATA_OBJ     = new Firebase(FIREBASE_CONN_DATA);
+
+var FIREBASE_SCHEDULES         = FIREBASE_ROOT + "schedules";
+var FIREBASE_SCHEDULES_OBJ     = new Firebase(FIREBASE_SCHEDULES);
+var FIREBASE_RULES             = FIREBASE_ROOT + "rules";
+var FIREBASE_RULES_OBJ         = new Firebase(FIREBASE_RULES);
+
+var DEVICE_SETTINGS_PATH       = "settings";
+
+var BOOTSTRAP_MSG_ELEMENT      = "#bootstrap-msg";
+var BOOTSTRAP_MSG_INTERVAL     = 200; // In MS.
+
+var USER                     = "jason";
+var FIREBASE_USER_DATA       = FIREBASE_ROOT + "/users/" + USER + "/device_configs/";
+var FIREBASE_USER_DATA_OBJ   = new Firebase(FIREBASE_USER_DATA);
+var FIREBASE_USER_STATUS     = FIREBASE_ROOT + "/users/" + USER + "/last_request/";
+var FIREBASE_USER_STATUS_OBJ = new Firebase(FIREBASE_USER_STATUS);
 
 var SPLASH_PAGE     = "index.html";
 var MY_DEVICES_PAGE = "my-devices.html";
 var DEVICES_PAGE    = "devices.html";
-
-var FIREBASE_ROOT              = "https://smarthomeapp.firebaseio.com/";
-var FIREBASE_OBJ               = new Firebase(FIREBASE_ROOT);
-var FIREBASE_DEVICE_DATA       = "https://smarthomeapp.firebaseio.com/device_data";
-var FIREBASE_DEVICE_DATA_OBJ   = new Firebase(FIREBASE_DEVICE_DATA);
-var DEVICE_SETTINGS_PATH       = "settings";
-var BOOTSTRAP_MSG_INTERVAL     = 350; // In MS.
-var BOOTSTRAP_MSG_ELEMENT      = "#bootstrap-msg";
 
 var DEVICE_ICON_DIR            = "img/device-icons";
 var DEFAULT_DEVICE_ICON        = "default.png";
@@ -46,6 +58,7 @@ var WIDGETS_DIRECTORY          = "widgets";
 global.$SH_GetParameters = function(url) {
 
     var pageURL     = (!url) ? window.location.search.substring(1) : url.split(/\?/)[1];
+    console.log(pageURL);
     var vars        = pageURL.split('&');
     var params      = {};
 

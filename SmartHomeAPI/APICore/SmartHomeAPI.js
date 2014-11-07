@@ -53,16 +53,23 @@ var SmartHome = function() {
     APIStatus.update({ last_msg_received: Date.now() });
   })
 
-  // On program exit, we need to notify firebase, and cleanup...
-  var exitNotification = function (code) {
 
+  /**
+   * Perform back-end shutdown operations...
+   * Remove all connected devices, etc.
+   *
+   */
+  var shutdown = function () {
+
+    deviceFirebase.remove();
     console.warn("\n\nSmart Home API Server v" + APIConfig.general.version + " Shutting Down...");
     APIStatus.update({ reachable: false, last_shutdown_status: 0, last_shutdown: Date.now() }, function () {
       process.exit(0);
     });
-  }
 
-  process.on("SIGINT", exitNotification);
+  } // End shutdown()
+
+  process.on("SIGINT", shutdown);
 
   // <!------------------------- PRIVATE GLOBAL VARIABLES -------------------------!>
 
@@ -89,8 +96,9 @@ var SmartHome = function() {
 
   var Devices = require("./Devices.js");
 
-  // The firebase location for all devices connected to the network...
+  // The firebase location for all devices **connected** to the network...
   var deviceFirebase = new Firebase(APIConfig.general.firebaseRootURI + '/' + APIConfig.general.firebaseAllDevicesPath);
+  console.log(deviceFirebase.toString());
 
   // All network devices
   var networkDevices = undefined;

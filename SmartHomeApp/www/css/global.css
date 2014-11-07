@@ -1,7 +1,9 @@
+/**
+ * General purpose CSS should go here...
+ */
+
+
 /* Give something a drop shadow */
-body {
-    background-color: black;
-}
 .shadowed {
     -webkit-filter: drop-shadow(0 10px 10px rgba(0,0,0,0.9));
     filter: drop-shadow(0 10px 10px rgba(0,0,0,0.9));
@@ -32,5 +34,20 @@ body {
     display: block;
 }
 .center {
-    text-align: center;
+    text-align: center !important;
+}
+.widget.ui-slider-input {
+    border-radius: 10px;
+    z-index: 99;
+    position: relative;
+}
+.ui-listview li p {
+    margin: 0;
+    line-height: 18px;
+}
+.wrapper {
+    padding: 10px;
+}
+.ui-btn {
+    background-color: #282828;
 }

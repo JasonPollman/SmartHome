@@ -1,21 +1,86 @@
-$(document).on("pagecreate", "#device-page", function () { // When the "device" page is inserted into the DOM...
+$(document).on("pagecreate", "#schedule", function () { // When the "device" page is inserted into the DOM...
 
     /**
-     * Flow for adding widgets to the "My Devices" page...
+     * Flow for adding widgets to the "Schedule" page...
      */
-    var devicePage = "#device-page";
-    var params = $SH_GetParameters($(devicePage).attr("data-url"));
+    var params = $SH_GetParameters($(this).attr("data-url"));
+
+    var schedule;
 
     if (!params.id && !params.value) { // Verify that we have the correct URL parameters...
         throw new Error("Missing required URL parameters");
     }
     else { // Pump the page full of widgets...
 
-        injectWidgets(devicePage, params);
+        // Match the device to the URL 'id' query string parameter
+        for (var i in global[SCHEDULES_GLOBAL]) {
+            if (i.replace(/[^a-z0-9_]/ig, '-').toUpperCase() == params.id.toUpperCase()) {
+                schedule = global[SCHEDULES_GLOBAL][i];
+                schedule.name = i.replace(/[^a-z0-9_:]/ig, ' ');
+                schedule.key = i;
+            }
+        }
+
+        // The schedule doesn't exist for some reason, even though we iterated through the SCHEDULES_GLOBAL,
+        // this should never happen.
+        if (!schedule)
+            throw new Error("Unable to find schedule. The schedule '" + schedule.name + "' does not exist.");
+
+        injectSettings("#schedule", params, schedule);
+        injectWidgets("#schedule", params, schedule);
+
+        $("#schedule-input-device").change(function () {
+
+            schedule.device = $(this).val();
+            schedule.setting_path = [];
+            schedule.setting_value = [];
+
+            FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+
+            $(".widgets-wrapper").empty();
+            injectWidgets("#schedule", params, schedule);
+            global[resizeHeight]();
+        });
+
+        $("#schedule-input-device").change(function () {
+
+            schedule.device = $(this).val();
+            schedule.setting_path = [];
+            schedule.setting_value = [];
+
+            FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+
+            $(".widgets-wrapper").empty();
+            injectWidgets("#schedule", params, schedule);
+            global[resizeHeight]();
+        });
+
+        $("#delete-schedule").click(function (e) {
+
+            e.stopPropagation();
+            e.preventDefault();
+
+            FIREBASE_SCHEDULES_OBJ.child(schedule.key).remove();
+            $.mobile.changePage('schedules.html');
+            return;
+        });
     }
 
 }); // End $(document).on("pagecreate")
 
+$(document).on("pagebeforecreate", "#schedule", function () { // When the "device" page is inserted into the DOM...
+    var keys = Object.keys(global[DEVICES_GLOBAL]);
+    for (var i in global[DEVICES_GLOBAL]) {
+        $("#schedule-input-device").append('<option ' + ((keys[0] == i) ? "selected" : "") + ' value="' + global[DEVICES_GLOBAL][i].mac + '">' + UCFirst(global[DEVICES_GLOBAL][i].name.replace(/[^a-z0-9]/ig, ' ')) + '</option>')
+    }
+});
+
+
+
+function injectSettings(page, params) {
+
+
+}
 
 /**
  * Injects the device page with widgets based on the "widgets"
@@ -24,27 +89,28 @@ $(document).on("pagecreate", "#device-page", function () { // When the "device" 
  * @param page      - The page in which we are injecting the widgets.
  * @param params    - The URL query string arguments
  */
-function injectWidgets(page, params) {
+function injectWidgets(page, params, schedule) {
 
     // Cleanup the parameters, formatting them all pretty like.
     var params = $SH_CleanParams(params);
 
-    // Pair the device based on the parameter "id" (MAC) value
     var device;
 
-    // Match the device to the URL 'id' query string parameter
-    for (var i in global[DEVICES_GLOBAL])
-        if (i.toUpperCase() == params.id.toUpperCase()) device = global[DEVICES_GLOBAL][i];
+    for (var i in global[DEVICES_GLOBAL]) {
+        if (global[DEVICES_GLOBAL][i].mac == schedule.device) {
+            device = global[DEVICES_GLOBAL][i];
+        }
+    }
 
     // The device doesn't exist for some reason, even though we iterated through the DEVICES_GLOBAL,
     // this should never happen.
     if (!device)
-        throw new Error("Unable to pair device to URL parameters. The device " + params.id + " does not exist.");
+        throw new Error("Unable to pair device to schedule. The device " + schedule.device + " does not exist.");
 
     // <---------------------- Begin jQuery Widget Injection ---------------------->
 
     // Make the page header the device's name
-    $(page + " h1.device-name").html(params.name);
+    $(page + " h1.schedule-name").html(UCFirst(schedule.name));
 
     FIREBASE_DEVICE_DATA_OBJ.child(device.mac).child("widgets").once("value", function (data) {
 
@@ -237,60 +303,44 @@ function injectWidgets(page, params) {
                             $(e).addClass(i + " delta-" + r);
                             $(e).addClass("z-" + widgets[i].z);
 
-                            // *** USE .on("slidestop") ON SLIDERS SO THAT  WE DON'T FLOOD THE DEVICES! *** //
-                            if ($(e).attr("data-type") == "range") {
+                            $(e).change(function () {
 
-                                $(e).on("slidestop", function () {
-                                    var obj = {}
-                                    obj[i] = $(this).val();
-                                    new Firebase(REFS[r].path).update(obj);
-                                });
+                                var i = this[0];
+                                var r = this[1];
 
-                            }
-                            else { // Not a range slider...
+                                var value = $(e).val();
 
-                                $(e).change(function () {
+                                FIREBASE_SCHEDULES_OBJ.child(schedule.key).once("value", function (data) {
 
-                                    var obj = {};
-                                    obj[REFS[r].set] = $(this).val();
+                                    var sch = data.val();
 
-                                    new Firebase(REFS[r].path).update(obj, function (error) {
+                                    if(!sch.setting_value) sch.setting_value = [];
+                                    if(!sch.setting_path) sch.setting_path = [];
 
-                                        var err = $("#device-error-message");
+                                    console.log(sch);
 
-                                        // Show popup-error if there was an error updating Firebase
-                                        if(status == 1) {
-                                            $(err).popup({ autoOpen: false });
-                                            $(err).html("Unable to connect to sync data with the SmartHome database. Try again in a few moments.");
-                                            $(err).trigger("create");
-                                            $(err).popup("open");
-                                        }
+                                    console.log(encodeURIComponent(device.mac));
+                                    var schPath = REFS[r].path.split(encodeURIComponent(device.mac))[1].replace(/^\/|\/$/g, '') + "/" + REFS[r].set;
 
-                                        FIREBASE_USER_STATUS_OBJ.child(device.mac).once("value", function (data) {
+                                    var index = -1;
 
-                                            var status = data.val();
+                                    if(sch.setting_path.indexOf(schPath) > -1) {
+                                        index = sch.setting_path.indexOf(schPath);
+                                        sch.setting_path[index] = schPath;
+                                        sch.setting_value[index] = value;
+                                    }
+                                    else {
+                                        sch.setting_path.push(schPath);
+                                        sch.setting_value.push(value);
+                                    }
 
-                                            if(status.device_response.status != 0) { // The device returned an error:
-
-                                                var msg;
-                                                if(status.status) msg = status.status.replace(/[^a-z0-9\s]/ig, " ");
-
-                                                $("#device-error-message-content").html(UCFirst(msg || "Unexpected Error"));
-                                                $("#device-error-message").trigger("create");
-                                                $("#device-error-message").popup("open");
-
-                                                $(document).on("pageshow", function () {
-                                                    $("#device-error-message").popup("close");
-                                                });
-                                            }
-
-                                        });
-
+                                    FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(sch, function () {
+                                        console.log("HERE");
                                     });
 
-                                }); // End $(e).change()
+                                }.bind(this));
 
-                            } // End if/else block
+                            }.bind([i, r])); // End $(e).change()
 
                             // The widget has defined itself as part of a swatch
                             if (widgets[i].swatch) swatch[r][i] = $(e);

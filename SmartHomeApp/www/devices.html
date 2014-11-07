@@ -1,17 +1,38 @@
+<!-- So this page cannot be directly accessed -->
+<head>
+    <script>
+        window.location.href = "index.html";
+    </script>
+</head>
+
+
 <!-- The Devices Page -->
-<div data-role="page" data-theme="b" id="device-page">
+<div data-role="page" data-theme="b" id="device-page" data-content-theme="b">
     <div data-role="header" id="device-page-header" data-position="fixed" data-theme="b" data-tap-toggle="false">
         <a href="#" data-rel="back" data-role="button" role="button"><i class="fa fa-arrow-circle-left"></i></a>
-        <h1 class="device-name"><!-- Inject Device Name --></h1>
+        <h1 data-theme="b" class="device-name"><!-- Inject Device Name --></h1>
     </div>
 
     <div data-role="content" data-theme="b" id="devices-content">
+
         <div class="widgets-wrapper">
             <h2 data-theme="b" data-tap-toggle="false">
                 Device Controls
             </h2>
             <!-- Inject Widgets -->
         </div>
+
+        <!-- Error Popup -->
+        <div data-role="popup" data-theme="b" id="device-error-message">
+            <div data-role="header" data-theme="b">
+                <h1>Oops! Something Went Wrong...</h1>
+            </div>
+            <div data-role="content" data-theme="b" class="popup">
+                <p id="device-error-message-content"><!-- Inject Error Message --></p>
+                <a href='#' data-theme="b" data-rel='back' data-iconpos='left' data-role='button' data-inline='true'>Okay</a>
+            </div>
+        </div>
+
     </div>
 
     <div data-role="footer" class="ui-bar-b" data-position="fixed" data-theme="b" data-role="footer" role="contentinfo" data-tap-toggle="false">
@@ -38,22 +59,4 @@
             </ul>
         </div>
     </div>
-
-    <!-- Call the devices.js script -->
-    <script src="scripts/devices.js"></script>
-
-    <script>
-        /**
-         * Makes the jQuery Mobile "Content" Page portion exhume the rest of the screen...
-         */
-        $(function () {
-                console.log("EXECUTING HERE");
-        var screen = $.mobile.getScreenHeight(),
-                header = $(".ui-header").hasClass("ui-header-fixed") ? $(".ui-header").outerHeight() - 1 : $(".ui-header").outerHeight(),
-                footer = $(".ui-footer").hasClass("ui-footer-fixed") ? $(".ui-footer").outerHeight() - 1 : $(".ui-footer").outerHeight(),
-                contentCurrent = $(".ui-content").outerHeight() - $(".ui-content").height();
-                var content = screen - header - footer - contentCurrent;
-        $("#devices-content").css("min-height", content + "px"); });
-    </script>
-
 </div>

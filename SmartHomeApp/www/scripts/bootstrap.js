@@ -1,6 +1,3 @@
-// Incase we want to make this a non-browser thing, this could be changed to global = global in node. :P
-var global = window;
-
 /**
  * SmartHome Bootstrap Process
  * Verifies Firebase & API Connectivity
@@ -12,53 +9,43 @@ var global = window;
 var Bootstrap = {
 
     status   : -1,
-    messages: [],
-
-    ready: false,
+    errorMessage: "",
 
     // Adds a message to the messages array...
-    push: function (msg, status) {
+    push: function (msg, status, errorMessage) {
 
-        this.messages.push(msg);
+        if(status != undefined) this.status = status;
+        if(errorMessage) this.errorMessage = errorMessage;
 
-        if(status == 0) {
-            this.push("SmartHome App Ready!", Infinity);
+        $(BOOTSTRAP_MSG_ELEMENT).html(msg);
+
+        if(this.status == 0) {
+            $.mobile.changePage(MY_DEVICES_PAGE);
+            this.status = Infinity;
+
+            // Must make this null so the Firebase code below doesn't push anymore once we're bootstrapped.
+            // TOOK ME 4 HOURS TO FIGURE THIS OUT, FML
+            this.push = function () {}
+
+            return;
         }
 
-        // Rewrite the push function so we don't print any further messages
-        if(this.status > -1) this.push = function () {};
-
-        this.status = status;
+        if(status == 1) {
+            $("#hero").attr("src", "img/loading-img.png");
+            $("#error-message").popup({autoOpen: false});
+            $("#error-message-content").html(Bootstrap.errorMessage);
+            $("#error-message").trigger("create");
+            $("#error-message").popup("open");
+        }
 
     } // End Bootstrap.push()
 
 }; // End Bootstrap object
 
-
 /**
- * Displays boot messages at a regular interval, and continues to push new messages to the output
- * until the boot status is either 1 (error) or 0 (successful boot).
- *
- * This will also ensure that callback functions get their chance to push messages...
+ * On document ready, we'll verify the following to ensure the SmartHome App is ready..document).on("pagecreate", "#loading-page", .
  */
-var messageInterval = setInterval(function () {
-
-    if(Bootstrap.messages.length > 0) {
-        $(BOOTSTRAP_MSG_ELEMENT).html(Bootstrap.messages.shift());
-    }
-    else {
-        Bootstrap.ready = true;
-        $.mobile.changePage(MY_DEVICES_PAGE);
-        clearInterval(messageInterval);
-    }
-
-}, BOOTSTRAP_MSG_INTERVAL); // End messageInterval
-
-
-/**
- * On document ready, we'll verify the following to ensure the SmartHome App is ready...
- */
-$(function () {
+$(document).one("pagecreate", "#loading-page", function () {
 
     // Set the initial state of the Bootstrap message
     Bootstrap.push("Loading SmartHome App...");
@@ -67,7 +54,8 @@ $(function () {
 
     // Check for Firebase Connection:
     if(!FIREBASE_OBJ) {
-        Bootstrap.push("Unable to connect to SmartHome Firebase Server<br />SmartHome cannot continue...", 1)
+        Bootstrap.push("Unable to connect to SmartHome Firebase Server", 1, "Unable to connect to SmartHome Firebase Server<br />SmartHome cannot continue...");
+        return;
     }
     else {
         Bootstrap.push("Successfully connected to the SmartHome database...");
@@ -78,55 +66,59 @@ $(function () {
     FIREBASE_OBJ.child("api_status").once("value", function (data) {
         var values = data.val();
         if(values.reachable != true) {
-            Bootstrap.push("Error connecting to the SmartHome API!<br />SmartHome cannot continue...", 1);
+            Bootstrap.push("Error connecting to the SmartHome API!", 1, "The SmartHome Network API is not connected.<br />The SmartHome App Cannot Continue.");
+            return;
         }
         else {
             Bootstrap.push("Successfully connected to the SmartHome API...");
         }
+
+        // Try to pull in some connected devices...
+        FIREBASE_OBJ.child("connected_devices").once("value", function (data) {
+
+            var values = data.val();
+
+            if(!values) { // We didn't detect any devices...
+
+                Bootstrap.push("No smart devices detected!");
+
+            }
+            else { // Network devices detected...
+
+                Bootstrap.push("Successfully retrieved list of connected network devices...");
+
+                for(var i in values) {
+                    (values[i].supported) ?
+                        Bootstrap.push('Found supported device <span class="Bootstrap-device">' + values[i].name + '...</span>') :
+                        Bootstrap.push('Found unsupported device <span class="Bootstrap-device">' + values[i].name + '...</span>') ;
+
+                } // End for loop
+
+            } // End if/else block
+
+            FIREBASE_OBJ.on("value", function (data) {
+
+                data = data.val();
+
+                Bootstrap.push("Loading Users...");
+                global[USERS_GLOBAL] = data.users;
+
+                Bootstrap.push("Loading Rules...");
+                global[RULES_GLOBAL] = data.rules;
+
+                Bootstrap.push("Loading Schedules...");
+                global[SCHEDULES_GLOBAL] = data.schedules;
+
+                Bootstrap.push("Loading Device Settings...");
+                global[DEVICES_GLOBAL] = data.device_data;
+                global[CONN_DEVICES_GLOBAL] = data.connected_devices;
+
+                Bootstrap.push("SmartHome App Ready!", 0);
+
+            });
+
+        }); // End FIREBASE_OBJ.child("connected_devices").once()
+
     });
-
-    // Try to pull in some connected devices...
-    FIREBASE_OBJ.child("connected_devices").once("value", function (data) {
-
-        var values = data.val();
-
-        if(!values) { // We didn't detect any devices...
-
-            Bootstrap.push.html("No smart devices detected!", 1);
-
-        }
-        else { // Network devices detected...
-
-            Bootstrap.push("Successfully retrieved list of connected network devices...");
-
-            for(var i in values) {
-                (values[i].supported) ?
-                    Bootstrap.push('Found supported device <span class="Bootstrap-device">' + values[i].name + '...</span>') :
-                    Bootstrap.push('Found unsupported device <span class="Bootstrap-device">' + values[i].name + '...</span>') ;
-
-            } // End for loop
-
-        } // End if/else block
-
-        FIREBASE_OBJ.on("value", function (data) {
-
-            data = data.val();
-
-            Bootstrap.push("Loading Users...");
-            global[USERS_GLOBAL] = data.users;
-
-            Bootstrap.push("Loading Rules...");
-            global[RULES_GLOBAL] = data.rules;
-
-            Bootstrap.push("Loading Schedules...");
-            global[SCHEDULES_GLOBAL] = data.schedules;
-
-            Bootstrap.push("Loading Device Settings...", 0);
-            global[DEVICES_GLOBAL] = data.device_data;
-            global[CONN_DEVICES_GLOBAL] = data.connected_devices;
-
-        });
-
-    }); // End FIREBASE_OBJ.child("connected_devices").once()
 
 });

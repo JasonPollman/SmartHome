@@ -1,3 +1,7 @@
+/**
+ * CSS for the "My Devices" page only...
+ */
+
 #my-devices #my-connected-devices .not-connected img {
     -webkit-filter: grayscale(100%);
     -moz-filter: grayscale(100%);

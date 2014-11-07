@@ -1,13 +1,37 @@
+<!-- So this page cannot be directly accessed -->
+<head>
+    <script>
+        window.location.href = "index.html";
+    </script>
+</head>
+
 <!-- The "Schedules" Page -->
 <div data-role="page" data-theme="b" id="schedules">
 
     <div data-role="header" data-position="fixed" role="banner" data-theme="b" data-tap-toggle="false">
         <a href="#" data-rel="back" data-role="button" role="button"><i class="fa fa-arrow-circle-left"></i></a>
         <h1>Device Schedules</h1>
+        <a href='#' id="add-schedule" data-position-to='window' data-role='button' data-transition='pop' data-inline='true'>
+            <i class="fa fa-plus"></i>
+        </a>
     </div>
 
-    <div data-role="content" data-theme="b" id="schedules-content">
-        <!-- Inject Schedules -->
+    <div data-role="content" data-theme="b" data-content-theme="b" id="schedules-content">
+        <ul data-role="listview" id="my-schedules">
+            <!-- Inject Schedules -->
+            <li id="pseduo-schedule">
+                <a href="#" class="schedule-href">
+                    <img src="img/schedules.png">
+                    <h3 class="schedule-title">Schedule Name</h3>
+                    <p class="em">For Device: <span class="schedule-device">Philips Hue</span></p>
+                    <p>
+                        <span class="schedule-days">S, M, T, W, TH, F, S</span>
+                        @
+                        <span class="schedule-time">6:30 PM</span></span>
+                    </p>
+                </a>
+            </li>
+        </ul>
     </div>
 
     <div data-role="footer" class="ui-bar-b" data-position="fixed" data-theme="b" data-role="footer" role="contentinfo" data-tap-toggle="false">
