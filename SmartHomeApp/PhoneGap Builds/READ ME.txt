@@ -1,0 +1,10 @@
+https://build.phonegap.com/apps
+
+ZIP the WWW folder, upload to website.
+
+Send yourself the application on Android, to install just click on the .apk package. 
+
+Still working on iOS, waiting for certificate to be finalized. 
+
+
+- Battaglia
