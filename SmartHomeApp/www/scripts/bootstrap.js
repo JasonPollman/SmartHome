@@ -20,11 +20,15 @@ var Bootstrap = {
         $(BOOTSTRAP_MSG_ELEMENT).html(msg);
 
         if(this.status == 0) {
-            $.mobile.changePage(MY_DEVICES_PAGE);
+
+            setTimeout(function () {
+                $.mobile.changePage(MY_DEVICES_PAGE);
+            }, 1000);
+
             this.status = Infinity;
 
             // Must make this null so the Firebase code below doesn't push anymore once we're bootstrapped.
-            // TOOK ME 4 HOURS TO FIGURE THIS OUT, FML
+            // TOOK ME 4 HOURS TO FIGURE THIS OUT, FTW!
             this.push = function () {}
 
             return;
@@ -113,7 +117,7 @@ $(document).one("pagecreate", "#loading-page", function () {
                 global[DEVICES_GLOBAL] = data.device_data;
                 global[CONN_DEVICES_GLOBAL] = data.connected_devices;
 
-                Bootstrap.push("SmartHome App Ready!", 0);
+                Bootstrap.push("SmartHome App Starting...", 0);
 
             });
 

@@ -51,3 +51,7 @@
 .ui-btn {
     background-color: #282828;
 }
+input[type="text"] {
+    color: white !important;
+    font-size: 17px !important;
+}

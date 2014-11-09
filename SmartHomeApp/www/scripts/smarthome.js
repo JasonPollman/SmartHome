@@ -31,6 +31,8 @@ var BOOTSTRAP_MSG_ELEMENT      = "#bootstrap-msg";
 var BOOTSTRAP_MSG_INTERVAL     = 200; // In MS.
 
 var USER                     = "jason";
+var FIREBASE_USER_ROOT       = FIREBASE_ROOT + "/users/" + USER;
+var FIREBASE_USER_ROOT_OBJ   = new Firebase(FIREBASE_USER_ROOT);
 var FIREBASE_USER_DATA       = FIREBASE_ROOT + "/users/" + USER + "/device_configs/";
 var FIREBASE_USER_DATA_OBJ   = new Firebase(FIREBASE_USER_DATA);
 var FIREBASE_USER_STATUS     = FIREBASE_ROOT + "/users/" + USER + "/last_request/";
@@ -44,6 +46,21 @@ var DEVICE_ICON_DIR            = "img/device-icons";
 var DEFAULT_DEVICE_ICON        = "default.png";
 
 var WIDGETS_DIRECTORY          = "widgets";
+
+
+var USER_COLOR                 = "lib/native-droid/css/jquerymobile.nativedroid.color.green.css";
+
+
+var FIREBASES = [
+    FIREBASE_OBJ,
+    FIREBASE_DEVICE_DATA_OBJ,
+    FIREBASE_CONN_DATA_OBJ,
+    FIREBASE_SCHEDULES_OBJ,
+    FIREBASE_RULES_OBJ,
+    FIREBASE_USER_DATA_OBJ,
+    FIREBASE_USER_STATUS_OBJ,
+    FIREBASE_USER_ROOT_OBJ
+]
 
 
 // <------------------------------------------- USEFUL METHODS -------------------------------------------> //
@@ -128,3 +145,18 @@ global.$SH_LoadPage = function (pageName) {
     $.mobile.loadPage("pages/" + pageName + ".html");
 
 }; // End $SH_LoadPage
+
+
+global.resizeHeight = function () {
+
+    var screen = $.mobile.getScreenHeight(),
+        header = $(".ui-header").hasClass("ui-header-fixed") ? $(".ui-header").outerHeight() - 1 : $(".ui-header").outerHeight(),
+        footer = $(".ui-footer").hasClass("ui-footer-fixed") ? $(".ui-footer").outerHeight() - 1 : $(".ui-footer").outerHeight(),
+        contentCurrent = $(".ui-content").outerHeight() - $(".ui-content").height();
+    var content = screen - header - footer - contentCurrent;
+    $(".ui-content").each(function () {
+        if(!$(this).parent().hasClass("ui-popup")) {
+            $(this).height(content);
+        }
+    });
+}

@@ -12,57 +12,135 @@ $(document).on("pagecreate", "#schedule", function () { // When the "device" pag
     }
     else { // Pump the page full of widgets...
 
-        // Match the device to the URL 'id' query string parameter
-        for (var i in global[SCHEDULES_GLOBAL]) {
-            if (i.replace(/[^a-z0-9_]/ig, '-').toUpperCase() == params.id.toUpperCase()) {
-                schedule = global[SCHEDULES_GLOBAL][i];
-                schedule.name = i.replace(/[^a-z0-9_:]/ig, ' ');
-                schedule.key = i;
-            }
-        }
+        FIREBASE_SCHEDULES_OBJ.once("value", function (data) {
 
-        // The schedule doesn't exist for some reason, even though we iterated through the SCHEDULES_GLOBAL,
-        // this should never happen.
-        if (!schedule)
-            throw new Error("Unable to find schedule. The schedule '" + schedule.name + "' does not exist.");
+            var schs = data.val();
 
-        injectSettings("#schedule", params, schedule);
-        injectWidgets("#schedule", params, schedule);
+            for(var i in schs) {
 
-        $("#schedule-input-device").change(function () {
+                console.log(i, params.id);
+                if(i == params.id) {
 
-            schedule.device = $(this).val();
-            schedule.setting_path = [];
-            schedule.setting_value = [];
+                    schedule = schs[i];
+                    schedule.key = i;
 
-            FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+                    // The schedule doesn't exist for some reason, even though we iterated through the SCHEDULES_GLOBAL,
+                    // this should never happen.
+                    if (!schedule)
+                        throw new Error("Unable to find schedule. The schedule '" + schedule.name + "' does not exist.");
 
-            $(".widgets-wrapper").empty();
-            injectWidgets("#schedule", params, schedule);
-            global[resizeHeight]();
-        });
+                    injectWidgetsStatic(schedule);
 
-        $("#schedule-input-device").change(function () {
+                    // Make the page header the device's name
+                    $("h1.schedule-name").html(UCFirst(schedule.alias));
 
-            schedule.device = $(this).val();
-            schedule.setting_path = [];
-            schedule.setting_value = [];
+                    // Set the schedule name input field to the schedule's alias
+                    $("#schedule-input-name").val(schedule.alias);
 
-            FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+                    // Set the "Device Selector" to the DB Value:
+                    $("#schedule-input-device").find("option[value=\"" + schedule.device + "\"]").prop("selected", true);
+                    $("#schedule-input-device").selectmenu().selectmenu("refresh", true);
 
-            $(".widgets-wrapper").empty();
-            injectWidgets("#schedule", params, schedule);
-            global[resizeHeight]();
-        });
+                    // Set the Day checkboxes
+                    $(".day-time").each(function () {
+                        console.log("HERE asdf");
+                        console.log($(this).prop("checked"));
+                        console.log(schedule.time.d.indexOf(parseInt($(this).attr("name"))) > -1);
+                        if(schedule.time.d.indexOf(parseInt($(this).attr("name"))) > -1) {
+                            $(this).prop("checked", true).checkboxradio("refresh");
+                        }
+                        else {
+                            $(this).prop("checked", false).checkboxradio("refresh");
+                        }
+                    });
 
-        $("#delete-schedule").click(function (e) {
+                    // Set the Hour/Min Selectors
+                    $("#schedule-input-hour").val((schedule.time.h > 12) ? schedule.time.h - 12 : schedule.time.h);
+                    if(schedule.time.h == 0) $("#schedule-input-hour").val(12);
+                    $("#schedule-input-hour").selectmenu().selectmenu("refresh", true);
 
-            e.stopPropagation();
-            e.preventDefault();
+                    $("#schedule-input-minute").val(schedule.time.m);
+                    $("#schedule-input-minute").selectmenu().selectmenu("refresh", true);
 
-            FIREBASE_SCHEDULES_OBJ.child(schedule.key).remove();
-            $.mobile.changePage('schedules.html');
-            return;
+                    $("#schedule-input-ampm").val((schedule.time.h >= 12) ? "PM" : "AM");
+                    $("#schedule-input-ampm").selectmenu().selectmenu("refresh", true);
+
+                    // <-------------------------- BIND THE SCHEDULE SETTINGS --------------------------> //
+
+                    $("#schedule-input-name").change(function () {
+                        schedule.alias = $(this).val();
+                        $("h1.schedule-name").html(UCFirst(schedule.alias));
+                        FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+                    });
+
+                    $("#schedule-input-hour").change(function () {
+                        console.log($("#schedule-input-ampm").val());
+                        schedule.time.h = $(this).val();
+                        if($("#schedule-input-ampm").val() == "PM" && schedule.time.h < 12) schedule.time.h = parseInt(schedule.time.h) + 12;
+                        if($("#schedule-input-ampm").val() == "AM" && schedule.time.h >= 12) schedule.time.h = parseInt(schedule.time.h) - 12;
+                        if(schedule.time.h == 24) schedule.time.h = 0;
+                        if(schedule.time.h == -12) schedule.time.h = 12;
+                        schedule.time.h = parseInt(schedule.time.h);
+                        FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+                    });
+
+                    $("#schedule-input-minute").change(function () {
+                        schedule.time.m = $(this).val();
+                        schedule.time.m = parseInt(schedule.time.m);
+                        FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+                    });
+
+                    $("#schedule-input-ampm").change(function () {
+
+                        schedule.time.h += ($(this).val() == "AM") ? -12 : 12;
+                        if(schedule.time.h == 24) schedule.time.h = 0;
+                        if(schedule.time.h == -12) schedule.time.h = 12;
+                        schedule.time.h = parseInt(schedule.time.h);
+                        FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+
+                    });
+
+                    $(".day-time").each(function () {
+                        $(this).change(function () {
+                            if(schedule.time.d.indexOf(parseInt($(this).attr("name"))) == -1 && $(this).prop("checked") == true) {
+                                schedule.time.d.push(parseInt($(this).attr("name")));
+                                FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+                            }
+                            else if($(this).prop("checked") == false && schedule.time.d.indexOf(parseInt($(this).attr("name"))) > -1) {
+                                schedule.time.d.splice(schedule.time.d.indexOf(parseInt($(this).attr("name"))), 1);
+                                FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+                            }
+                        });
+                    });
+
+
+                    $("#schedule-input-device").change(function () {
+
+                        schedule.device = $(this).val();
+                        schedule.setting_path = [];
+                        schedule.setting_value = [];
+
+                        FIREBASE_SCHEDULES_OBJ.child(i).update(schedule);
+
+                        injectWidgetsStatic(schedule);
+                        $("#schedule").trigger("create");
+                    });
+
+                    $("#delete-schedule").click(function (e) {
+
+                        e.stopPropagation();
+                        e.preventDefault();
+
+                        FIREBASE_SCHEDULES_OBJ.child(i).remove();
+                        $.mobile.changePage('schedules.html');
+                        return;
+                    });
+
+                    break;
+
+                } // End if block
+
+            } // End for loop
         });
     }
 
@@ -76,12 +154,6 @@ $(document).on("pagebeforecreate", "#schedule", function () { // When the "devic
 });
 
 
-
-function injectSettings(page, params) {
-
-
-}
-
 /**
  * Injects the device page with widgets based on the "widgets"
  * object in the device's firebase path.
@@ -89,10 +161,9 @@ function injectSettings(page, params) {
  * @param page      - The page in which we are injecting the widgets.
  * @param params    - The URL query string arguments
  */
-function injectWidgets(page, params, schedule) {
+function injectWidgetsStatic(schedule) {
 
-    // Cleanup the parameters, formatting them all pretty like.
-    var params = $SH_CleanParams(params);
+    $(".widgets-wrapper").empty();
 
     var device;
 
@@ -109,8 +180,6 @@ function injectWidgets(page, params, schedule) {
 
     // <---------------------- Begin jQuery Widget Injection ---------------------->
 
-    // Make the page header the device's name
-    $(page + " h1.schedule-name").html(UCFirst(schedule.name));
 
     FIREBASE_DEVICE_DATA_OBJ.child(device.mac).child("widgets").once("value", function (data) {
 
@@ -334,9 +403,7 @@ function injectWidgets(page, params, schedule) {
                                         sch.setting_value.push(value);
                                     }
 
-                                    FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(sch, function () {
-                                        console.log("HERE");
-                                    });
+                                    FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(sch);
 
                                 }.bind(this));
 
@@ -359,8 +426,10 @@ function injectWidgets(page, params, schedule) {
 
                             });
 
+                            var tmpFB = new Firebase(REFS[r].path);
                             // If the data is changed in Firebase, update it client-side as well:
-                            new Firebase(REFS[r].path).on("value", function (data) {
+                            FIREBASES.push(tmpFB);
+                            tmpFB.on("value", function (data) {
                                 var val = data.val();
 
                                 for (var m in val) {

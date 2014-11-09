@@ -33,19 +33,12 @@ $(document).on('pagebeforechange', function(e, data){
 /**
  * Makes the jQuery Mobile "Content" Page portion exhume the rest of the screen...
  */
-$(document).on("pagecreate", "#loading-page", function () {
+$(document).on("pagecreate", resizeHeight);
 
-    var screen = $.mobile.getScreenHeight(),
-        header = $(".ui-header").hasClass("ui-header-fixed") ? $(".ui-header").outerHeight() - 1 : $(".ui-header").outerHeight(),
-        footer = $(".ui-footer").hasClass("ui-footer-fixed") ? $(".ui-footer").outerHeight() - 1 : $(".ui-footer").outerHeight(),
-        contentCurrent = $(".ui-content").outerHeight() - $(".ui-content").height();
-    var content = screen - header - footer - contentCurrent;
-    $(".ui-content").each(function () {
-        if(!$(this).parent().hasClass("ui-popup")) {
-            $(this).height(content);
-        }
-    });
-
+$(document).on("pageremove", function () {
+    for(var i in FIREBASES) {
+        if(FIREBASES[i] && FIREBASES[i].hasOwnProperty("off")) FIREBASES[i].off();
+    }
 });
 
 // <---------------------------------------- JQUERY HANDLERS, ETC. ---------------------------------------> //

@@ -34,42 +34,43 @@
                     <select id="schedule-input-device" name="schedule-input-device">
                         <!-- Inject Device Options -->
                     </select>
-
-                    <label for="days-checkboxes">Day/Time:</label>
                     <br />
+
+                    <label for="days-checkboxes">Day/Time</label>
                     <div id="days-checkboxes" class="ui-controlgroup-controls">
 
                         <div>
                             <label for="sun">Sunday</label>
-                            <input type="checkbox" name="sun" id="sun" checked="" value="0">
+                            <input class="day-time" type="checkbox" name="0" id="sun">
                         </div>
                         <div>
                             <label for="mon">Monday</label>
-                            <input type="checkbox" name="mon" id="mon" checked="" value="1">
+                            <input class="day-time" type="checkbox" name="1" id="mon">
                         </div>
                         <div>
                             <label for="tue">Tuesday</label>
-                            <input type="checkbox" name="tue" id="tue" checked="" value="2">
+                            <input class="day-time" type="checkbox" name="2" id="tue">
                         </div>
                         <div>
                             <label for="wed">Wednesday</label>
-                            <input type="checkbox" name="wed" id="wed" checked="" value="3">
+                            <input class="day-time" type="checkbox" name="3" id="wed">
                         </div>
                         <div>
-                            <label for="thu">Thrusday</label>
-                            <input type="checkbox" name="thu" id="thu" checked="" value="4">
+                            <label for="thu">Thursday</label>
+                            <input class="day-time" type="checkbox" name="4" id="thu">
                         </div>
                         <div>
                             <label for="fri">Friday</label>
-                            <input type="checkbox" name="fri" id="fri" checked="" value="5">
+                            <input class="day-time" type="checkbox" name="5" id="fri">
                         </div>
                         <div>
                             <label for="sat">Saturday</label>
-                            <input type="checkbox" name="sat" id="sat" checked="" value="6">
+                            <input class="day-time" type="checkbox" name="6" id="sat">
                         </div>
 
                     </div>
 
+                    <br />
                     <label for="schedule-input-hour">Hour</label>
                     <select name="schedule-input-hour" id="schedule-input-hour">
                         <option id="hour-1">1</option>
@@ -101,6 +102,13 @@
                         <option id="minute-50">50</option>
                         <option id="minute-55">55</option>
                     </select>
+
+                    <label for="schedule-input-ampm">AM/PM</label>
+                    <select name="schedule-input-ampm" id="schedule-input-ampm">
+                        <option id="minute-00">AM</option>
+                        <option id="minute-00">PM</option>
+                    </select>
+
                 </form>
             </div>
         </div>
@@ -121,14 +129,16 @@
             <div data-role="header" data-theme="b">
                 <h1 id="#schedule-message-h1">Delete Schedule?</h1>
             </div>
-            <div data-role="content" data-theme="b" class="popup">
+            <div data-role="content" data-theme="b" class="popup center">
                 <p id="schedule-message-content">Are you sure you want to delete this schedule?</p>
                 <p>This action cannot be undone.</p>
-                <a href='#' id="delete-schedule" data-theme="b" data-rel='back' data-iconpos='left' data-role='button' data-inline='true'>
-                    <i class="fa fa-check"></i>Delete</a>
-                <a href='schedules.html' data-theme="b" data-iconpos='left' data-role='button' data-inline='true'>
-                    <i class="fa fa-times"></i>Cancel
-                </a>
+                <div class="center">
+                    <a href='#' id="delete-schedule" data-theme="b" data-rel='back' data-iconpos='left' data-role='button' data-inline='true'>
+                        <i class="fa fa-check"></i>Delete</a>
+                    <a href='schedules.html' data-theme="b" data-iconpos='left' data-role='button' data-inline='true'>
+                        <i class="fa fa-times"></i>Cancel
+                    </a>
+                </div>
             </div>
         </div>
 

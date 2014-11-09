@@ -11,32 +11,33 @@ $(document).on("pagecreate", "#schedules", function () {
 
     function setSchedule (child) {
 
+        console.log(child.val());
+
         // Clone the pseudeSchedule for modification...
         var newSchedule = pseudoSchedule.clone();
 
         var schedule = child.val();
-        var scheduleName = child.name().replace(/[^a-z0-9_]/ig, '-');
+        var scheduleName = child.name();
 
         console.log(schedule);
         if( // Make sure we have the fields we need:
-            !(schedule instanceof Object)               &&
-            !schedule.time                              &&
-            !schedule.time.d                            &&
-            !(schedule.time.d instanceof Array)         &&
-            !schedule.time.h                            &&
-            !schedule.time.m                            &&
-            !schedule.setting_path                      &&
-            !(schedule.setting_path instanceof Array)   &&
-            !schedule.setting_value                     &&
-            !(schedule.setting_value instanceof Array)  &&
-            !schedule.device
+            !(schedule instanceof Object)
+        ) {
+            console.log("Schedule " + scheduleName + " is missing required fields!");
+            return false;
+        }
+        else if(
+            Object.keys(schedule).indexOf("time")   <= -1 ||
+            Object.keys(schedule).indexOf("device") <= -1 ||
+            Object.keys(schedule).indexOf("alias")  <= -1
+
         ) {
             console.log("Schedule " + scheduleName + " is missing required fields!");
             return false;
         }
 
         newSchedule.attr("id", scheduleName);
-        newSchedule.find(".schedule-title").html(UCFirst(scheduleName).replace(/-/ig, ' '));
+        newSchedule.find(".schedule-title").html(UCFirst(schedule.alias));
         newSchedule.find(".schedule-device").html(UCFirst(global[DEVICES_GLOBAL][schedule.device].name.replace(/[^a-z0-9\s]/ig, ' ')));
 
         var days = [];
@@ -80,7 +81,7 @@ $(document).on("pagecreate", "#schedules", function () {
         var scheduleElem;
 
         if($("#my-schedules").find(scheduleName).length > 0) {
-            scheduleElem = $("#my-schedules").find(scheduleName);
+            scheduleElem = $("#my-schedules").find("#" + scheduleName);
         }
         else {
             $("#my-schedules").append('<div id="' + scheduleName + '"></div>');
@@ -93,7 +94,7 @@ $(document).on("pagecreate", "#schedules", function () {
 
     // When a schedule is removed from the database:
     FIREBASE_SCHEDULES_OBJ.on("child_removed", function (child) {
-        var scheduleName = child.name().replace(/[^a-z0-9_]/ig, '-');
+        var scheduleName = child.name();
         $("#my-schedules").find("#" + scheduleName).remove();
     });
 
@@ -103,16 +104,13 @@ $(document).on("pagecreate", "#schedules", function () {
         e.preventDefault();
 
         var newSchedule = {
-            "New Schedule":
-                {
-                    device: global[DEVICES_GLOBAL][Object.keys(global[DEVICES_GLOBAL])[0]].mac,
-                    time: { d: [0,1,2,3,4,5,6], h: 12, m:00 }
-                }
+            device: global[DEVICES_GLOBAL][Object.keys(global[DEVICES_GLOBAL])[0]].mac,
+            time: { d: [0,1,2,3,4,5,6], h: 12, m:00 },
+            alias: "New Schedule"
         }
 
-        FIREBASE_SCHEDULES_OBJ.set(newSchedule);
-        $.mobile.changePage('schedule.html?id=New-Schedule');
-        return;
+        var newScheduleID = FIREBASE_SCHEDULES_OBJ.push(newSchedule);
+        $.mobile.changePage('schedule.html?id=' + newScheduleID.name());
     })
 
 });

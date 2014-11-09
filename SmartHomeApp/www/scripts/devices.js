@@ -310,7 +310,9 @@ function injectWidgets(page, params) {
                             });
 
                             // If the data is changed in Firebase, update it client-side as well:
-                            new Firebase(REFS[r].path).on("value", function (data) {
+                            var tmpFB = new Firebase(REFS[r].path);
+                            FIREBASES.push(tmpFB);
+                            tmpFB.on("value", function (data) {
                                 var val = data.val();
 
                                 for (var m in val) {
