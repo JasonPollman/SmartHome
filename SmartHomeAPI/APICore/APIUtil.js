@@ -122,9 +122,9 @@ module.exports.mark = function (name) { console.log("<--------------------------
 /**
  * Gets/Sets a descendant property of an object
  */
-module.exports.getSetDescendantProp = function (obj, desc, value) {
+module.exports.getSetDescendantProp = function (obj, desc, value, delim) {
 
-  var arr = desc ? desc.split(".") : [];
+  var arr = desc ? desc.split(delim || "/") : [];
 
   while (arr.length && obj) {
     var comp = arr.shift();
@@ -137,7 +137,7 @@ module.exports.getSetDescendantProp = function (obj, desc, value) {
 
       if (obj[arrayData.arrName] !== undefined) {
 
-        if (value && arr.length === 0) obj[arrayData.arrName][arrayData.arrIndex] = value;
+        if (value != undefined && arr.length === 0) obj[arrayData.arrName][arrayData.arrIndex] = value;
         obj = obj[arrayData.arrName][arrayData.arrIndex];
 
       } else {
@@ -150,7 +150,7 @@ module.exports.getSetDescendantProp = function (obj, desc, value) {
     } // End outer if block
 
     // Handle Primitive Objects
-    if (value) {
+    if (value != undefined) {
       if (obj[comp] === undefined) obj[comp] = {};
       if (arr.length === 0) obj[comp] = value;
     }

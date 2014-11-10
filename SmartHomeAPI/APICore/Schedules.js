@@ -8,7 +8,7 @@ var getSetD   = require('./APIUtil.js').getSetDescendantProp;
 var mark      = require('./APIUtil.js').mark;
 var diff      = require("deep-diff").diff;
 
-var Schedules = function () {
+var SchedulesMod = function () {
 
   var self = this;
 
@@ -82,18 +82,22 @@ var Schedules = function () {
             var deviceSettingsClone = {};
             deviceSettingsClone.setEqual(Devices[device.mac].settings);
 
-            if(!Schedules[i].hasOwnProperty("setting_path")) {
+            if(Schedules[i] && !Schedules[i].hasOwnProperty("setting_path")) {
               Schedules[i].setting_path = [];
             }
 
-            if(!Schedules[i].hasOwnProperty("setting_value")) {
+            if(Schedules[i] && !Schedules[i].hasOwnProperty("setting_value")) {
               Schedules[i].setting_value = [];
             }
 
             for(var n in Schedules[i].setting_path) {
 
+
+              global.console.log(Schedules[i].setting_path[n], Schedules[i].setting_value[n])
+
               // Set the clone settings with the specified schedule settings
-              getSetD(deviceSettingsClone, Schedules[i].setting_path[n], Schedules[i].setting_value[n]);
+              var x = getSetD(deviceSettingsClone, Schedules[i].setting_path[n], Schedules[i].setting_value[n], "/");
+              console.log(x);
 
             } // End for loop
 
@@ -145,6 +149,6 @@ var Schedules = function () {
 } // End Schedules Module
 
 // Inherit from the EventEmitter
-require('util').inherits(Schedules, require('events').EventEmitter);
+require('util').inherits(SchedulesMod, require('events').EventEmitter);
 // Export the module
-module.exports = new Schedules();
+module.exports = new SchedulesMod();

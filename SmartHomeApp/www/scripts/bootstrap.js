@@ -46,6 +46,18 @@ var Bootstrap = {
 
 }; // End Bootstrap object
 
+
+$(document).on("pagecreate", "#loading-page", function () {
+
+    $("#try-again").click(function (e) {
+
+        e.stopPropagation();
+        e.preventDefault();
+
+        window.location.href = "index.html";
+    });
+});
+
 /**
  * On document ready, we'll verify the following to ensure the SmartHome App is ready..document).on("pagecreate", "#loading-page", .
  */
@@ -58,7 +70,7 @@ $(document).one("pagecreate", "#loading-page", function () {
 
     // Check for Firebase Connection:
     if(!FIREBASE_OBJ) {
-        Bootstrap.push("Unable to connect to SmartHome Firebase Server", 1, "Unable to connect to SmartHome Firebase Server<br />SmartHome cannot continue...");
+        Bootstrap.push("Unable to connect to SmartHome Firebase Server", 1, "Unable to connect to SmartHome Database Server<br />Do you have internet?");
         return;
     }
     else {
@@ -70,7 +82,7 @@ $(document).one("pagecreate", "#loading-page", function () {
     FIREBASE_OBJ.child("api_status").once("value", function (data) {
         var values = data.val();
         if(values.reachable != true) {
-            Bootstrap.push("Error connecting to the SmartHome API!", 1, "The SmartHome Network API is not connected.<br />The SmartHome App Cannot Continue.");
+            Bootstrap.push("Error connecting to the SmartHome API!", 1, "The SmartHome Network API is not connected.<br />Please make sure your local SmartHome API is running.");
             return;
         }
         else {

@@ -120,7 +120,19 @@ $(document).on("pagecreate", "#schedule", function () { // When the "device" pag
 
                     $("#schedule-input-device").change(function () {
 
-                        schedule.device = $(this).val();
+                        var value = $(this).val();
+
+                        if($.isNumeric(value)) {
+                            value = Number(value);
+                        }
+                        else if(value === "true") {
+                            value = Boolean(true);
+                        }
+                        else if(value === "false") {
+                            value = Boolean(false);
+                        }
+
+                        schedule.device = value;
                         schedule.setting_path = [];
                         schedule.setting_value = [];
 
@@ -136,7 +148,7 @@ $(document).on("pagecreate", "#schedule", function () { // When the "device" pag
                         e.preventDefault();
 
                         FIREBASE_SCHEDULES_OBJ.child(i).remove();
-                        $.mobile.changePage('schedules.html');
+                        $.mobile.changePage('schedules.html', { transition: PAGE_TRANSITION_TYPE });
                         return;
                     });
 
@@ -387,7 +399,20 @@ function injectWidgetsStatic(schedule) {
 
                                 var value = $(e).val();
 
+                                if($.isNumeric(value)) {
+                                    value = Number(value);
+                                }
+                                else if(value === "true") {
+                                    value = Boolean(true);
+                                }
+                                else if(value === "false") {
+                                    value = Boolean(false);
+                                }
+
                                 FIREBASE_SCHEDULES_OBJ.child(schedule.key).once("value", function (data) {
+
+                                    var i = this[0];
+                                    var r = this[1]
 
                                     var sch = data.val();
 
