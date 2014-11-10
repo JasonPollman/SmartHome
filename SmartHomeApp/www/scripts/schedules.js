@@ -106,6 +106,8 @@ $(document).on("pagecreate", "#schedules", function () {
         var newSchedule = {
             device: global[DEVICES_GLOBAL][Object.keys(global[DEVICES_GLOBAL])[0]].mac,
             time: { d: [0,1,2,3,4,5,6], h: 12, m:00 },
+            setting_path: [],
+            setting_value: [],
             alias: "New Schedule"
         }
 

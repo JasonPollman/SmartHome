@@ -7,7 +7,8 @@ $(document).on("pagecreate", "#device-page", function () { // When the "device" 
     var params = $SH_GetParameters($(devicePage).attr("data-url"));
 
     if (!params.id && !params.value) { // Verify that we have the correct URL parameters...
-        throw new Error("Missing required URL parameters");
+        $.mobile.changePage("my-devices.html");
+        console.log("Missing required URL parameters");
     }
     else { // Pump the page full of widgets...
 
@@ -242,7 +243,8 @@ function injectWidgets(page, params) {
 
                                 $(e).on("slidestop", function () {
                                     var obj = {}
-                                    obj[i] = $(this).val();
+                                    var value = $(this).val();
+                                    obj[i] = ($.isNumeric(value)) ? Number(value) : (value === "true") ? Boolean(true) : (value === "false") ? Boolean(false) : value;
                                     new Firebase(REFS[r].path).update(obj);
                                 });
 
@@ -252,8 +254,20 @@ function injectWidgets(page, params) {
                                 $(e).change(function () {
 
                                     var obj = {};
-                                    obj[REFS[r].set] = $(this).val();
+                                    var value = $(this).val();
+                                    console.log(REFS[r], r);
 
+                                    if($.isNumeric(value)) {
+                                        obj[REFS[r].set] = Number(value);
+                                    }
+                                    else if(value === "true") {
+                                        obj[REFS[r].set] = Boolean(true);
+                                    }
+                                    else if(value === "false") {
+                                        obj[REFS[r].set] = Boolean(false);
+                                    }
+
+                                    console.log(obj[REFS[r].set]);
                                     new Firebase(REFS[r].path).update(obj, function (error) {
 
                                         var err = $("#device-error-message");
@@ -272,10 +286,11 @@ function injectWidgets(page, params) {
 
                                             if(status.device_response.status != 0) { // The device returned an error:
 
-                                                var msg;
-                                                if(status.status) msg = status.status.replace(/[^a-z0-9\s]/ig, " ");
+                                                var msg = "Unexpected Error";
+                                                console.log(status);
+                                                if(status.device_response && status.device_response.message) msg = global["sentenceCase"](status.device_response.message.replace(/[^a-z0-9\s\._]/ig, " "));
 
-                                                $("#device-error-message-content").html(UCFirst(msg || "Unexpected Error"));
+                                                $("#device-error-message-content").html(UCFirst(msg));
                                                 $("#device-error-message").trigger("create");
                                                 $("#device-error-message").popup("open");
 
@@ -295,13 +310,19 @@ function injectWidgets(page, params) {
                             // The widget has defined itself as part of a swatch
                             if (widgets[i].swatch) swatch[r][i] = $(e);
 
-                            // Set the current value as default slider value...
+                            // Set the current value as default value...
                             // Using "on" for 2-way data binding
                             new Firebase(REFS[r].path + REFS[r].set).once("value", function (data) {
+
+                                if(!data.val()) return;
 
                                 $(e).val(data.val().toString());
 
                                 if ($(e).attr("data-type") == "range") $(e).slider().slider("refresh");
+                                if ($(e).attr("data-role") == "slider") {
+                                    console.log("GOT FLIP");
+                                    $(e).slider().slider("refresh");
+                                }
 
                                 // If we have all three required swatch fields, build the swatch...
                                 if (swatch[r].hue && swatch[r].sat && swatch[r].bri)
@@ -310,19 +331,6 @@ function injectWidgets(page, params) {
                             });
 
                             // If the data is changed in Firebase, update it client-side as well:
-                            var tmpFB = new Firebase(REFS[r].path);
-                            FIREBASES.push(tmpFB);
-                            tmpFB.on("value", function (data) {
-                                var val = data.val();
-
-                                for (var m in val) {
-                                    if (m == REFS[r].set) {
-                                        $(e).val(val[m]).trigger("change");
-                                        if ($(e).attr("data-type") == "range") $(e).slider().slider("refresh");
-                                    }
-                                }
-
-                            });
 
                         }.bind([i, r])); // End $.get()
 
@@ -356,12 +364,12 @@ function injectWidgets(page, params) {
 
             for (var i in swatch) { // Set the swatches background color
 
-                $(this).find(".color-swatch").css("background-color", "hsl(" + ($(swatch.hue).val() / 182.04) + "," + ($(swatch.sat).val() / 2.55) + "%," + ($(swatch.bri).val() / 2.55) + "%)");
+                $(this).find(".color-swatch").css("background-color", "hsl(" + ($(swatch.hue).val() / 182.04) + "," + ($(swatch.sat).val() / 2.55) + "%," + ($(swatch.bri).val() / 5.1) + "%)");
 
 
-                // Change the background color on slider change:
+                // Change the background color on slider:
                 $(swatch[i]).on("change", function () {
-                    $(swatchElem).find(".color-swatch").css("background-color", "hsl(" + ($(swatch.hue).val() / 182.04) + "," + ($(swatch.sat).val() / 2.55) + "%," + ($(swatch.bri).val() / 2.55) + "%)");
+                    $(swatchElem).find(".color-swatch").css("background-color", "hsl(" + ($(swatch.hue).val() / 182.04) + "," + ($(swatch.sat).val() / 2.55) + "%," + ($(swatch.bri).val() / 5.1) + "%)");
                 });
             }
 

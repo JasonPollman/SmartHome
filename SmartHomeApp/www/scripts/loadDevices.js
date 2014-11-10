@@ -47,7 +47,7 @@ $(document).on("pagecreate", "#my-devices", function () {
     else { // Otherwise, detect if the devices are connected or not, and set an iterval to continually check this...
 
         FIREBASE_DEVICE_CONNECTION_LISTENER = FIREBASE_CONN_DATA_OBJ.on("value", function (data) {
-            detectDevices(data.val());
+            detectDevices(data.val() || {});
         })
 
     } // End If/else block
@@ -57,6 +57,8 @@ $(document).on("pagecreate", "#my-devices", function () {
      * in the device listview.
      */
     function detectDevices (connectedDevices) {
+
+        if(!connectedDevices) connectedDevices = {};
 
         // Loop through the "device_data" Firebase object
         for (var d in global[DEVICES_GLOBAL]) {

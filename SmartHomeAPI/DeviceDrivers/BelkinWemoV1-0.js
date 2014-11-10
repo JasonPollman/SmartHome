@@ -18,6 +18,8 @@
  *
  *   - Any other method as defined in this device's 'type' interface.
  *
+ *   - setWidgets
+ *
  * -----------------------------------------------------------------------------
  * Helper Methods/Properties:
  * -----------------------------------------------------------------------------
@@ -147,6 +149,41 @@ BelkinWemo.driverKeywords = [
 // If discoverable is true, use the discover method rather than
 // using keywords (more reliable).
 BelkinWemo.discoverable = true;
+
+
+// Set the WeMo's Widgets
+BelkinWemo.prototype.setWidgets = function () {
+
+  if(self.name == "wemo_motion") {
+
+    return {
+
+      "motion": {
+        "info": "The current motion status. Red indicates no motion and green indicates motion.",
+        "name": "Motion",
+        "path": "state",
+        "type": "motion"
+      }
+
+    } // End return
+
+  }
+  else {
+
+    return {
+
+      "state" : {
+        "info" : "Change the power state of the WeMo Switch.",
+        "name" : "Power State",
+        "path" : "state",
+        "type" : "flipswitch"
+      }
+
+    }
+
+  } // End if/else block
+
+} // End setWidgets()
 
 /**
  * Discover WeMo Devices

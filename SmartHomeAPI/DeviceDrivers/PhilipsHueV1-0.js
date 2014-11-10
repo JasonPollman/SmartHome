@@ -18,6 +18,8 @@
  *
  *   - Any other method as defined in this device's 'type' interface.
  *
+ *   - setWidgets()
+ *
  * -----------------------------------------------------------------------------
  * Helper Methods/Properties:
  * -----------------------------------------------------------------------------
@@ -141,6 +143,56 @@ PhilipsHue.driverKeywords = [
 
 // Tell the API that these devices can be discovered by the driver...
 PhilipsHue.discoverable = true;
+
+
+PhilipsHue.prototype.setWidgets = function () {
+
+  return {
+
+      "bri": {
+        "info": "Change the brightness of this light.",
+        "max": 255,
+        "min": 0,
+        "name": "Brightness",
+        "path": "lights/*/state/bri",
+        "step": 1,
+        "swatch": true,
+        "type": "slider",
+        "z": 3
+      },
+      "hue": {
+        "info": "Change the hue of this light.",
+        "max": 65535,
+        "min": 0,
+        "name": "Hue",
+        "path": "lights/*/state/hue",
+        "step": 1,
+        "swatch": true,
+        "type": "slider",
+        "z": 1
+      },
+      "power": {
+        "info": "Turn this light on or off.",
+        "name": "Power",
+        "path": "/lights/*/state/on",
+        "type": "flipswitch-bool",
+        "z": 0
+      },
+      "sat": {
+        "info": "Change the saturation of this light.",
+        "max": 255,
+        "min": 0,
+        "name": "Saturation",
+        "path": "/lights/*/state/sat",
+        "step": 1,
+        "swatch": true,
+        "type": "slider",
+        "z": 2
+      }
+
+  } // End return
+
+} // End setWidgets()
 
 
 /**
@@ -294,6 +346,7 @@ PhilipsHue.prototype.onFirebaseData = function (diff, data, lastState, updateSta
     }
 
     // If the device response wasn't an error, update the status as "success" and pass the response.
+    console.log(JSON.parse(response)[0].error);
     (JSON.parse(response)[0].error) ? updateStatus(1, response) : updateStatus(0, response);
 
   }

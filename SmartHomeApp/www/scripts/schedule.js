@@ -5,6 +5,8 @@ $(document).on("pagecreate", "#schedule", function () { // When the "device" pag
      */
     var params = $SH_GetParameters($(this).attr("data-url"));
 
+    var found = false;
+
     var schedule;
 
     if (!params.id && !params.value) { // Verify that we have the correct URL parameters...
@@ -20,6 +22,8 @@ $(document).on("pagecreate", "#schedule", function () { // When the "device" pag
 
                 console.log(i, params.id);
                 if(i == params.id) {
+
+                    found = true;
 
                     schedule = schs[i];
                     schedule.key = i;
@@ -141,6 +145,10 @@ $(document).on("pagecreate", "#schedule", function () { // When the "device" pag
                 } // End if block
 
             } // End for loop
+
+            if(!found) {
+                $.mobile.changePage("schedules.html");
+            }
         });
     }
 

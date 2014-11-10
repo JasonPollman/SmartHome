@@ -46,9 +46,7 @@ var Schedules = function () {
        scheduleData.time.d != null                   &&
        (scheduleData.time.d instanceof Array)        &&
        scheduleData.time.h != null                   &&
-       scheduleData.time.m != null                   &&
-       scheduleData.setting_path                     &&
-       scheduleData.setting_value                       ) {
+       scheduleData.time.m != null                   ) {
 
       // Push the schedule into the Schedules object
       Schedules[schedule.name()] = scheduleData; 
@@ -71,7 +69,7 @@ var Schedules = function () {
 
     if(!device && !(typeof device == "object")) return;
     
-    for(var i in Schedules) { // Iterate through the scheduels
+    for(var i in Schedules) { // Iterate through the schedules
 
       if(Schedules[i].device == device.mac) { // If the schedule MAC == the device's MAC
 
@@ -83,6 +81,14 @@ var Schedules = function () {
             // Grab a cloned copy of the device's settings...
             var deviceSettingsClone = {};
             deviceSettingsClone.setEqual(Devices[device.mac].settings);
+
+            if(!Schedules[i].hasOwnProperty("setting_path")) {
+              Schedules[i].setting_path = [];
+            }
+
+            if(!Schedules[i].hasOwnProperty("setting_value")) {
+              Schedules[i].setting_value = [];
+            }
 
             for(var n in Schedules[i].setting_path) {
 

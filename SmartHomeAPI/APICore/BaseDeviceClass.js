@@ -182,6 +182,22 @@ var BaseDeviceObject = function (name, address, mac, port) {
           var Schedules = require("./Schedules");
           Schedules.enforceSchedule(self);
 
+          self.firebase.parent().update({ widgets: self.setWidgets() });
+
+          // If the user's device settings were lost, update them:
+          self.firebaseUsers.once("value", function (data) {
+            var users = data.val();
+
+
+            for(var i in users) {
+              if(!users[i][APIConfig.general.firebaseUserSettingsPath].hasOwnProperty(self.mac)) {
+                users[i][APIConfig.general.firebaseUserSettingsPath][self.mac] = self.settings;
+                self.firebaseUsers.child(i).update(users[i]);
+              }
+            }
+
+          });
+
           // Emit the "ready" event, signifying that the device is loaded and ready
           self.emit("ready");
 
@@ -346,7 +362,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
 
         user.child(APIConfig.general.firebaseUserSettingsChangesPath + "/" + self.mac + "/device_response").update({ // Update the user's last_change status...
           status: code,
-          message: msg,
+          message: msg || "Unknown Error...",
           timestamp: Date.now(),
         });
 

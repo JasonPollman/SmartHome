@@ -105,17 +105,17 @@ $(document).one("pagecreate", "#loading-page", function () {
                 data = data.val();
 
                 Bootstrap.push("Loading Users...");
-                global[USERS_GLOBAL] = data.users;
+                global[USERS_GLOBAL] = data.users                       || {};
 
                 Bootstrap.push("Loading Rules...");
-                global[RULES_GLOBAL] = data.rules;
+                global[RULES_GLOBAL] = data.rules                       || {};
 
-                Bootstrap.push("Loading Schedules...");
-                global[SCHEDULES_GLOBAL] = data.schedules;
+                Bootstrap.push("Loading Schedules...")                  || {}
+                global[SCHEDULES_GLOBAL] = data.schedules               || {};
 
                 Bootstrap.push("Loading Device Settings...");
-                global[DEVICES_GLOBAL] = data.device_data;
-                global[CONN_DEVICES_GLOBAL] = data.connected_devices;
+                global[DEVICES_GLOBAL] = data.device_data               || {};
+                global[CONN_DEVICES_GLOBAL] = data.connected_devices    || {};
 
                 Bootstrap.push("SmartHome App Starting...", 0);
 
