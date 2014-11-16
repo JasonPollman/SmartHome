@@ -1,8 +1,9 @@
 <div data-theme="b" class="motion-widget-wrapper">
     <input id="hidden-motion" class="widget" type="hidden" name="" value="0" />
-    <img id="motion-indicator" src="../img/runner.png" class="motion-indicator"></div>
+    <img id="motion-indicator" src="img/runner.png" class="motion-indicator"></div>
     <script>
         $(function () {
+            console.log("HERE");
             $("#hidden-motion").change(function () {
                 console.log("CHANGING MOTION");
                 $("#motion-indicator").attr("src",

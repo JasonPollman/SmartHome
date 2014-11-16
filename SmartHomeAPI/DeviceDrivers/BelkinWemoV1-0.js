@@ -154,6 +154,8 @@ BelkinWemo.discoverable = true;
 // Set the WeMo's Widgets
 BelkinWemo.prototype.setWidgets = function () {
 
+  var self = this;
+
   if(self.name == "wemo_motion") {
 
     return {

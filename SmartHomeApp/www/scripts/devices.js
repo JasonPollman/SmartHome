@@ -4,6 +4,7 @@ $(document).on("pagecreate", "#device-page", function () { // When the "device" 
      * Flow for adding widgets to the "My Devices" page...
      */
     var devicePage = "#device-page";
+    console.log($(devicePage).attr("data-url"));
     var params = $SH_GetParameters($(devicePage).attr("data-url"));
 
     if (!params.id && !params.value) { // Verify that we have the correct URL parameters...
@@ -210,7 +211,7 @@ function injectWidgets(page, params) {
 
                         // Give the widget a header, and some info.
                         $("#" + device.name + "-" + REFS[r].delta)
-                            .append('<div></div><h3>' + UCFirst(widgets[i].name) + '</h3>' +
+                            .append('<div><h3>' + UCFirst(widgets[i].name) + '</h3>' +
                             '<p><i class="fa fa-info"></i>' + widgets[i].info + '</p>' +
                             '<div class="widget-wrapper-' + i + '"></div></div>');
 
@@ -255,7 +256,6 @@ function injectWidgets(page, params) {
 
                                     var obj = {};
                                     var value = $(this).val();
-                                    console.log(REFS[r], r);
 
                                     if($.isNumeric(value)) {
                                         obj[REFS[r].set] = Number(value);
@@ -267,7 +267,6 @@ function injectWidgets(page, params) {
                                         obj[REFS[r].set] = Boolean(false);
                                     }
 
-                                    console.log(obj[REFS[r].set]);
                                     new Firebase(REFS[r].path).update(obj, function (error) {
 
                                         var err = $("#device-error-message");
@@ -288,7 +287,7 @@ function injectWidgets(page, params) {
 
                                                 var msg = "Unexpected Error";
                                                 console.log(status);
-                                                if(status.device_response && status.device_response.message) msg = global["sentenceCase"](status.device_response.message.replace(/[^a-z0-9\s\._]/ig, " "));
+                                                if(status.device_response && status.device_response.message) msg = global["sentenceCase"](JSON.stringify(status.device_response.message).replace(/[^a-z0-9\s\._]/ig, " "));
 
                                                 $("#device-error-message-content").html(UCFirst(msg));
                                                 $("#device-error-message").trigger("create");
@@ -312,11 +311,12 @@ function injectWidgets(page, params) {
 
                             // Set the current value as default value...
                             // Using "on" for 2-way data binding
-                            new Firebase(REFS[r].path + REFS[r].set).once("value", function (data) {
+
+                            FIREBASES.push(new Firebase(REFS[r].path + REFS[r].set).once("value", function (data) {
 
                                 if(!data.val()) return;
 
-                                $(e).val(data.val().toString());
+                                $(e).val(data.val().toString()).trigger("change");
 
                                 if ($(e).attr("data-type") == "range") $(e).slider().slider("refresh");
                                 if ($(e).attr("data-role") == "slider") {
@@ -328,9 +328,23 @@ function injectWidgets(page, params) {
                                 if (swatch[r].hue && swatch[r].sat && swatch[r].bri)
                                     buildSwatch(swatch[r], "#" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i);
 
+                            }));
+
+                            /**
+                             * If the data is changed in the device's Firebase settings, update it client-side as well:
+                             */
+                            var pathRegExp = RegExp("(.*" + encodeURIComponent(device.mac) + ")(.*)");
+                            console.log(device.mac + "/settings" + REFS[r].path.replace(pathRegExp, "$2") + REFS[r].set);
+                            FIREBASE_DEVICE_DATA_OBJ.child(device.mac + "/settings/" + REFS[r].path.replace(pathRegExp, "$2") + REFS[r].set).on("value", function (data) {
+                                $(e).val(data.val().toString()).trigger("change");
                             });
 
-                            // If the data is changed in Firebase, update it client-side as well:
+                            /**
+                             * If the data is changed in the users's Firebase settings, update it client-side as well:
+                             */
+                            FIREBASES.push(new Firebase(REFS[r].path + REFS[r].set).on("value", function (data) {
+                                $(e).val(data.val().toString()).trigger("change");
+                            }));
 
                         }.bind([i, r])); // End $.get()
 
@@ -344,6 +358,7 @@ function injectWidgets(page, params) {
         } // End for(widgets)
 
         $('.widgets-wrapper').trigger("create");
+        $('.ui-content').find('.ui-collapsible').trigger("create");
 
 
     });

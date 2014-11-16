@@ -13,6 +13,8 @@ var SCHEDULES_GLOBAL    = "$SH_Schedules";
 var DEVICES_GLOBAL      = "$SH_Devices";
 var CONN_DEVICES_GLOBAL = "$SH_Conn_Devices";
 
+var LAST_PAGE_GLOBAL        = "$SH_LastPage";
+
 var FIREBASE_ROOT              = "https://smarthomeapp.firebaseio.com/";
 var FIREBASE_OBJ               = new Firebase(FIREBASE_ROOT);
 var FIREBASE_DEVICE_DATA       = FIREBASE_ROOT + "device_data";
@@ -29,6 +31,7 @@ var DEVICE_SETTINGS_PATH       = "settings";
 
 var BOOTSTRAP_MSG_ELEMENT      = "#bootstrap-msg";
 var BOOTSTRAP_MSG_INTERVAL     = 200; // In MS.
+var BOOTSTRAP_PING_TIMEOUT     = 5000;
 
 var USER                     = "jason";
 var FIREBASE_USER_ROOT       = FIREBASE_ROOT + "/users/" + USER;
@@ -75,7 +78,9 @@ var FIREBASES = [
 global.$SH_GetParameters = function(url) {
 
     var pageURL     = (!url) ? window.location.search.substring(1) : url.split(/\?/)[1];
-    console.log(pageURL);
+
+    if(!pageURL) return;
+
     var vars        = pageURL.split('&');
     var params      = {};
 
@@ -124,7 +129,7 @@ global.$SH_CleanParams = function (params) {
 
     var clean = {};
 
-    for(var i in params) clean[i] = UCFirst(params[i].replace(/_/ig, ' '));
+    for(var i in params) if(params[i]) clean[i] = UCFirst(params[i].replace(/_/ig, ' '));
 
     return clean;
 
@@ -133,18 +138,6 @@ global.$SH_CleanParams = function (params) {
 global.UCFirst = function (s) {
     return s.replace(/\w\S*/ig, function (str) { return str.charAt(0).toUpperCase() + str.substr(1).toLowerCase(); });
 }
-
-
-/**
- * On Demand Page Loader
- * @param pageName - The filename of the Page *** Without the "pages" prefix and extension! ***
- */
-global.$SH_LoadPage = function (pageName) {
-
-    // Immediately load the page into the DOM
-    $.mobile.loadPage("pages/" + pageName + ".html");
-
-}; // End $SH_LoadPage
 
 
 global.resizeHeight = function () {

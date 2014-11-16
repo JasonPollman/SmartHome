@@ -1,7 +1,7 @@
 /**
  * SmartHome Actions
  */
-
+var connectionVerifyInterval;
 
 /**
  * Prevent Users from using the back button to go back to the loading page...
@@ -35,17 +35,110 @@ $(document).on('pagebeforechange', function(e, data){
  */
 $(document).on("pagecreate", resizeHeight);
 
+
+/**
+ * Keep a persistent connection to the back-end... or show an error, otherwise:
+ */
+var CONN_ERROR_ON_PAGE = false;
+var connectionVerifyInterval = setInterval(function () {
+
+    FIREBASE_OBJ.child("api_status").child("ping").set("marco", function () {
+
+        setTimeout(function () {
+
+            FIREBASE_OBJ.child("api_status").once("value", function (data) {
+
+                var values = data.val();
+                if(values.ping != "polo" && values.reachable != "true") {
+                    $(".error-message-content-page").html("The SmartHome Network API is not connected.<br />Please make sure your local SmartHome API is running.");
+                    $(".error-message-page").trigger("create");
+                    $(".error-message-page").popup("open");
+                }
+                else {
+                    $(".error-message-page").popup("close");
+                }
+
+            });
+
+        }, 60);
+
+    });
+
+}, 1000);
+
+
+/**
+ * "Retrys" the SmartHome API Connection on a connection failure...
+ */
+$(document).on("pagecreate", function () {
+
+    $(".try-again").click(function (e) {
+
+        e.stopPropagation();
+        e.preventDefault();
+
+        global[LAST_PAGE_GLOBAL] = window.location.pathname.split("/").pop();
+        console.log("index.html?page=" + global[LAST_PAGE_GLOBAL] + "&" + window.location.search.slice(1, window.location.search.length));
+        window.location.href = "index.html?page=" + global[LAST_PAGE_GLOBAL] + "&" + window.location.search.slice(1, window.location.search.length)
+
+    });
+});
+
+
+/**
+ * Remove Firebase Listeners on each page change.
+ * Since we're not re-loading the DOM, this is important as if you update
+ * a value within an 'on("value")' function, you'll end up doing this
+ * the number of times the page has loaded for each declaration.
+ */
 $(document).on("pageremove", function () {
     for(var i in FIREBASES) {
         if(FIREBASES[i] && FIREBASES[i].hasOwnProperty("off")) FIREBASES[i].off();
     }
 });
 
-// <---------------------------------------- JQUERY HANDLERS, ETC. ---------------------------------------> //
 
-// Add the page transition to every link
-var links = $("a, button");
-for (var i = 0; i < links.length - 1; i++) $(links[i]).attr("data-transition", PAGE_TRANSITION_TYPE);
+/**
+ * Sets the user's color preference
+ */
+$(document).on("pagecreate", function () {
+
+    FIREBASE_USER_ROOT_OBJ.once("value", function (data) {
+
+        var user = data.val();
+
+        if (!user.settings) {
+            user.settings = {};
+            if (!user.settings.color) user.settings.color = "green";
+        }
+
+        FIREBASE_USER_ROOT_OBJ.update(user);
+        $('link[href="' + USER_COLOR + '"]').attr('href', 'lib/native-droid/css/jquerymobile.nativedroid.color.' + user.settings.color + '.css');
+        USER_COLOR = 'lib/native-droid/css/jquerymobile.nativedroid.color.' + user.settings.color + '.css';
+
+        $("#change-color").val(user.settings.color).selectmenu().selectmenu("refresh", true);
+
+        $("#change-color").change(function () {
+            $('link[href="' + USER_COLOR + '"]').attr('href', 'lib/native-droid/css/jquerymobile.nativedroid.color.' + $(this).val() + '.css');
+            USER_COLOR = 'lib/native-droid/css/jquerymobile.nativedroid.color.' + $(this).val() + '.css';
+            user.settings.color = $(this).val();
+            FIREBASE_USER_ROOT_OBJ.update(user);
+        });
+
+
+    });
+
+}); // End $(document).on("pagecreate")
+
+
+/**
+ * Adds the default page transition to EVERY page using the global setting (for consistency).
+ */
+$(document).on("pagecreate", function () {
+    var links = $("a, button");
+    for (var i = 0; i < links.length - 1; i++) $(links[i]).attr("data-transition", PAGE_TRANSITION_TYPE);
+});
+
 
 // Add the params to the global (window) object, for various uses
 $SH_GetParameters();

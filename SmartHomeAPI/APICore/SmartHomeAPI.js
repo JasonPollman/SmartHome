@@ -40,6 +40,11 @@ var SmartHome = function() {
   var APIStatus = new Firebase(APIConfig.general.firebaseRootURI + "/" + APIConfig.general.firebaseAPIStatus);
   APIStatus.update({ last_startup: Date.now(), status: "startup pending", code: 0 });
 
+  // So we can ping the backend from the front-end.
+  APIStatus.child("ping").on("value", function (data) {
+    if(data.val() == "marco") APIStatus.child("ping").set("polo");
+  })
+
   // What to do on uncaught exceptions....
   process.on("uncaughtException", function (e) {
     console.error("An uncaught exception has occured:\n" + e.toString() + "\n\nThe API cannot continue.");

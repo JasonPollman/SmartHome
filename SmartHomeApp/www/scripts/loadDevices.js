@@ -6,31 +6,6 @@ $(document).on("pageremove", "#my-devices", function () {
 
 $(document).on("pagecreate", "#my-devices", function () {
 
-    FIREBASE_USER_ROOT_OBJ.once("value", function (data) {
-
-        var user = data.val();
-
-        if(!user.settings) {
-            user.settings = {};
-            if(!user.settings.color) user.settings.color = "green";
-        }
-
-        FIREBASE_USER_ROOT_OBJ.update(user);
-        $('link[href="' + USER_COLOR + '"]').attr('href','lib/native-droid/css/jquerymobile.nativedroid.color.' + user.settings.color + '.css');
-        USER_COLOR = 'lib/native-droid/css/jquerymobile.nativedroid.color.' + user.settings.color + '.css';
-
-        $("#change-color").val(user.settings.color).selectmenu().selectmenu("refresh", true);
-
-        $("#change-color").change(function () {
-            $('link[href="' + USER_COLOR + '"]').attr('href','lib/native-droid/css/jquerymobile.nativedroid.color.' + $(this).val() + '.css');
-            USER_COLOR = 'lib/native-droid/css/jquerymobile.nativedroid.color.' + $(this).val() + '.css';
-            user.settings.color = $(this).val();
-            FIREBASE_USER_ROOT_OBJ.update(user);
-        });
-
-
-    });
-
     // The last state of the device, true = connected, false = not connected.
     var last = {};
 
