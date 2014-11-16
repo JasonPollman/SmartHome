@@ -57,3 +57,15 @@ input[type="text"] {
 #error-message-content {
     padding: 20px;
 }
+.pull-right {
+    float: right;
+}
+hr {
+    border-left: none;
+}
+.ui-state-disabled {
+    -webkit-filter: grayscale(100%);
+    -moz-filter: grayscale(100%);
+    filter: grayscale(100%);
+    opacity: .4;
+}

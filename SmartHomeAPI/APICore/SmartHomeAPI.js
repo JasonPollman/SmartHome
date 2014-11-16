@@ -42,7 +42,10 @@ var SmartHome = function() {
 
   // So we can ping the backend from the front-end.
   APIStatus.child("ping").on("value", function (data) {
-    if(data.val() == "marco") APIStatus.child("ping").set("polo");
+    var users = data.val();
+    for(var i in users) {
+      if(users[i] == "marco") APIStatus.child("ping").child(i).set("polo");
+    }
   })
 
   // What to do on uncaught exceptions....

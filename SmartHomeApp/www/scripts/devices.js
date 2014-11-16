@@ -4,7 +4,6 @@ $(document).on("pagecreate", "#device-page", function () { // When the "device" 
      * Flow for adding widgets to the "My Devices" page...
      */
     var devicePage = "#device-page";
-    console.log($(devicePage).attr("data-url"));
     var params = $SH_GetParameters($(devicePage).attr("data-url"));
 
     if (!params.id && !params.value) { // Verify that we have the correct URL parameters...
@@ -286,7 +285,6 @@ function injectWidgets(page, params) {
                                             if(status.device_response.status != 0) { // The device returned an error:
 
                                                 var msg = "Unexpected Error";
-                                                console.log(status);
                                                 if(status.device_response && status.device_response.message) msg = global["sentenceCase"](JSON.stringify(status.device_response.message).replace(/[^a-z0-9\s\._]/ig, " "));
 
                                                 $("#device-error-message-content").html(UCFirst(msg));
@@ -320,7 +318,6 @@ function injectWidgets(page, params) {
 
                                 if ($(e).attr("data-type") == "range") $(e).slider().slider("refresh");
                                 if ($(e).attr("data-role") == "slider") {
-                                    console.log("GOT FLIP");
                                     $(e).slider().slider("refresh");
                                 }
 
@@ -334,7 +331,7 @@ function injectWidgets(page, params) {
                              * If the data is changed in the device's Firebase settings, update it client-side as well:
                              */
                             var pathRegExp = RegExp("(.*" + encodeURIComponent(device.mac) + ")(.*)");
-                            console.log(device.mac + "/settings" + REFS[r].path.replace(pathRegExp, "$2") + REFS[r].set);
+
                             FIREBASE_DEVICE_DATA_OBJ.child(device.mac + "/settings/" + REFS[r].path.replace(pathRegExp, "$2") + REFS[r].set).on("value", function (data) {
                                 $(e).val(data.val().toString()).trigger("change");
                             });
@@ -362,34 +359,5 @@ function injectWidgets(page, params) {
 
 
     });
-
-    /**
-     * Builds a color "swatch" so the user can see the results of the values changed.
-     * @param swatch    - The "swatch" object
-     * @param container - The container the "swatch" object will be appended to.
-     */
-    function buildSwatch(swatch, container) {
-
-        // Load the swatch widget
-        $("<div>").load(WIDGETS_DIRECTORY + "/color-swatch.html", function () {
-
-            $(container).append($(this));
-
-            var swatchElem = this;
-
-            for (var i in swatch) { // Set the swatches background color
-
-                $(this).find(".color-swatch").css("background-color", "hsl(" + ($(swatch.hue).val() / 182.04) + "," + ($(swatch.sat).val() / 2.55) + "%," + ($(swatch.bri).val() / 5.1) + "%)");
-
-
-                // Change the background color on slider:
-                $(swatch[i]).on("change", function () {
-                    $(swatchElem).find(".color-swatch").css("background-color", "hsl(" + ($(swatch.hue).val() / 182.04) + "," + ($(swatch.sat).val() / 2.55) + "%," + ($(swatch.bri).val() / 5.1) + "%)");
-                });
-            }
-
-        });
-
-    } // End buildSwatch()
 
 } // End injectWidgets

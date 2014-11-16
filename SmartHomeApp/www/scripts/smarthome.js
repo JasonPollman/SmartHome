@@ -13,6 +13,7 @@ var SCHEDULES_GLOBAL    = "$SH_Schedules";
 var DEVICES_GLOBAL      = "$SH_Devices";
 var CONN_DEVICES_GLOBAL = "$SH_Conn_Devices";
 
+var CONN_PING_INTERVAL  = 100000; // 1 Second
 var LAST_PAGE_GLOBAL        = "$SH_LastPage";
 
 var FIREBASE_ROOT              = "https://smarthomeapp.firebaseio.com/";
@@ -45,13 +46,10 @@ var SPLASH_PAGE     = "index.html";
 var MY_DEVICES_PAGE = "my-devices.html";
 var DEVICES_PAGE    = "devices.html";
 
-var DEVICE_ICON_DIR            = "img/device-icons";
-var DEFAULT_DEVICE_ICON        = "default.png";
-
-var WIDGETS_DIRECTORY          = "widgets";
-
-
-var USER_COLOR                 = "lib/native-droid/css/jquerymobile.nativedroid.color.green.css";
+var DEVICE_ICON_DIR         = "img/device-icons";
+var DEFAULT_DEVICE_ICON     = "default.png";
+var WIDGETS_DIRECTORY       = "widgets";
+var USER_COLOR              = "lib/native-droid/css/jquerymobile.nativedroid.color.green.css";
 
 
 var FIREBASES = [
@@ -133,11 +131,15 @@ global.$SH_CleanParams = function (params) {
 
     return clean;
 
-} // End $SH_CleanParams
+}; // End $SH_CleanParams
 
+
+/**
+ * Capitalize the first letter of each word.
+ */
 global.UCFirst = function (s) {
     return s.replace(/\w\S*/ig, function (str) { return str.charAt(0).toUpperCase() + str.substr(1).toLowerCase(); });
-}
+}; // End UCFirst
 
 
 global.resizeHeight = function () {
@@ -152,27 +154,104 @@ global.resizeHeight = function () {
             $(this).height(content);
         }
     });
-}
+}; // End resizeHeight
 
 
+/**
+ * Capitalize the first letter of the first word in each sentence.
+ * @param string - The string to convert to sentence case.
+ * @returns {string}
+ */
 global.sentenceCase = function (string) {
 
     var n = string.split(".");
     var vfinal = "";
 
-    for(i=0;i<n.length;i++) {
+    for(var i = 0; i < n.length; i++) {
 
-        var spaceput=""
+        var spaceput = ""
         var spaceCount = n[i].replace(/^(\s*).*$/,"$1").length;
 
         n[i] = n[i].replace(/^\s+/,"");
 
-        var newstring=n[i].charAt(n[i]).toUpperCase() + n[i].slice(1);
+        var newstring = n[i].charAt(n[i]).toUpperCase() + n[i].slice(1);
 
-        for(j=0;j<spaceCount;j++) spaceput = spaceput + " ";
+        for(var j = 0; j < spaceCount ; j++) spaceput = spaceput + " ";
         vfinal = vfinal + spaceput + newstring + ".";
     }
+
     vfinal = vfinal.substring(0, vfinal.length - 1);
     return vfinal;
 
+} // End sentanceCase()
+
+
+/**
+ * Builds a color "swatch" so the user can see the results of the values changed.
+ * @param swatch    - The "swatch" object
+ * @param container - The container the "swatch" object will be appended to.
+ */
+global.buildSwatch = function (swatch, container) {
+
+    // Load the swatch widget
+    $("<div>").load(WIDGETS_DIRECTORY + "/color-swatch.html", function () {
+
+        $(container).append($(this));
+
+        var swatchElem = this;
+
+        for (var i in swatch) { // Set the swatches background color
+
+            $(this).find(".color-swatch").css("background-color", "hsl(" + ($(swatch.hue).val() / 182.04) + "," + ($(swatch.sat).val() / 2.55) + "%," + ($(swatch.bri).val() / 5.1) + "%)");
+
+
+            // Change the background color on slider:
+            $(swatch[i]).on("change", function () {
+                $(swatchElem).find(".color-swatch").css("background-color", "hsl(" + ($(swatch.hue).val() / 182.04) + "," + ($(swatch.sat).val() / 2.55) + "%," + ($(swatch.bri).val() / 5.1) + "%)");
+            });
+        }
+
+    });
+
+} // End buildSwatch()
+
+
+/**
+ * Cleans form input values for Firebase insertion for device values
+ */
+function cleanValue (value) {
+    return ($.isNumeric(value)) ? Number(value) : (value === "true") ? Boolean(true) : (value === "false") ? Boolean(false) : value;
 }
+
+
+/**
+ * Pad strings or numbers...
+ */
+Object.defineProperty(
+
+    Object.prototype,
+    "padded",
+
+    {
+        configurable : false,
+        enumerable   : false,
+        writable     : false,
+
+        value        : function (length) {
+
+            return ((!(this instanceof String) && !(this instanceof Number)) || length < this.length) ?
+
+                this :
+
+                (function () {
+
+                    var zeros = "";
+                    for(var i = 0; i < length; i++) zeros += "0";
+                    return (zeros + this.toString()).slice(-length || this.length);
+
+                }.bind(this))();
+
+        }
+    }
+
+); // End Definition

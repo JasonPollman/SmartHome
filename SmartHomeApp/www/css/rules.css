@@ -1,10 +1,10 @@
 /**
- * CSS for the "Schedules" page only...
+ * CSS for the "Rules" page only...
  */
-#schedules #schedules-content #my-schedules.ui-listview h3 {
+#rules #rules-content #my-rules.ui-listview h3 {
     margin: 0;
     padding: 0;
 }
-#schedules #schedules-content #my-schedules.ui-listview .ui-li-has-thumb img {
-    left: 10px;
+#rules #rules-content #my-rules.ui-listview .ui-li-has-thumb img {
+    left: 8px;
 }

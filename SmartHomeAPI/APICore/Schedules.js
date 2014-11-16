@@ -75,29 +75,25 @@ var SchedulesMod = function () {
 
         (function (i) { // Wrap in function so that we can preserve i
 
-          // Set an interval to check the schuedule to see if it is time to implement it.
+          // Set an interval to check the schedule to see if it is time to implement it.
           setInterval(function () {
 
             // Grab a cloned copy of the device's settings...
             var deviceSettingsClone = {};
             deviceSettingsClone.setEqual(Devices[device.mac].settings);
 
-            if(Schedules[i] && !Schedules[i].hasOwnProperty("setting_path")) {
+            if(!Schedules[i].setting_path) {
               Schedules[i].setting_path = [];
             }
 
-            if(Schedules[i] && !Schedules[i].hasOwnProperty("setting_value")) {
+            if(!Schedules[i].setting_value) {
               Schedules[i].setting_value = [];
             }
 
             for(var n in Schedules[i].setting_path) {
 
-
-              global.console.log(Schedules[i].setting_path[n], Schedules[i].setting_value[n])
-
               // Set the clone settings with the specified schedule settings
               var x = getSetD(deviceSettingsClone, Schedules[i].setting_path[n], Schedules[i].setting_value[n], "/");
-              console.log(x);
 
             } // End for loop
 

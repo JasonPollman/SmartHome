@@ -42,14 +42,14 @@ $(document).on("pagecreate", resizeHeight);
 var CONN_ERROR_ON_PAGE = false;
 var connectionVerifyInterval = setInterval(function () {
 
-    FIREBASE_OBJ.child("api_status").child("ping").set("marco", function () {
+    FIREBASE_OBJ.child("api_status").child("ping").child(USER).set("marco", function () {
 
         setTimeout(function () {
 
             FIREBASE_OBJ.child("api_status").once("value", function (data) {
 
                 var values = data.val();
-                if(values.ping != "polo" && values.reachable != "true") {
+                if(values.ping[USER] != "polo" && values.reachable != "true") {
                     $(".error-message-content-page").html("The SmartHome Network API is not connected.<br />Please make sure your local SmartHome API is running.");
                     $(".error-message-page").trigger("create");
                     $(".error-message-page").popup("open");
@@ -64,7 +64,7 @@ var connectionVerifyInterval = setInterval(function () {
 
     });
 
-}, 1000);
+}, CONN_PING_INTERVAL);
 
 
 /**

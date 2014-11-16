@@ -92,19 +92,19 @@ $(document).one("pagecreate", "#loading-page", function () {
         Bootstrap.push("Successfully connected to the SmartHome cloud...");
 
         // Set the ping to marco
-        FIREBASE_OBJ.child("api_status").child("ping").set("marco");
+        FIREBASE_OBJ.child("api_status").child("ping").child(USER).set("marco");
 
         // Set an timeout to check for back-end connectivity
         var backendTimeout = setTimeout(function () {
 
-            FIREBASE_OBJ.child("api_status").child("ping").once("value", function (data) {
+            FIREBASE_OBJ.child("api_status").child("ping").child(USER).once("value", function (data) {
                 if (data.val() != "polo") Bootstrap.push("Error connecting to the SmartHome API!", 1, "The SmartHome Network API is not connected.<br />Please make sure your local SmartHome API is running.");
             });
 
         }, BOOTSTRAP_PING_TIMEOUT); // End timeout
 
         // Set an interval to check that we've got connectivity (e.g. marco/polo):
-        setInterval(function () {
+        var bootConnInterval = function () {
 
             FIREBASE_OBJ.child("api_status").once("value", function (data) {
 
@@ -112,7 +112,7 @@ $(document).one("pagecreate", "#loading-page", function () {
 
                 var values = data.val();
 
-                if (values.ping &&  values.ping  == "polo") { // We have successfully pinged:
+                if (values.ping[USER] && values.ping[USER] == "polo") { // We have successfully pinged:
 
                     clearTimeout(backendTimeout);
 
@@ -184,7 +184,10 @@ $(document).one("pagecreate", "#loading-page", function () {
 
             }); // (ping).once()
 
-        }, 60); // End interval
+        } // End bootConnInterval
+
+        setInterval(bootConnInterval, CONN_PING_INTERVAL); // End interval
+        bootConnInterval();
 
     } // End if/else block
 

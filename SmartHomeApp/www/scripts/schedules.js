@@ -11,15 +11,12 @@ $(document).on("pagecreate", "#schedules", function () {
 
     function setSchedule (child) {
 
-        console.log(child.val());
-
         // Clone the pseudeSchedule for modification...
         var newSchedule = pseudoSchedule.clone();
 
         var schedule = child.val();
         var scheduleName = child.name();
 
-        console.log(schedule);
         if( // Make sure we have the fields we need:
             !(schedule instanceof Object)
         ) {
@@ -71,7 +68,7 @@ $(document).on("pagecreate", "#schedules", function () {
         var AMPM = (schedule.time.h) >= 12 ? "PM" : "AM";
         var hour = (schedule.time.h) > 12 ? schedule.time.h - 12 : schedule.time.h - 0;
         if(hour == 0) hour = 12;
-        var time = hour + ":" + schedule.time.m + " " + AMPM;
+        var time = hour.padded(2) + ":" + schedule.time.m.padded(2) + " " + AMPM;
 
         newSchedule.find(".schedule-time").html(time);
         newSchedule.find(".schedule-days").html(days.join(", "));
@@ -80,7 +77,7 @@ $(document).on("pagecreate", "#schedules", function () {
 
         var scheduleElem;
 
-        if($("#my-schedules").find(scheduleName).length > 0) {
+        if($("#my-schedules").find("#" + scheduleName).length > 0) {
             scheduleElem = $("#my-schedules").find("#" + scheduleName);
         }
         else {

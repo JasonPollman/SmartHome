@@ -1,0 +1,117 @@
+<!-- So this page cannot be directly accessed -->
+<head>
+    <script>
+        window.location.href = "index.html";
+    </script>
+</head>
+
+
+<!-- The Device-Rule Page -->
+<div data-role="page" data-theme="b" id="rule" data-content-theme="b">
+
+    <!-- Page Header -->
+    <div data-role="header" id="rule-page-header" data-position="fixed" data-theme="b" data-tap-toggle="false">
+        <a href="#" data-rel="back" data-role="button" role="button"><i class="fa fa-arrow-circle-left"></i></a>
+        <h1 data-theme="b" class="rule-name"><!-- Inject Rule Name --></h1>
+        <a href='#rule-message' data-rel='popup' data-position-to='window' data-role='button' data-transition='pop' data-inline='true'>
+            <i class="fa fa-times"></i>
+        </a>
+    </div>
+
+    <div data-role="content" data-theme="b" data-content-theme="b" id="rule-content">
+
+        <!-- Error Popup -->
+        <div data-role="popup" data-theme="b" class="error-message-page">
+            <div data-role="header" data-theme="b">
+                <h1>SmartHome App Error</h1>
+            </div>
+            <div data-role="content" data-theme="b" class="popup center">
+                <p class="error-message-content-page"></p>
+                <a href='#' class="try-again" data-theme="b" data-rel='back' data-iconpos='left' data-role='button' data-inline='true'>
+                    <i class="fa fa-refresh"></i>Retry</a>
+            </div>
+        </div>
+
+        <div class="wrapper input-wrapper" data-theme="b">
+            <div data-theme="b" data-role="collapsible">
+                <h3 data-theme="b" data-tap-toggle="false">
+                    Rule Settings
+                </h3>
+
+                <form>
+
+                    <input type="text" name="rule-input-name" id="rule-input-name" value="" data-clear-btn="true" placeholder="rule Name...">
+
+                    <label for="rule-source-device">Device</label>
+                    <select id="rule-source-device" name="rule-input-device">
+                        <!-- Inject Device Options -->
+                    </select>
+                    <br />
+
+                    <label for="rule-target-device">Device</label>
+                    <select id="rule-target-device" name="rule-input-device">
+                        <!-- Inject Device Options -->
+                    </select>
+                    <br />
+
+                </form>
+            </div>
+        </div>
+
+        <div class="wrapper">
+            <div data-theme="b" data-role="collapsible">
+                <h3 data-theme="b" data-tap-toggle="false" style="font-weight: normal">
+                    Device Settings
+                </h3>
+                <div class="widgets-wrapper">
+                    <!-- Inject Widgets -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Popup -->
+        <div data-role="popup" data-theme="b" id="rule-message">
+            <div data-role="header" data-theme="b">
+                <h1 id="#rule-message-h1">Delete rule?</h1>
+            </div>
+            <div data-role="content" data-theme="b" class="popup center">
+                <p id="rule-message-content">Are you sure you want to delete this rule?</p>
+                <p>This action cannot be undone.</p>
+                <div class="center">
+                    <a href='#' id="delete-rule" data-theme="b" data-rel='back' data-iconpos='left' data-role='button' data-inline='true'>
+                        <i class="fa fa-check"></i>Delete</a>
+                    <a href='rules.html' data-theme="b" data-iconpos='left' data-role='button' data-inline='true'>
+                        <i class="fa fa-times"></i>Cancel
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Page Footer -->
+    <div data-role="footer" class="ui-bar-b" data-position="fixed" data-theme="b" data-role="footer" role="contentinfo" data-tap-toggle="false">
+        <div data-role="navbar" role="navigation" data-tap-toggle="false">
+            <ul>
+                <li>
+                    <a href="my-devices.html" data-transition="slide" data-direction="reverse">
+                        <i class="blIcon fa fa-cog"></i><br />
+                        <span>My Devices</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="rules.html" data-transition="slide">
+                        <i class="blIcon fa fa-calendar"></i><br />
+                        <span>rules</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="rules.html" data-transition="slide">
+                        <i class="blIcon fa fa-wrench"></i><br />
+                        <span>Rules</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

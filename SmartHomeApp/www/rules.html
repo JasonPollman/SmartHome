@@ -5,16 +5,18 @@
     </script>
 </head>
 
-<!-- The "Device Rules" Page -->
+<!-- The "Rules" Page -->
 <div data-role="page" data-theme="b" id="rules">
 
     <div data-role="header" data-position="fixed" role="banner" data-theme="b" data-tap-toggle="false">
         <a href="#" data-rel="back" data-role="button" role="button"><i class="fa fa-arrow-circle-left"></i></a>
         <h1>Device Rules</h1>
+        <a href='#' id="add-rule" data-position-to='window' data-role='button' data-transition='pop' data-inline='true'>
+            <i class="fa fa-plus"></i>
+        </a>
     </div>
 
-    <div data-role="content" data-theme="b" id="schedules-content">
-        <!-- Inject Rules -->
+    <div data-role="content" data-theme="b" data-content-theme="b" id="rules-content">
 
         <!-- Error Popup -->
         <div data-role="popup" data-theme="b" class="error-message-page">
@@ -28,6 +30,17 @@
             </div>
         </div>
 
+        <ul data-role="listview" id="my-rules">
+            <!-- Inject Rules -->
+            <li id="pseduo-rule">
+                <a href="#" class="rule-href">
+                    <img src="img/rules.png">
+                    <h3 class="rules-title">Rule Name</h3>
+                    <p class="em">Source Device: <span class="rule-source-device">Philips Hue</span></p>
+                    <p class="em">Target Device: <span class="rule-target-device">Philips Hue</span></p>
+                </a>
+            </li>
+        </ul>
     </div>
 
     <div data-role="footer" class="ui-bar-b" data-position="fixed" data-theme="b" data-role="footer" role="contentinfo" data-tap-toggle="false">

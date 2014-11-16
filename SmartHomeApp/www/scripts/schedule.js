@@ -20,7 +20,6 @@ $(document).on("pagecreate", "#schedule", function () { // When the "device" pag
 
             for(var i in schs) {
 
-                console.log(i, params.id);
                 if(i == params.id) {
 
                     found = true;
@@ -363,10 +362,14 @@ function injectWidgetsStatic(schedule) {
                         }
 
                         // Give the widget a header, and some info.
+                        var pathRegExp = new RegExp("(.*" + encodeURIComponent(device.mac) + "\/)(.*)");
                         $("#" + device.name + "-" + REFS[r].delta)
-                            .append('<div></div><h3>' + UCFirst(widgets[i].name) + '</h3>' +
+                            .append('<div><div class="pull-right"><select class="widget" name="' + REFS[r].path.replace(pathRegExp, '$2') + REFS[r].set + '" id="enable-' + "widget-" + i + "-" + REFS[r].delta + '" data-role="slider" data-theme="b">' +
+                            '<option value="0">Disabled</option>' +
+                            '<option value="1">Enabled</option>'  +
+                            '</select></div><h3>' + UCFirst(widgets[i].name) + '</h3>' +
                             '<p><i class="fa fa-info"></i>' + widgets[i].info + '</p>' +
-                            '<div class="widget-wrapper-' + i + '"></div></div>');
+                            '<div class="widget-wrapper-' + i + '"></div></div><hr />');
 
                         // Load the widget from the '/widgets' directory
                         // Note this function is bound to an array [i, r] to maintain the
@@ -384,7 +387,7 @@ function injectWidgetsStatic(schedule) {
 
                             // Set the widget's HTML attributes
                             $(e).attr("name", i + "-" + REFS[r].delta);
-                            $(e).attr("id", "widget-" + i + "-" + REFS[r].delta + '-' + i);
+                            $(e).attr("id", "widget-" + i + "-" + REFS[r].delta);
                             $(e).attr("data-highlight", true);
                             $(e).attr("min", widgets[i].min);
                             $(e).attr("max", widgets[i].max);
@@ -397,17 +400,7 @@ function injectWidgetsStatic(schedule) {
                                 var i = this[0];
                                 var r = this[1];
 
-                                var value = $(e).val();
-
-                                if($.isNumeric(value)) {
-                                    value = Number(value);
-                                }
-                                else if(value === "true") {
-                                    value = Boolean(true);
-                                }
-                                else if(value === "false") {
-                                    value = Boolean(false);
-                                }
+                                var value = cleanValue($(e).val());
 
                                 FIREBASE_SCHEDULES_OBJ.child(schedule.key).once("value", function (data) {
 
@@ -419,10 +412,8 @@ function injectWidgetsStatic(schedule) {
                                     if(!sch.setting_value) sch.setting_value = [];
                                     if(!sch.setting_path) sch.setting_path = [];
 
-                                    console.log(sch);
-
-                                    console.log(encodeURIComponent(device.mac));
                                     var schPath = REFS[r].path.split(encodeURIComponent(device.mac))[1].replace(/^\/|\/$/g, '') + "/" + REFS[r].set;
+                                    if(schPath.charAt(0) == '/') schPath = schPath.slice(1, schPath.length);
 
                                     var index = -1;
 
@@ -446,7 +437,6 @@ function injectWidgetsStatic(schedule) {
                             if (widgets[i].swatch) swatch[r][i] = $(e);
 
                             // Set the current value as default slider value...
-                            // Using "on" for 2-way data binding
                             new Firebase(REFS[r].path + REFS[r].set).once("value", function (data) {
 
                                 $(e).val(data.val().toString());
@@ -459,22 +449,71 @@ function injectWidgetsStatic(schedule) {
 
                             });
 
-                            var tmpFB = new Firebase(REFS[r].path);
-                            // If the data is changed in Firebase, update it client-side as well:
-                            FIREBASES.push(tmpFB);
-                            tmpFB.on("value", function (data) {
-                                var val = data.val();
+                            var enable = $("#enable-" + "widget-" + i + "-" + REFS[r].delta);
 
-                                for (var m in val) {
-                                    if (m == REFS[r].set) {
-                                        $(e).val(val[m]).trigger("change");
-                                        if ($(e).attr("data-type") == "range") $(e).slider().slider("refresh");
-                                    }
+                            FIREBASE_SCHEDULES_OBJ.child(schedule.key).child("setting_path").once("value", function (data) {
+
+                                if(!data.val()) return;
+
+                                var values = data.val();
+                                if(values.indexOf($(enable).attr("name")) > -1) {
+                                    $(enable).val(1).slider("refresh");
                                 }
-
+                                else {
+                                    $(enable).val(0).slider("refresh");
+                                    $("#widget-" + i + "-" + REFS[r].delta).slider({disabled: true}).slider("refresh");
+                                }
                             });
 
-                        }.bind([i, r])); // End $.get()
+                            $(enable).change(function () {
+
+                                var e = $("#" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i + ' .widget');
+
+                                if($(enable).val() == 0) { // The widget isn't enabled for this rule/schedule
+
+                                    $("#widget-" + i + "-" + REFS[r].delta).slider({disabled: true}).slider("refresh");
+
+                                    // Remove the reference to the schedules paths/values
+                                    FIREBASE_SCHEDULES_OBJ.child(schedule.key).once("value", function (data) {
+
+                                        var sch = data.val();
+                                        if(!sch.setting_path) sch.setting_path = [];
+                                        if(!sch.setting_value) sch.setting_value = [];
+
+                                        var index = sch.setting_path.indexOf($(enable).attr("name"));
+                                        if(index > -1) {
+                                            sch.setting_path.splice(index, 1);
+                                            sch.setting_value.splice(index, 1);
+                                        }
+                                        console.log(sch);
+                                        FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(sch);
+                                    });
+                                }
+                                else { // The widget is enabled for this schedule/rule
+
+                                    $("#widget-" + i + "-" + REFS[r].delta).slider({disabled: false}).slider("refresh");
+
+                                    // Remove the reference to the schedules paths/values
+                                    FIREBASE_SCHEDULES_OBJ.child(schedule.key).once("value", function (data) {
+
+                                        var sch = data.val();
+                                        if(!sch.setting_path) sch.setting_path = [];
+                                        if(!sch.setting_value) sch.setting_value = [];
+
+                                        if(sch.setting_path.indexOf($(enable).attr("name")) == -1) {
+                                            sch.setting_path.push($(enable).attr("name"));
+                                            sch.setting_value.push(cleanValue($(e).val()));
+                                        }
+
+                                        FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(sch);
+
+                                    });
+
+                                } // End if/else block
+
+                            }); // End $(enable).change()
+
+                        }.bind([i, r])); // End $.load()
 
 
                     } // End for(var r in REFS)
@@ -489,34 +528,5 @@ function injectWidgetsStatic(schedule) {
 
 
     });
-
-    /**
-     * Builds a color "swatch" so the user can see the results of the values changed.
-     * @param swatch    - The "swatch" object
-     * @param container - The container the "swatch" object will be appended to.
-     */
-    function buildSwatch(swatch, container) {
-
-        // Load the swatch widget
-        $("<div>").load(WIDGETS_DIRECTORY + "/color-swatch.html", function () {
-
-            $(container).append($(this));
-
-            var swatchElem = this;
-
-            for (var i in swatch) { // Set the swatches background color
-
-                $(this).find(".color-swatch").css("background-color", "hsl(" + ($(swatch.hue).val() / 182.04) + "," + ($(swatch.sat).val() / 2.55) + "%," + ($(swatch.bri).val() / 2.55) + "%)");
-
-
-                // Change the background color on slider change:
-                $(swatch[i]).on("change", function () {
-                    $(swatchElem).find(".color-swatch").css("background-color", "hsl(" + ($(swatch.hue).val() / 182.04) + "," + ($(swatch.sat).val() / 2.55) + "%," + ($(swatch.bri).val() / 2.55) + "%)");
-                });
-            }
-
-        });
-
-    } // End buildSwatch()
 
 } // End injectWidgets
