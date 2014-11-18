@@ -158,7 +158,7 @@ PhilipsHue.prototype.setWidgets = function () {
         "step": 1,
         "swatch": true,
         "type": "slider",
-        "z": 3
+        "z": 4
       },
       "hue": {
         "info": "Change the hue of this light.",
@@ -169,7 +169,7 @@ PhilipsHue.prototype.setWidgets = function () {
         "step": 1,
         "swatch": true,
         "type": "slider",
-        "z": 1
+        "z": 2
       },
       "power": {
         "info": "Turn this light on or off.",
@@ -187,7 +187,14 @@ PhilipsHue.prototype.setWidgets = function () {
         "step": 1,
         "swatch": true,
         "type": "slider",
-        "z": 2
+        "z": 3
+      },
+      "effects": {
+        "info": "Apply an effect to this light.",
+        "name": "Effects",
+        "path": "/lights/*/state/effect",
+        "type": "hue-effects",
+        "z": 1
       }
 
   } // End return

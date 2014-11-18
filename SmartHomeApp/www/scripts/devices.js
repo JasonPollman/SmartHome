@@ -193,16 +193,11 @@ function injectWidgets(page, params) {
 
                         REFS[r].path += "/";
 
+                        var collapsed = (r == 0) ? "false" : "true";
+
                         // Append a container for the widgets, if we haven't done so on a previous iteration
-                        if (!$('#delta-' + r).length) {
-                            $(".widgets-wrapper").append('<div class="widget-container" id="delta-' + r + '"></div>');
-                        }
-
-                        // Append a wrapper for the widget for this "delta" or widget group.
                         if (!$("#" + device.name + "-" + REFS[r].delta).length) {
-
-                            $('.widgets-wrapper #delta-' + r)
-                                .prepend('<div data-content-theme="b" data-role="collapsible" data-collapsed="true" id="' + device.name + "-" + REFS[r].delta + '"></div>');
+                            $(".widgets-wrapper").append('<div data-content-theme="b" data-role="collapsible" data-collapsed="' + collapsed + '" id="' + device.name + "-" + REFS[r].delta + '"></div>');
 
                             $("#" + device.name + "-" + REFS[r].delta)
                                 .append('<h3 class="ui-bar-b">' + REFS[r].title + ((REFS.length > 1) ? " " + REFS[r].delta : "" ) + '</h3>');
@@ -212,11 +207,12 @@ function injectWidgets(page, params) {
                         $("#" + device.name + "-" + REFS[r].delta)
                             .append('<div><h3>' + UCFirst(widgets[i].name) + '</h3>' +
                             '<p><i class="fa fa-info"></i>' + widgets[i].info + '</p>' +
-                            '<div class="widget-wrapper-' + i + '"></div></div>');
+                            '<div class="widget-wrapper-' + i + '"></div></div><hr />');
 
                         // Load the widget from the '/widgets' directory
                         // Note this function is bound to an array [i, r] to maintain the
                         // widget key (i) and widget delta (r)
+                        console.log(WIDGETS_DIRECTORY + "/" + widgets[i].type + ".html");
                         $("#" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i).load(WIDGETS_DIRECTORY + "/" + widgets[i].type + ".html", function (data) {
 
                             var i = this[0];
@@ -253,20 +249,18 @@ function injectWidgets(page, params) {
 
                                 $(e).change(function () {
 
-                                    var obj = {};
-                                    var value = $(this).val();
+                                    console.log("HERE");
 
-                                    if($.isNumeric(value)) {
-                                        obj[REFS[r].set] = Number(value);
-                                    }
-                                    else if(value === "true") {
-                                        obj[REFS[r].set] = Boolean(true);
-                                    }
-                                    else if(value === "false") {
-                                        obj[REFS[r].set] = Boolean(false);
-                                    }
+                                    var obj = {};
+                                    var value = cleanValue($(this).val());
+
+                                    console.log($(this).val());
+
+                                    obj[REFS[r].set] = value;
 
                                     new Firebase(REFS[r].path).update(obj, function (error) {
+
+                                        console.log(error + "ERROR");
 
                                         var err = $("#device-error-message");
 

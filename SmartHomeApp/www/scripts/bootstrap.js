@@ -20,6 +20,7 @@ global.persistentConnection = function (persist, reset, cb) {
 
             var connection = false;
             var pageID = $.mobile.activePage.attr("id");
+            console.log("PAGE" + pageID);
 
             if (data.val() != "polo") {
 
