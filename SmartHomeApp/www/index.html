@@ -38,19 +38,24 @@
 			$.mobile.phonegapNavigationEnabled = true;
 			$.mobile.allowCrossDomainPages = true;
 		});
+
+		app.initialize();
 	</script>
 
 	<!-- Load the Firebase Library -->
 	<script src="lib/firebase/firebase.js"></script>
 
+	<!-- Load the SmartHome Key *** -->
+	<script src="key.js"></script>
+
 	<!-- Load the SmartHome JS Library *** After Everything Else! *** -->
 	<script src="scripts/smarthome.js"></script>
 
-	<!-- Load the SmartHome Application Actions *** -->
-	<script src="scripts/actions.js"></script>
-
 	<!-- Bootstrap the App *** This script should only be present within the index.html file *** -->
 	<script src="scripts/bootstrap.js"></script>
+
+	<!-- Load the SmartHome Application Actions *** -->
+	<script src="scripts/actions.js"></script>
 
 	<!-- For the "My Devices" Page -->
 	<script src="scripts/loadDevices.js"></script>
@@ -98,7 +103,5 @@
 
 		</div>
 	</div>
-
-
 </body>
 </html>

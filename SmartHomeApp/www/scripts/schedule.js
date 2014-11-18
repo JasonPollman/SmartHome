@@ -346,20 +346,16 @@ function injectWidgetsStatic(schedule) {
 
                         REFS[r].path += "/";
 
+                        var collapsed = (r == 0) ? "false" : "true";
+
                         // Append a container for the widgets, if we haven't done so on a previous iteration
-                        if (!$('#delta-' + r).length) {
-                            $(".widgets-wrapper").append('<div class="widget-container" id="delta-' + r + '"></div>');
-                        }
-
-                        // Append a wrapper for the widget for this "delta" or widget group.
                         if (!$("#" + device.name + "-" + REFS[r].delta).length) {
-
-                            $('.widgets-wrapper #delta-' + r)
-                                .prepend('<div data-content-theme="b" data-role="collapsible" data-collapsed="true" id="' + device.name + "-" + REFS[r].delta + '"></div>');
+                            $(".widgets-wrapper").append('<div data-content-theme="b" data-role="collapsible" data-collapsed="' + collapsed + '" id="' + device.name + "-" + REFS[r].delta + '"></div>');
 
                             $("#" + device.name + "-" + REFS[r].delta)
                                 .append('<h3 class="ui-bar-b">' + REFS[r].title + ((REFS.length > 1) ? " " + REFS[r].delta : "" ) + '</h3>');
                         }
+
 
                         // Give the widget a header, and some info.
                         var pathRegExp = new RegExp("(.*" + encodeURIComponent(device.mac) + "\/)(.*)");
@@ -485,7 +481,7 @@ function injectWidgetsStatic(schedule) {
                                             sch.setting_path.splice(index, 1);
                                             sch.setting_value.splice(index, 1);
                                         }
-                                        console.log(sch);
+
                                         FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(sch);
                                     });
                                 }

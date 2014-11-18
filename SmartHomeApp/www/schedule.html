@@ -20,8 +20,7 @@
 
     <div data-role="content" data-theme="b" data-content-theme="b" id="schedule-content">
 
-        <!-- Error Popup -->
-        <div data-role="popup" data-theme="b" class="error-message-page">
+        <div data-role="popup" data-theme="b" id="error-message-schedule">
             <div data-role="header" data-theme="b">
                 <h1>SmartHome App Error</h1>
             </div>
@@ -83,8 +82,8 @@
                     </div>
 
                     <br />
-                    <label for="schedule-input-hour">Hour</label>
-                    <select name="schedule-input-hour" id="schedule-input-hour">
+                    <label for="schedule-input-hour">Time</label>
+                    <select name="schedule-input-hour" id="schedule-input-hour" data-inline="true">
                         <option id="hour-1">1</option>
                         <option id="hour-2">2</option>
                         <option id="hour-3">3</option>
@@ -99,8 +98,7 @@
                         <option id="hour-12">12</option>
                     </select>
 
-                    <label for="schedule-input-minute">Minute</label>
-                    <select name="schedule-input-minute" id="schedule-input-minute">
+                    <select name="schedule-input-minute" id="schedule-input-minute" data-inline="true">
                         <option id="minute-00">0</option>
                         <option id="minute-05">5</option>
                         <option id="minute-10">10</option>
@@ -115,8 +113,7 @@
                         <option id="minute-55">55</option>
                     </select>
 
-                    <label for="schedule-input-ampm">AM/PM</label>
-                    <select name="schedule-input-ampm" id="schedule-input-ampm">
+                    <select name="schedule-input-ampm" id="schedule-input-ampm" data-inline="true">
                         <option id="am">AM</option>
                         <option id="pm">PM</option>
                     </select>
@@ -130,13 +127,13 @@
                 <h3 data-theme="b" data-tap-toggle="false" style="font-weight: normal">
                     Device Settings
                 </h3>
-                <div class="widgets-wrapper">
+                <div class="widgets-wrapper" data-role="collapsible-set">
                     <!-- Inject Widgets -->
                 </div>
             </div>
         </div>
 
-        <!-- Popup -->
+        <!-- Add Schedule Popup -->
         <div data-role="popup" data-theme="b" id="schedule-message">
             <div data-role="header" data-theme="b">
                 <h1 id="#schedule-message-h1">Delete Schedule?</h1>

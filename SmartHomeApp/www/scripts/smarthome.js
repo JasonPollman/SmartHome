@@ -1,7 +1,6 @@
 // Incase we want to make this a non-browser thing, this could be changed to global = global in node. :P
 var global = window;
 
-
 // <------------------------------------------- GLOBAL SETTINGS ------------------------------------------> //
 
 var PAGE_TRANSITION_TYPE       = "slide";
@@ -13,10 +12,13 @@ var SCHEDULES_GLOBAL    = "$SH_Schedules";
 var DEVICES_GLOBAL      = "$SH_Devices";
 var CONN_DEVICES_GLOBAL = "$SH_Conn_Devices";
 
-var CONN_PING_INTERVAL  = 100000; // 1 Second
-var LAST_PAGE_GLOBAL        = "$SH_LastPage";
+var CONN_PING_INTERVAL  = 1000; // 1 Second
+var LAST_PAGE_GLOBAL    = "$SH_LastPage";
+var SESSION_ID_GLOBAL   = "$SH_SESSION_ID";
+var SESSION_REF_GLOBAL  = {};
 
-var FIREBASE_ROOT              = "https://smarthomeapp.firebaseio.com/";
+var FIREBASE_ROOT              = "https://smarthometest.firebaseio.com/" + $SH_KEY + "/";
+console.log($SH_KEY);
 var FIREBASE_OBJ               = new Firebase(FIREBASE_ROOT);
 var FIREBASE_DEVICE_DATA       = FIREBASE_ROOT + "device_data";
 var FIREBASE_DEVICE_DATA_OBJ   = new Firebase(FIREBASE_DEVICE_DATA);
