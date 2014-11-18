@@ -190,7 +190,12 @@ var BaseDeviceObject = function (name, address, mac, port) {
 
 
             for(var i in users) {
-              if(!users[i][APIConfig.general.firebaseUserSettingsPath].hasOwnProperty(self.mac)) {
+
+              if(!users[i][APIConfig.general.firebaseUserSettingsPath]) {
+                users[i][APIConfig.general.firebaseUserSettingsPath] = {};
+              }
+
+              if(!users[i][APIConfig.general.firebaseUserSettingsPath][self.mac]) {
                 users[i][APIConfig.general.firebaseUserSettingsPath][self.mac] = self.settings;
                 self.firebaseUsers.child(i).update(users[i]);
               }

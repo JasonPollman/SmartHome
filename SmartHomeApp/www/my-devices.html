@@ -15,19 +15,18 @@
 
     <div data-role="content" data-theme="b" id="my-devices-content">
         <!-- Inject Device Icons -->
+    </div>
 
-        <!-- Error Popup -->
-        <div data-role="popup" data-theme="b" class="error-message-page">
-            <div data-role="header" data-theme="b">
-                <h1>SmartHome App Error</h1>
-            </div>
-            <div data-role="content" data-theme="b" class="popup center">
-                <p class="error-message-content-page"></p>
-                <a href='#' class="try-again" data-theme="b" data-rel='back' data-iconpos='left' data-role='button' data-inline='true'>
-                    <i class="fa fa-refresh"></i>Retry</a>
-            </div>
+    <!-- Error Popup -->
+    <div data-role="popup" data-theme="b" id="error-message-my-devices">
+        <div data-role="header" data-theme="b">
+            <h1>SmartHome App Error</h1>
         </div>
-
+        <div data-role="content" data-theme="b" class="popup center">
+            <p class="error-message-content-page"></p>
+            <a href='#' class="try-again" data-theme="b" data-rel='back' data-iconpos='left' data-role='button' data-inline='true'>
+                <i class="fa fa-refresh"></i>Retry</a>
+        </div>
     </div>
 
     <!-- Options Panel -->
@@ -47,6 +46,11 @@
             <li data-icon="false">
                 <a href='#credits' data-rel='popup' data-position-to='window' data-role='button' data-transition='pop' data-inline='true'>
                     <i class="lIcon fa fa-legal"></i>Credits
+                </a>
+            </li>
+            <li data-icon="false">
+                <a href='help.html' data-role='button' data-inline='true'>
+                    <i class="lIcon fa fa-question"></i>Help
                 </a>
             </li>
         </ul>
@@ -84,7 +88,7 @@
         </div>
         <div data-role='content' data-theme='b'>
             <p>Project developed by Jason Pollman, Michael Battaglia, Lawrence Ismail & Patrick Sinnot.</p>
-            <p>Version: 1.0.0</p>
+            <p>Version: 0.1.0</p>
                 <div class='center'>
                     <a href='#' data-rel='back' data-role='button' data-inline='true'>
             <i class="fa fa-check-circle-o"></i>Okay
@@ -96,11 +100,11 @@
     <!-- The "Credits" Page -->
     <div data-role='popup' id='credits' data-theme='b' data-content-theme="b">
         <div data-role='header' data-theme='b'>
-              <h1>nativeDroid Theme</h1>
+              <h1>NativeDroid Theme</h1>
         </div>
         <div data-role='content' data-theme='b'>
-            <p>Special Thanks to the maker of the nativeDroid Theme for jQuery Mobile:
-                <a target="_blank" rel="external" href="http://nativedroid.godesign.ch/">nativeDroid-Theme by Raphael Wildhaber</a>
+            <p>NativeDroid Theme for jQuery Mobile:
+                <a target="_blank" rel="external" href="http://nativedroid.godesign.ch/">NativeDroid-Theme by Raphael Wildhaber</a>
                 <div class='center'>
                     <a href='#' data-rel='back' data-role='button' data-inline='true'>
                         <i class="fa fa-check-circle-o"></i>Okay

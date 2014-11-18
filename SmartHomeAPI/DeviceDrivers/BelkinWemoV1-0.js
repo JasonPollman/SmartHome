@@ -338,46 +338,21 @@ BelkinWemo.prototype.construct = BelkinWemo.prototype.setSettings;
  *               See: https://www.npmjs.org/package/deep-diff for more info.
  */
 BelkinWemo.prototype.onFirebaseData = function (diff, data, lastState, updateStatus) {
-  
+
   var self = this;
-  
-  for(var i in diff) { // Loop through all the differences...
 
-    // If it's not a wemo_motion
-    if(diff[i].kind == 'E') { // Kind 'E' means edited.
+  if(self.name != "wemo_motion") {
 
-      switch(true) { 
+    self.wemoDevice.setBinaryState(data.state, function(error, result) {
 
-        case diff[i].path && diff[i].path.join('-').match(/state/g) != null: // The WeMo device's state was changed
+      // Update the status, which will push the changes to firebase
+      (error != null) ? updateStatus(1, error) : updateStatus(0, result);
 
-          var rhs = (diff[i].rhs > 1) ? 1 : (diff[i].rhs < 0) ? 0 : diff[i].rhs; // Anything > 0 is a one, anything < 0 is a zero...
-
-          // Set the device's state
-          if(self.name != "wemo_motion") {
-
-            self.wemoDevice.setBinaryState(rhs.toString(), function(error, result) {
-
-            // !!! Note Belkin requires a string for some stupid reason. !!! //
-              
-              // Update the status, which will push the changes to firebase
-              (error != null) ? updateStatus(1, error) : updateStatus(0, result);
-
-            });
-          }
-          else {
-            updateStatus(0, "Motion Detection Successful...");
-          }
-          break;
-
-        default:
-          updateStatus(0, "Successfully Updated");
-          break;
-
-     } // End switch block
-
-    } // End if block
-
-  } // End for loop
+    });
+  }
+  else {
+    updateStatus(0, "Motion Detection Successful...");
+  }
 
 } // End onFirebaseData()
 

@@ -5,10 +5,10 @@ var APIConfig = require('./APIConfig');
 var console   = require('./APIUtil.js').console;
 var Firebase  = require("firebase");
 
-var UserConfig = function () {
+// Object which will synchronize with the Firebase User's Object
+var Users = {};
 
-  // Object which will synchronize with the Firebase User's Object
-  var Users = {};
+var UserConfig = function () {
 
   var DevicesRegistered = [];
 
@@ -17,8 +17,8 @@ var UserConfig = function () {
 
   // Set Users equal to the firebase users object (initialize)
   UsersFirebase.once("value", function (usersData) {
-    Users = usersData.val();
-  })
+    Users = usersData.val() || {};
+  });
 
   // When a change is made in firbase, change it in Users
   UsersFirebase.on("child_changed", function (child) {
@@ -33,12 +33,13 @@ var UserConfig = function () {
 
   UsersFirebase.on("child_added", function (child) {
 
-    if(!(child.val() instanceof Object)) {
-      console.warn("User '" + child.name() + "' is invalid. Users must be an object.");
-      return;
-    }
-
     var childData = child.val();
+
+    if(!(childData instanceof Object)) childData = {};
+
+    // When the user was created...
+    if(!childData.created) childData.created = Date.now();
+
     // If there's no "device_configs" key for the user, create it:
     if(!childData[APIConfig.general.firebaseUserSettingsPath]) childData[APIConfig.general.firebaseUserSettingsPath] = {};
 
@@ -80,7 +81,7 @@ var UserConfig = function () {
 
       configurable: false,
       writable: false,
-      enumerable: true,
+      enumerable: true
 
     }); // End Object.defineProperty
 
@@ -91,4 +92,4 @@ var UserConfig = function () {
 require('util').inherits(UserConfig, require('events').EventEmitter);
 
 // Export the module
-module.exports = new UserConfig;
+module.exports = new UserConfig();

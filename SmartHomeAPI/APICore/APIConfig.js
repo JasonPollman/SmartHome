@@ -1,4 +1,5 @@
 "use strict"
+var fs = require('fs');
 
 module.exports = {
 
@@ -35,7 +36,7 @@ module.exports = {
 
     requireAuthentication: false,
 
-    firebaseRootURI   : "https://smarthomeapp.firebaseio.com",
+    firebaseRootURI   : "https://smarthometest.firebaseio.com/" + fs.readFileSync('.key').toString(),
     firebaseAPIStatus : "api_status",
 
     firebaseDevicePath              : "device_data",

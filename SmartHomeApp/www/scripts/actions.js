@@ -1,7 +1,6 @@
 /**
  * SmartHome Actions
  */
-var connectionVerifyInterval;
 
 /**
  * Prevent Users from using the back button to go back to the loading page...
@@ -34,37 +33,6 @@ $(document).on('pagebeforechange', function(e, data){
  * Makes the jQuery Mobile "Content" Page portion exhume the rest of the screen...
  */
 $(document).on("pagecreate", resizeHeight);
-
-
-/**
- * Keep a persistent connection to the back-end... or show an error, otherwise:
- */
-var CONN_ERROR_ON_PAGE = false;
-var connectionVerifyInterval = setInterval(function () {
-
-    FIREBASE_OBJ.child("api_status").child("ping").child(USER).set("marco", function () {
-
-        setTimeout(function () {
-
-            FIREBASE_OBJ.child("api_status").once("value", function (data) {
-
-                var values = data.val();
-                if(values.ping[USER] != "polo" && values.reachable != "true") {
-                    $(".error-message-content-page").html("The SmartHome Network API is not connected.<br />Please make sure your local SmartHome API is running.");
-                    $(".error-message-page").trigger("create");
-                    $(".error-message-page").popup("open");
-                }
-                else {
-                    $(".error-message-page").popup("close");
-                }
-
-            });
-
-        }, 60);
-
-    });
-
-}, CONN_PING_INTERVAL);
 
 
 /**

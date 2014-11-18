@@ -69,3 +69,9 @@ hr {
     filter: grayscale(100%);
     opacity: .4;
 }
+.widget-wrapper-motion .ui-slider {
+ display: none !important;
+}
+#help .fa:before {
+    padding: 5px;
+}

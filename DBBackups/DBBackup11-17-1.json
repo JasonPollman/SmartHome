@@ -1,0 +1,738 @@
+{
+  "api_status" : {
+    "code" : 0,
+    "last_msg_received" : 1416120684316,
+    "last_shutdown" : 1416115640763,
+    "last_shutdown_status" : 0,
+    "last_startup" : 1416119594066,
+    "last_startup_status" : 0,
+    "ping" : {
+      "jason" : "polo"
+    },
+    "reachable" : true,
+    "status" : "undefined message",
+    "wan_ip" : "24.74.174.223"
+  },
+  "connected_devices" : {
+    "00:17:88:14:C7:78" : {
+      "address" : "192.168.0.11",
+      "driver" : {
+        "make" : "Philips",
+        "model" : "Hue",
+        "type" : "lighting",
+        "version" : "1.0.0"
+      },
+      "mac" : "00:17:88:14:C7:78",
+      "name" : "philips_hue",
+      "port" : "N/A",
+      "supported" : true
+    },
+    "00:A0:96:FA:30:7A" : {
+      "address" : "192.168.0.8",
+      "driver" : "none",
+      "mac" : "00:A0:96:FA:30:7A",
+      "name" : "Mitsumi Electric CO.",
+      "supported" : false
+    },
+    "A4:EE:57:BB:7E:29" : {
+      "address" : "192.168.0.9",
+      "driver" : "none",
+      "mac" : "A4:EE:57:BB:7E:29",
+      "name" : "Seiko Epson",
+      "supported" : false
+    },
+    "C0:14:3D:BB:2E:34" : {
+      "address" : "192.168.0.1",
+      "driver" : "none",
+      "mac" : "C0:14:3D:BB:2E:34",
+      "name" : "Hon Hai Precision Ind. Co.",
+      "supported" : false
+    }
+  },
+  "device_data" : {
+    "00:17:88:14:C7:78" : {
+      "address" : "192.168.0.11",
+      "last_change" : {
+        "message" : "[{\"success\":{\"/lights/3/state/on\":true}}]",
+        "status" : "success",
+        "timestamp" : 1416120097093,
+        "user" : "jason"
+      },
+      "mac" : "00:17:88:14:C7:78",
+      "name" : "philips_hue",
+      "settings" : {
+        "config" : {
+          "UTC" : "2014-11-16T06:48:20",
+          "dhcp" : true,
+          "gateway" : "192.168.0.1",
+          "ipaddress" : "192.168.0.11",
+          "linkbutton" : false,
+          "mac" : "00:17:88:14:c7:78",
+          "name" : "Philips hue",
+          "netmask" : "255.255.255.0",
+          "portalservices" : false,
+          "proxyaddress" : "none",
+          "proxyport" : 0,
+          "swupdate" : {
+            "notify" : false,
+            "text" : "",
+            "updatestate" : 0,
+            "url" : ""
+          },
+          "swversion" : "01006390",
+          "whitelist" : {
+            "000000004bf28fd0653e0255653e0255" : {
+              "create date" : "2014-09-22T17:26:32",
+              "last use date" : "2014-09-22T21:27:30",
+              "name" : "Hue#LGE VS980 4G"
+            },
+            "SmartHomeAPI" : {
+              "create date" : "2014-09-29T03:27:54",
+              "last use date" : "2014-11-16T06:48:20",
+              "name" : "SmartHomeAPI"
+            }
+          }
+        },
+        "groups" : [ null, {
+          "action" : {
+            "bri" : 0,
+            "colormode" : "xy",
+            "ct" : 369,
+            "effect" : "none",
+            "hue" : 0,
+            "on" : true,
+            "sat" : 95,
+            "xy" : [ 0, 0 ]
+          },
+          "lights" : [ "2" ],
+          "name" : "test"
+        }, {
+          "action" : {
+            "bri" : 0,
+            "colormode" : "xy",
+            "ct" : 369,
+            "effect" : "none",
+            "hue" : 0,
+            "on" : true,
+            "sat" : 95,
+            "xy" : [ 0, 0 ]
+          },
+          "lights" : [ "2" ],
+          "name" : "jason"
+        }, {
+          "action" : {
+            "bri" : 0,
+            "colormode" : "xy",
+            "ct" : 369,
+            "effect" : "none",
+            "hue" : 0,
+            "on" : true,
+            "sat" : 95,
+            "xy" : [ 0, 0 ]
+          },
+          "lights" : [ "2" ],
+          "name" : "testing"
+        }, {
+          "action" : {
+            "bri" : 0,
+            "colormode" : "xy",
+            "ct" : 369,
+            "effect" : "none",
+            "hue" : 0,
+            "on" : true,
+            "sat" : 95,
+            "xy" : [ 0, 0 ]
+          },
+          "lights" : [ "2" ],
+          "name" : "pollman"
+        } ],
+        "lights" : [ null, {
+          "modelid" : "LCT001",
+          "name" : "Hue Lamp",
+          "pointsymbol" : [ null, "none", "none", "none", "none", "none", "none", "none", "none" ],
+          "state" : {
+            "alert" : "none",
+            "bri" : 253,
+            "colormode" : "hs",
+            "ct" : 500,
+            "effect" : "none",
+            "hue" : 8520,
+            "on" : true,
+            "reachable" : true,
+            "sat" : 252,
+            "xy" : [ 0.5848, 0.3872 ]
+          },
+          "swversion" : "66009663",
+          "type" : "Extended color light"
+        }, {
+          "modelid" : "LCT001",
+          "name" : "Hue Lamp 1",
+          "pointsymbol" : [ null, "none", "none", "none", "none", "none", "none", "none", "none" ],
+          "state" : {
+            "alert" : "none",
+            "bri" : 0,
+            "colormode" : "hs",
+            "ct" : 369,
+            "effect" : "none",
+            "hue" : 0,
+            "on" : true,
+            "reachable" : false,
+            "sat" : 95,
+            "xy" : [ 0, 0 ]
+          },
+          "swversion" : "66009663",
+          "type" : "Extended color light"
+        }, {
+          "modelid" : "LCT001",
+          "name" : "Hue Lamp 2",
+          "pointsymbol" : [ null, "none", "none", "none", "none", "none", "none", "none", "none" ],
+          "state" : {
+            "alert" : "none",
+            "bri" : 254,
+            "colormode" : "hs",
+            "ct" : 500,
+            "effect" : "none",
+            "hue" : 64880,
+            "on" : true,
+            "reachable" : true,
+            "sat" : 240,
+            "xy" : [ 0.6417, 0.3155 ]
+          },
+          "swversion" : "66009663",
+          "type" : "Extended color light"
+        } ]
+      },
+      "widgets" : {
+        "bri" : {
+          "info" : "Change the brightness of this light.",
+          "max" : 255,
+          "min" : 0,
+          "name" : "Brightness",
+          "path" : "lights/*/state/bri",
+          "step" : 1,
+          "swatch" : true,
+          "type" : "slider",
+          "z" : 3
+        },
+        "hue" : {
+          "info" : "Change the hue of this light.",
+          "max" : 65535,
+          "min" : 0,
+          "name" : "Hue",
+          "path" : "lights/*/state/hue",
+          "step" : 1,
+          "swatch" : true,
+          "type" : "slider",
+          "z" : 1
+        },
+        "power" : {
+          "info" : "Turn this light on or off.",
+          "name" : "Power",
+          "path" : "/lights/*/state/on",
+          "type" : "flipswitch-bool",
+          "z" : 0
+        },
+        "sat" : {
+          "info" : "Change the saturation of this light.",
+          "max" : 255,
+          "min" : 0,
+          "name" : "Saturation",
+          "path" : "/lights/*/state/sat",
+          "step" : 1,
+          "swatch" : true,
+          "type" : "slider",
+          "z" : 2
+        }
+      }
+    },
+    "00:90:0B:33:0D:D3" : {
+      "address" : "10.39.223.255",
+      "last_change" : {
+        "message" : "Success",
+        "status" : "success",
+        "timestamp" : 1412887170088,
+        "user" : "lismail"
+      },
+      "mac" : "00:90:0B:33:0D:D3",
+      "name" : "lanner_electronics",
+      "settings" : {
+        "test1" : "Testdsfdf 1",
+        "test2" : "Test 2"
+      }
+    },
+    "08:86:3B:6D:95:25" : {
+      "address" : "192.168.1.128",
+      "last_change" : {
+        "message" : "Motion Detection Successful...",
+        "status" : "success",
+        "timestamp" : 1415807132588,
+        "user" : "lismail"
+      },
+      "mac" : "08:86:3B:6D:95:25",
+      "name" : "wemo_motion",
+      "settings" : {
+        "state" : "1",
+        "type" : "wemo_motion"
+      },
+      "widgets" : {
+        "motion" : {
+          "info" : "The current motion status. Red indicates no motion and green indicates motion.",
+          "name" : "Motion",
+          "path" : "state",
+          "type" : "motion"
+        }
+      }
+    },
+    "08:86:3B:71:32:A1" : {
+      "address" : "192.168.1.125",
+      "last_change" : {
+        "message" : "Error",
+        "status" : "success",
+        "timestamp" : 1415810328325,
+        "user" : "jason"
+      },
+      "mac" : "08:86:3B:71:32:A1",
+      "name" : "wemo_switch",
+      "settings" : {
+        "state" : "0",
+        "type" : "wemo_switch"
+      },
+      "widgets" : {
+        "state" : {
+          "info" : "Change the power state of the WeMo Switch.",
+          "name" : "Power State",
+          "path" : "state",
+          "type" : "flipswitch"
+        }
+      }
+    }
+  },
+  "global_settings" : "hgjhg",
+  "rules" : {
+    "device_rules" : {
+      "\"turn on switch when light 1 is off\"" : {
+        "alias" : "asdf",
+        "enabled" : false,
+        "source_mac" : "00:17:88:14:C7:78",
+        "source_path" : [ "lights/1/state/on" ],
+        "source_value" : [ false ],
+        "status" : {
+          "code" : 1,
+          "message" : "Success: Rule loaded.",
+          "timestamp" : 1416120317672
+        },
+        "target_mac" : "08:86:3B:71:32:A1",
+        "target_path" : [ "state" ],
+        "target_value" : [ "1" ]
+      }
+    },
+    "user_rules" : "dsaf"
+  },
+  "schedules" : {
+    "-JarHlwP0i_VYqplsXos" : {
+      "alias" : "New Schedule",
+      "device" : "00:17:88:14:C7:78",
+      "key" : "-JarHlwP0i_VYqplsXos",
+      "setting_path" : [ "lights/1/state/on" ],
+      "setting_value" : [ false ],
+      "status" : {
+        "code" : 0,
+        "message" : "Schedule Set",
+        "timestamp" : 1416120500287
+      },
+      "time" : {
+        "d" : [ 0, 1, 2, 3, 4, 5, 6 ],
+        "h" : 1,
+        "m" : 35
+      }
+    },
+    "-JarIcoibW59EhARlSm0" : {
+      "alias" : "New Schedule",
+      "device" : "00:17:88:14:C7:78",
+      "key" : "-JarIcoibW59EhARlSm0",
+      "setting_path" : [ "lights/2/state/on" ],
+      "setting_value" : [ false ],
+      "status" : {
+        "code" : 0,
+        "message" : "Schedule Set",
+        "timestamp" : 1416120500288
+      },
+      "time" : {
+        "d" : [ 0, 1, 2, 3, 4, 5, 6 ],
+        "h" : 1,
+        "m" : 40
+      }
+    }
+  },
+  "users" : {
+    "jason" : {
+      "device_configs" : {
+        "00:17:88:14:C7:78" : {
+          "config" : {
+            "UTC" : "2014-11-10T01:04:49",
+            "dhcp" : true,
+            "gateway" : "192.168.0.1",
+            "ipaddress" : "192.168.0.11",
+            "linkbutton" : false,
+            "mac" : "00:17:88:14:c7:78",
+            "name" : "Philips hue",
+            "netmask" : "255.255.255.0",
+            "portalservices" : false,
+            "proxyaddress" : "none",
+            "proxyport" : 0,
+            "swupdate" : {
+              "notify" : false,
+              "text" : "",
+              "updatestate" : 0,
+              "url" : ""
+            },
+            "swversion" : "01006390",
+            "whitelist" : {
+              "000000004bf28fd0653e0255653e0255" : {
+                "create date" : "2014-09-22T17:26:32",
+                "last use date" : "2014-09-22T21:27:30",
+                "name" : "Hue#LGE VS980 4G"
+              },
+              "SmartHomeAPI" : {
+                "create date" : "2014-09-29T03:27:54",
+                "last use date" : "2014-11-10T01:04:49",
+                "name" : "SmartHomeAPI"
+              }
+            }
+          },
+          "groups" : [ null, {
+            "action" : {
+              "bri" : 110,
+              "colormode" : "xy",
+              "ct" : 369,
+              "effect" : "none",
+              "hue" : 15728,
+              "on" : false,
+              "sat" : 95,
+              "xy" : [ 0, 0 ]
+            },
+            "lights" : [ "2" ],
+            "name" : "test"
+          }, {
+            "action" : {
+              "bri" : 110,
+              "colormode" : "xy",
+              "ct" : 369,
+              "effect" : "none",
+              "hue" : 15728,
+              "on" : false,
+              "sat" : 95,
+              "xy" : [ 0, 0 ]
+            },
+            "lights" : [ "2" ],
+            "name" : "jason"
+          }, {
+            "action" : {
+              "bri" : 110,
+              "colormode" : "xy",
+              "ct" : 369,
+              "effect" : "none",
+              "hue" : 15728,
+              "on" : false,
+              "sat" : 95,
+              "xy" : [ 0, 0 ]
+            },
+            "lights" : [ "2" ],
+            "name" : "testing"
+          }, {
+            "action" : {
+              "bri" : 110,
+              "colormode" : "xy",
+              "ct" : 369,
+              "effect" : "none",
+              "hue" : 15728,
+              "on" : false,
+              "sat" : 95,
+              "xy" : [ 0, 0 ]
+            },
+            "lights" : [ "2" ],
+            "name" : "pollman"
+          } ],
+          "lights" : [ null, {
+            "modelid" : "LCT001",
+            "name" : "Hue Lamp",
+            "pointsymbol" : [ null, "none", "none", "none", "none", "none", "none", "none", "none" ],
+            "state" : {
+              "alert" : "none",
+              "bri" : 253,
+              "colormode" : "hs",
+              "ct" : 492,
+              "effect" : "none",
+              "hue" : 8520,
+              "on" : true,
+              "reachable" : true,
+              "sat" : 252,
+              "xy" : [ 0.5249, 0.4135 ]
+            },
+            "swversion" : "66009663",
+            "type" : "Extended color light"
+          }, {
+            "modelid" : "LCT001",
+            "name" : "Hue Lamp 1",
+            "pointsymbol" : [ null, "none", "none", "none", "none", "none", "none", "none", "none" ],
+            "state" : {
+              "alert" : "none",
+              "bri" : 110,
+              "colormode" : "hs",
+              "ct" : 369,
+              "effect" : "none",
+              "hue" : 32112,
+              "on" : true,
+              "reachable" : false,
+              "sat" : 95,
+              "xy" : [ 0, 0 ]
+            },
+            "swversion" : "66009663",
+            "type" : "Extended color light"
+          }, {
+            "modelid" : "LCT001",
+            "name" : "Hue Lamp 2",
+            "pointsymbol" : [ null, "none", "none", "none", "none", "none", "none", "none", "none" ],
+            "state" : {
+              "alert" : "none",
+              "bri" : 255,
+              "colormode" : "hs",
+              "ct" : 153,
+              "effect" : "none",
+              "hue" : 64880,
+              "on" : true,
+              "reachable" : true,
+              "sat" : 255,
+              "xy" : [ 0.2925, 0.2869 ]
+            },
+            "swversion" : "66009663",
+            "type" : "Extended color light"
+          } ]
+        },
+        "08:86:3B:6D:95:25" : {
+          "state" : 1,
+          "type" : "wemo_motion"
+        },
+        "08:86:3B:71:32:A1" : {
+          "state" : 0,
+          "type" : "wemo_switch"
+        }
+      },
+      "last_request" : {
+        "00:17:88:14:C7:78" : {
+          "device_response" : {
+            "message" : "[{\"success\":{\"/lights/3/state/on\":true}}]",
+            "status" : 0,
+            "timestamp" : 1416120097095
+          },
+          "status" : "message",
+          "timestamp" : 1416120093893
+        },
+        "08:86:3B:6D:95:25" : {
+          "device_response" : {
+            "message" : "Motion Detection Successful...",
+            "status" : 0,
+            "timestamp" : 1415807132581
+          },
+          "status" : "message",
+          "timestamp" : 1415807132582
+        },
+        "08:86:3B:71:32:A1" : {
+          "device_response" : {
+            "message" : "Error",
+            "status" : 0,
+            "timestamp" : 1415810325289
+          },
+          "status" : "message",
+          "timestamp" : 1415810325241
+        }
+      },
+      "settings" : {
+        "color" : "blue"
+      }
+    },
+    "lismail" : {
+      "device_configs" : {
+        "00:17:88:14:C7:78" : {
+          "config" : {
+            "UTC" : "2014-10-10T01:44:17",
+            "dhcp" : true,
+            "gateway" : "192.168.1.1",
+            "ipaddress" : "192.168.1.5",
+            "linkbutton" : false,
+            "mac" : "00:17:88:14:c7:78",
+            "name" : "Phillips Hue",
+            "netmask" : "255.255.255.0",
+            "portalservices" : false,
+            "proxyaddress" : "none",
+            "proxyport" : 0,
+            "swupdate" : {
+              "notify" : false,
+              "text" : "",
+              "updatestate" : 0,
+              "url" : ""
+            },
+            "swversion" : "01006390",
+            "whitelist" : {
+              "000000004bf28fd0653e0255653e0255" : {
+                "create date" : "2014-09-22T17:26:32",
+                "last use date" : "2014-09-22T21:27:30",
+                "name" : "Hue#LGE VS980 4G"
+              },
+              "SmartHomeAPI" : {
+                "create date" : "2014-09-29T03:27:54",
+                "last use date" : "2014-10-10T01:44:17",
+                "name" : "SmartHomeAPI"
+              }
+            }
+          },
+          "groups" : [ null, {
+            "action" : {
+              "bri" : "36",
+              "colormode" : "xy",
+              "ct" : 369,
+              "effect" : "none",
+              "hue" : "26869",
+              "on" : "true",
+              "sat" : "47",
+              "xy" : [ 0.4595, 0.4105 ]
+            },
+            "lights" : [ "2" ],
+            "name" : "test"
+          }, {
+            "action" : {
+              "bri" : 254,
+              "colormode" : "xy",
+              "ct" : 369,
+              "effect" : "none",
+              "hue" : 14922,
+              "on" : true,
+              "sat" : 144,
+              "xy" : [ 0.4595, 0.4105 ]
+            },
+            "lights" : [ "2" ],
+            "name" : "jason"
+          }, {
+            "action" : {
+              "bri" : 254,
+              "colormode" : "xy",
+              "ct" : 369,
+              "effect" : "none",
+              "hue" : 14922,
+              "on" : true,
+              "sat" : 144,
+              "xy" : [ 0.4595, 0.4105 ]
+            },
+            "lights" : [ "2" ],
+            "name" : "testing"
+          }, {
+            "action" : {
+              "bri" : 254,
+              "colormode" : "xy",
+              "ct" : 369,
+              "effect" : "none",
+              "hue" : 14922,
+              "on" : true,
+              "sat" : 144,
+              "xy" : [ 0.4595, 0.4105 ]
+            },
+            "lights" : [ "2" ],
+            "name" : "pollman"
+          } ],
+          "lights" : [ null, {
+            "modelid" : "LCT001",
+            "name" : "Hue Lamp",
+            "pointsymbol" : [ null, "none", "none", "none", "none", "none", "none", "none", "none" ],
+            "state" : {
+              "alert" : "none",
+              "bri" : 254,
+              "colormode" : "ct",
+              "ct" : 497,
+              "effect" : "none",
+              "hue" : 65000,
+              "on" : true,
+              "reachable" : true,
+              "sat" : 225,
+              "xy" : [ 0.5261, 0.4132 ]
+            },
+            "swversion" : "66009663",
+            "type" : "Extended color light"
+          }, {
+            "modelid" : "LCT001",
+            "name" : "Hue Lamp 1",
+            "pointsymbol" : [ null, "none", "none", "none", "none", "none", "none", "none", "none" ],
+            "state" : {
+              "alert" : "none",
+              "bri" : 254,
+              "colormode" : "ct",
+              "ct" : 369,
+              "effect" : "none",
+              "hue" : 4500,
+              "on" : true,
+              "reachable" : true,
+              "sat" : 255,
+              "xy" : [ 0.4595, 0.4105 ]
+            },
+            "swversion" : "66009663",
+            "type" : "Extended color light"
+          }, {
+            "modelid" : "LCT001",
+            "name" : "Hue Lamp 2",
+            "pointsymbol" : [ null, "none", "none", "none", "none", "none", "none", "none", "none" ],
+            "state" : {
+              "alert" : "none",
+              "bri" : 254,
+              "colormode" : "ct",
+              "ct" : 369,
+              "effect" : "none",
+              "hue" : 28000,
+              "on" : true,
+              "reachable" : true,
+              "sat" : 255,
+              "xy" : [ 0.4595, 0.4105 ]
+            },
+            "swversion" : "66009663",
+            "type" : "Extended color light"
+          } ]
+        },
+        "08:86:3B:6D:95:25" : {
+          "state" : "0",
+          "type" : "wemo_motion"
+        },
+        "08:86:3B:71:32:A1" : {
+          "state" : "0",
+          "type" : "wemo_switch"
+        }
+      },
+      "last_request" : {
+        "00:17:88:14:C7:78" : {
+          "device_response" : {
+            "message" : "[{\"success\":{\"/lights/2/state/hue\":4500}}]",
+            "status" : 0,
+            "timestamp" : 1413385662602
+          },
+          "status" : "message",
+          "timestamp" : 1413385662538
+        },
+        "08:86:3B:6D:95:25" : {
+          "device_response" : {
+            "message" : "Motion Detection Successful...",
+            "status" : 0,
+            "timestamp" : 1415807132589
+          },
+          "status" : "message",
+          "timestamp" : 1415807132590
+        },
+        "08:86:3B:71:32:A1" : {
+          "device_response" : {
+            "message" : "0",
+            "status" : 0,
+            "timestamp" : 1413387438156
+          },
+          "status" : "message",
+          "timestamp" : 1413387438121
+        }
+      }
+    }
+  }
+}

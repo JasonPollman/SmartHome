@@ -41,12 +41,25 @@ var SmartHome = function() {
   APIStatus.update({ last_startup: Date.now(), status: "startup pending", code: 0 });
 
   // So we can ping the backend from the front-end.
-  APIStatus.child("ping").on("value", function (data) {
-    var users = data.val();
-    for(var i in users) {
-      if(users[i] == "marco") APIStatus.child("ping").child(i).set("polo");
-    }
-  })
+  APIStatus.child("sessions").on("value", function (data) {
+
+    var sessions = data.val();
+
+    for(var i in sessions) {
+
+      if(sessions[i].last != undefined && Date.now() - sessions[i].last > 300000) { // 5 Mins, Delete old sessions...
+        APIStatus.child("sessions").child(i).remove();
+      }
+      else if(sessions[i].ping && sessions[i].ping == "marco") {
+        APIStatus.child("sessions").child(i).update({
+          ping: "polo",
+          last: Date.now()
+        });
+      }
+
+    } // End for loop
+
+  }); // End APIStatus.child("sessions").on("value")
 
   // What to do on uncaught exceptions....
   process.on("uncaughtException", function (e) {

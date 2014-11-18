@@ -282,7 +282,7 @@ function injectWidgets(page, params) {
 
                                             var status = data.val();
 
-                                            if(status.device_response.status != 0) { // The device returned an error:
+                                            if(status.device_response && status.device_response.status != 0) { // The device returned an error:
 
                                                 var msg = "Unexpected Error";
                                                 if(status.device_response && status.device_response.message) msg = global["sentenceCase"](JSON.stringify(status.device_response.message).replace(/[^a-z0-9\s\._]/ig, " "));
@@ -333,7 +333,8 @@ function injectWidgets(page, params) {
                             var pathRegExp = RegExp("(.*" + encodeURIComponent(device.mac) + ")(.*)");
 
                             FIREBASE_DEVICE_DATA_OBJ.child(device.mac + "/settings/" + REFS[r].path.replace(pathRegExp, "$2") + REFS[r].set).on("value", function (data) {
-                                $(e).val(data.val().toString()).trigger("change");
+                                console.log($(e).val().toString(), data.val().toString())
+                                if($(e).val().toString() !=  data.val().toString()) $(e).val(data.val().toString()).trigger("change");
                             });
 
                             /**

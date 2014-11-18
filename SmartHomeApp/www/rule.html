@@ -20,8 +20,8 @@
 
     <div data-role="content" data-theme="b" data-content-theme="b" id="rule-content">
 
-        <!-- Error Popup -->
-        <div data-role="popup" data-theme="b" class="error-message-page">
+        <!-- Connection Error Popup -->
+        <div data-role="popup" data-theme="b" id="error-message-rule">
             <div data-role="header" data-theme="b">
                 <h1>SmartHome App Error</h1>
             </div>
@@ -29,6 +29,24 @@
                 <p class="error-message-content-page"></p>
                 <a href='#' class="try-again" data-theme="b" data-rel='back' data-iconpos='left' data-role='button' data-inline='true'>
                     <i class="fa fa-refresh"></i>Retry</a>
+            </div>
+        </div>
+
+        <!-- Add Rule Popup -->
+        <div data-role="popup" data-theme="b" id="rule-message">
+            <div data-role="header" data-theme="b">
+                <h1 id="#rule-message-h1">Delete Rule?</h1>
+            </div>
+            <div data-role="content" data-theme="b" class="popup center">
+                <p id="rule-message-content">Are you sure you want to delete this rule?</p>
+                <p>This action cannot be undone.</p>
+                <div class="center">
+                    <a href='#' id="delete-rule" data-theme="b" data-rel='back' data-iconpos='left' data-role='button' data-inline='true'>
+                        <i class="fa fa-check"></i>Delete</a>
+                    <a href='rules.html' data-theme="b" data-iconpos='left' data-role='button' data-inline='true'>
+                        <i class="fa fa-times"></i>Cancel
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -40,7 +58,7 @@
 
                 <form>
 
-                    <input type="text" name="rule-input-name" id="rule-input-name" value="" data-clear-btn="true" placeholder="rule Name...">
+                    <input type="text" name="rule-input-name" id="rule-input-name" value="" data-clear-btn="true" placeholder="Rule Name...">
 
                     <label for="rule-source-device">Device</label>
                     <select id="rule-source-device" name="rule-input-device">
@@ -61,7 +79,7 @@
         <div class="wrapper">
             <div data-theme="b" data-role="collapsible">
                 <h3 data-theme="b" data-tap-toggle="false" style="font-weight: normal">
-                    Device Settings
+                    Source Device Settings
                 </h3>
                 <div class="widgets-wrapper">
                     <!-- Inject Widgets -->
@@ -69,23 +87,18 @@
             </div>
         </div>
 
-        <!-- Popup -->
-        <div data-role="popup" data-theme="b" id="rule-message">
-            <div data-role="header" data-theme="b">
-                <h1 id="#rule-message-h1">Delete rule?</h1>
-            </div>
-            <div data-role="content" data-theme="b" class="popup center">
-                <p id="rule-message-content">Are you sure you want to delete this rule?</p>
-                <p>This action cannot be undone.</p>
-                <div class="center">
-                    <a href='#' id="delete-rule" data-theme="b" data-rel='back' data-iconpos='left' data-role='button' data-inline='true'>
-                        <i class="fa fa-check"></i>Delete</a>
-                    <a href='rules.html' data-theme="b" data-iconpos='left' data-role='button' data-inline='true'>
-                        <i class="fa fa-times"></i>Cancel
-                    </a>
+        <div class="wrapper">
+            <div data-theme="b" data-role="collapsible">
+                <h3 data-theme="b" data-tap-toggle="false" style="font-weight: normal">
+                    Target Device Settings
+                </h3>
+                <div class="widgets-wrapper">
+                    <!-- Inject Widgets -->
                 </div>
             </div>
         </div>
+
+
 
     </div>
 
@@ -102,7 +115,7 @@
                 <li>
                     <a href="rules.html" data-transition="slide">
                         <i class="blIcon fa fa-calendar"></i><br />
-                        <span>rules</span>
+                        <span>Schedules</span>
                     </a>
                 </li>
                 <li>

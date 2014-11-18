@@ -485,7 +485,7 @@ function injectWidgetsStatic(schedule) {
                                             sch.setting_path.splice(index, 1);
                                             sch.setting_value.splice(index, 1);
                                         }
-                                        console.log(sch);
+
                                         FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(sch);
                                     });
                                 }
