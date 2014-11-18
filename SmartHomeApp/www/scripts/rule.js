@@ -107,7 +107,7 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
 
 }); // End $(document).on("pagecreate")
 
-$(document).on("pagebeforecreate", "#schedule", function () { // When the "device" page is inserted into the DOM...
+$(document).on("pagebeforecreate", "#rule", function () { // When the "device" page is inserted into the DOM...
     var keys = Object.keys(global[DEVICES_GLOBAL]);
     for (var i in global[DEVICES_GLOBAL]) {
         $("#rule-source-device").append('<option ' + ((keys[0] == i) ? "selected" : "") + ' value="' + global[DEVICES_GLOBAL][i].mac + '">' + UCFirst(global[DEVICES_GLOBAL][i].name.replace(/[^a-z0-9]/ig, ' ')) + '</option>');
