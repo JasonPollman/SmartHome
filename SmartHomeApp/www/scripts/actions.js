@@ -46,7 +46,6 @@ $(document).on("pagecreate", function () {
         e.preventDefault();
 
         global[LAST_PAGE_GLOBAL] = window.location.pathname.split("/").pop();
-        console.log("index.html?page=" + global[LAST_PAGE_GLOBAL] + "&" + window.location.search.slice(1, window.location.search.length));
         window.location.href = "index.html?page=" + global[LAST_PAGE_GLOBAL] + "&" + window.location.search.slice(1, window.location.search.length)
 
     });
@@ -61,7 +60,8 @@ $(document).on("pagecreate", function () {
  */
 $(document).on("pageremove", function () {
     for(var i in FIREBASES) {
-        if(FIREBASES[i] && FIREBASES[i].hasOwnProperty("off")) FIREBASES[i].off();
+        console.log(FIREBASES[i].toString());
+        if(FIREBASES[i] != undefined && FIREBASES[i].off != undefined) FIREBASES[i].off();
     }
 });
 

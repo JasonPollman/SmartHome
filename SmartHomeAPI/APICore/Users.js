@@ -1,6 +1,3 @@
-// Keep the Users object consistent among device drivers... since we clear the driver's base module cache for each driver.
-// This value will stay cached in Node...
-
 var APIConfig = require('./APIConfig');
 var console   = require('./APIUtil.js').console;
 var Firebase  = require("firebase");

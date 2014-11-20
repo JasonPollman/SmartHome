@@ -436,7 +436,7 @@ var SmartHome = function() {
 
     for(var i in drivers) { // Loop through all the device drivers that have loaded
 
-      // If the driver implements it's own discvoer method, use it rather than using keywords:
+      // If the driver implements it's own discover method, use it rather than using keywords:
       if(drivers[i].discoverable == true && drivers[i].discover && (drivers[i].discover instanceof Function)) {
         
         // Execute the driver's discover function with the following callback:
@@ -449,9 +449,9 @@ var SmartHome = function() {
             // Loop through the networkDevices until we find a device with the same address as this device:
             for(var k in networkDevices) if(discovered.address == networkDevices[k].address) discoveredMAC = networkDevices[k].mac;
 
-            if(discoveredMAC) { // Instantiate the new device
+            if(discoveredMAC && !Devices[discoveredMAC]) { // Instantiate the new device
               Devices[discoveredMAC] = new drivers[getDriverID(discoveredDriver.driverDetails.make, discoveredDriver.driverDetails.model, discoveredDriver.driverDetails.version)](discovered.name.toLowerCase().replace(/\s+/ig, '_'), discovered.address, discoveredMAC, discovered.port);
-              console.warn("Found Supported " + Devices[discoveredMAC].toString());
+              console.warn("Found *New* Supported " + Devices[discoveredMAC].toString());
 
               // Add the device to firebase
               deviceFirebase.child(discoveredMAC).set({
@@ -464,7 +464,7 @@ var SmartHome = function() {
                   make    : discoveredDriver.driverDetails.make,
                   type    : discoveredDriver.driverDetails.type,
                   model   : discoveredDriver.driverDetails.model,
-                  version : discoveredDriver.driverDetails.version,
+                  version : discoveredDriver.driverDetails.version
                 }
               }); // End set()
               
@@ -472,9 +472,12 @@ var SmartHome = function() {
               Devices[discoveredMAC].emit("instantiated");
               supportedDevices++;
             }
+            else if(Devices[discoveredMAC]) { // Print an error
+              console.warn("Found Supported " + Devices[discoveredMAC].toString());
+            }
             else if(!Devices[discoveredMAC]) { // Print an error
               console.error("Unable to pair driver (" + discoveredDriver.driverDetails.make + ":" + discoveredDriver.driverDetails.model + ":" + discoveredDriver.driverDetails.version + ") discovered device with correct MAC address for device @ " + discovered.address);
-            } 
+            }
             else {
               // End if block
               supportedDevices++;

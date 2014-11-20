@@ -7,7 +7,6 @@ var fs = require('fs');
 var fsRoot = require("path").resolve(__dirname);
 process.chdir(fsRoot);
 process.chdir("../");
-console.log(process.cwd());
 
 // This is the object that will be exported!
 module.exports = {

@@ -18,7 +18,7 @@ var SESSION_ID_GLOBAL   = "$SH_SESSION_ID";
 var SESSION_REF_GLOBAL  = {};
 
 var FIREBASE_ROOT              = "https://smarthometest.firebaseio.com/" + $SH_KEY + "/";
-console.log($SH_KEY);
+
 var FIREBASE_OBJ               = new Firebase(FIREBASE_ROOT);
 var FIREBASE_DEVICE_DATA       = FIREBASE_ROOT + "device_data";
 var FIREBASE_DEVICE_DATA_OBJ   = new Firebase(FIREBASE_DEVICE_DATA);

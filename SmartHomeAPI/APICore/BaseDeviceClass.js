@@ -166,6 +166,9 @@ var BaseDeviceObject = function (name, address, mac, port) {
     {
       value: function () {
 
+        // Remove any extraneous Firebase handlers...
+        self.firebase.off();
+
         // Call the device instance constructor, with the following callback:
         if(this.construct) this.construct.call(this, function () {
 
