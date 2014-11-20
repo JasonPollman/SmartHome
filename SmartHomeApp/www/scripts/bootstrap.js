@@ -16,32 +16,34 @@ global.persistentConnection = function (persist, reset, cb) {
 
     function checkConnection() {
 
-        FIREBASE_OBJ.child("api_status/sessions/").child(global[SESSION_ID_GLOBAL]).child("ping").once("value", function (data) {
+        setTimeout(function () {
+            FIREBASE_OBJ.child("api_status/sessions/").child(global[SESSION_ID_GLOBAL]).child("ping").once("value", function (data) {
 
-            var connection = false;
-            var pageID = $.mobile.activePage.attr("id");
-            console.log("PAGE" + pageID);
+                var connection = false;
+                var pageID = $.mobile.activePage.attr("id");
+                var pingVal = data.val();
 
-            if (data.val() != "polo") {
+                if (pingVal != "polo") {
 
-                $(".error-message-content-page").each(function () {
-                    $(this).html("The SmartHome Network API is not connected.<br />Please make sure your local SmartHome API is running.");
-                });
-                $("#error-message-" + pageID).trigger("create");
-                $("#error-message-" + pageID).popup("open");
+                    $(".error-message-content-page").each(function () {
+                        $(this).html("The SmartHome Network API is not connected.<br />Please make sure your local SmartHome API is running.");
+                    });
+                    $("#error-message-" + pageID).trigger("create");
+                    $("#error-message-" + pageID).popup("open");
 
-            }
-            else {
+                }
+                else {
 
-                $("#error-message-" + pageID).popup("close");
-                FIREBASE_OBJ.child("api_status").child("sessions").child(global[SESSION_ID_GLOBAL]).child("ping").set("marco");
-                connection = true;
-            }
+                    $("#error-message-" + pageID).popup("close");
+                    FIREBASE_OBJ.child("api_status").child("sessions").child(global[SESSION_ID_GLOBAL]).child("ping").set("marco");
+                    connection = true;
+                }
 
-            if (cb) cb.call(null, connection);
-            if (!persist) setTimeout(persistentConnection, CONN_PING_INTERVAL);
+                if (cb) cb.call(null, connection);
+                if (!persist) setTimeout(persistentConnection, CONN_PING_INTERVAL);
 
-        });
+            });
+        }, CONN_PING_INTERVAL/2);
     }
 
 } // End persistentConnection()

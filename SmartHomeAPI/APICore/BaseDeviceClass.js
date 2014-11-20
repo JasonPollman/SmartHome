@@ -92,7 +92,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
       value: {},
       configurable: false,
       writable: true,
-      enumerable: true,
+      enumerable: true
     }
   );
 
@@ -173,7 +173,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
           self.firebase.parent().update({ name: this.name, address: this.address, mac: this.mac, settings: this.settings });
 
           // Set the lastState to the initial state
-          this.lastState.setEqual(this.settings);
+          this.lastState = this.settings.cloneThis();
 
           // Ensure the user has data for this device:
           UserConfig.update(self);
@@ -259,10 +259,15 @@ var BaseDeviceObject = function (name, address, mac, port) {
    */
   var setState = function (data, user) {
 
-    var d = data;
+    var d = data.cloneThis();
 
     // Update the previous state, so we can detect changes...
-    for(var i in self.settings) if(d && d[i]) self.settings[i] = d[i];
+
+    // FML!
+    // Note the line below used to read ...if(d && d[i])...
+    // GOTTA STOP DOING THAT! SINCE d[i]'s VALUE WAS FREQUENTLY 0, AND THEREFORE EVALUATING TO FALSE!
+    // USE != undefined INSTEAD.
+    for(var i in self.settings) if(d != undefined && d[i] != undefined) self.settings[i] = d[i];
 
     // Update the firebase settings
     self.firebase.update(self.settings, function (error) {
@@ -279,7 +284,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
 
         // The difference between the lastState and the setings as a difference array
         // @see the deep-diff module
-        var difference = diff(self.lastState, self.settings);
+        var difference = diff(self.lastState.cloneThis(), self.settings.cloneThis());
 
         // Iterate through the differences
         for(var i in difference) {
@@ -303,7 +308,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
         if(changesMade) console.notice("Firebase Settings State Change for: " + self.toString() + "\n\n" + (changeStr.length > 0 ? changeStr.join("\n") : "") + "\n\nMade by user '" + user + "'.\n");
 
         // Update the "last" state
-        self.lastState.setEqual(self.settings);
+        self.lastState = self.settings.cloneThis();
 
         // Enforce rules set by the new settings, if need be...
         var Rules = require("./Rules");
@@ -344,7 +349,7 @@ var BaseDeviceObject = function (name, address, mac, port) {
 
       // Call the device instance's onFirebaseData method to see how to handle the new data within the device itself,
       // then call the anon-callback below:
-      self.onFirebaseData(diff(self.lastState, newSettings.setting), newSettings.setting, self.lastState, function (code, msg) {
+      self.onFirebaseData(diff(self.lastState.cloneThis(), newSettings.setting), newSettings.setting, self.lastState.cloneThis(), function (code, msg) {
 
         // Update the status of the last request
         self.updateStatus(code, msg);

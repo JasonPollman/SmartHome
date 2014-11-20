@@ -9,7 +9,7 @@
  * -----------------------------------------------------------------------------
  *
  *   - onFireBaseData()
- *       Each time a user change's one of their settings, this method is called.
+ *       Each time a user changes one of their settings, this method is called.
  *
  *   - connect()
  *       Used by the API to attempt to make a connection to the device once the 
