@@ -353,7 +353,6 @@ PhilipsHue.prototype.onFirebaseData = function (diff, data, lastState, updateSta
     }
 
     // If the device response wasn't an error, update the status as "success" and pass the response.
-    console.log(JSON.parse(response)[0].error);
     (JSON.parse(response)[0].error) ? updateStatus(1, response) : updateStatus(0, response);
 
   }

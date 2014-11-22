@@ -212,7 +212,6 @@ function injectWidgets(page, params) {
                         // Load the widget from the '/widgets' directory
                         // Note this function is bound to an array [i, r] to maintain the
                         // widget key (i) and widget delta (r)
-                        console.log(WIDGETS_DIRECTORY + "/" + widgets[i].type + ".html");
                         $("#" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i).load(WIDGETS_DIRECTORY + "/" + widgets[i].type + ".html", function (data) {
 
                             var i = this[0];
@@ -249,18 +248,12 @@ function injectWidgets(page, params) {
 
                                 $(e).change(function () {
 
-                                    console.log("HERE");
-
                                     var obj = {};
                                     var value = cleanValue($(this).val());
-
-                                    console.log($(this).val());
 
                                     obj[REFS[r].set] = value;
 
                                     new Firebase(REFS[r].path).update(obj, function (error) {
-
-                                        console.log(error + "ERROR");
 
                                         var err = $("#device-error-message");
 
@@ -327,7 +320,6 @@ function injectWidgets(page, params) {
                             var pathRegExp = RegExp("(.*" + encodeURIComponent(device.mac) + ")(.*)");
 
                             FIREBASE_DEVICE_DATA_OBJ.child(device.mac + "/settings/" + REFS[r].path.replace(pathRegExp, "$2") + REFS[r].set).on("value", function (data) {
-                                console.log($(e).val().toString(), data.val().toString())
                                 if($(e).val().toString() !=  data.val().toString()) $(e).val(data.val().toString()).trigger("change");
                             });
 

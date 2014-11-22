@@ -46,9 +46,6 @@ $(document).on("pagecreate", "#schedule", function () { // When the "device" pag
 
                     // Set the Day checkboxes
                     $(".day-time").each(function () {
-                        console.log("HERE asdf");
-                        console.log($(this).prop("checked"));
-                        console.log(schedule.time.d.indexOf(parseInt($(this).attr("name"))) > -1);
                         if(schedule.time.d.indexOf(parseInt($(this).attr("name"))) > -1) {
                             $(this).prop("checked", true).checkboxradio("refresh");
                         }
@@ -77,7 +74,6 @@ $(document).on("pagecreate", "#schedule", function () { // When the "device" pag
                     });
 
                     $("#schedule-input-hour").change(function () {
-                        console.log($("#schedule-input-ampm").val());
                         schedule.time.h = $(this).val();
                         if($("#schedule-input-ampm").val() == "PM" && schedule.time.h < 12) schedule.time.h = parseInt(schedule.time.h) + 12;
                         if($("#schedule-input-ampm").val() == "AM" && schedule.time.h >= 12) schedule.time.h = parseInt(schedule.time.h) - 12;

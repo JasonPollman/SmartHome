@@ -1,7 +1,18 @@
 "use strict"
+
+// Require the "fs" (filesystem) module:
 var fs = require('fs');
 
+// Change the current working directory to the "SmartHomeAPI" Root.
+var fsRoot = require("path").resolve(__dirname);
+process.chdir(fsRoot);
+process.chdir("../");
+
+// This is the object that will be exported!
 module.exports = {
+
+  lastError: "",
+  exitWithError: false,
 
   devices: {
 
@@ -45,26 +56,26 @@ module.exports = {
     firebaseAllDevicesPath          : "connected_devices",
     firebaseUserSettingsChangesPath : "last_request",
 
-    logPath: "smarthomelog.log",
+    logPath: "smarthomelog.log"
 
   }, // End general
 
   request: {
 
-    requiredFields: [ "make", "model", "version", "func" ],
+    requiredFields: [ "make", "model", "version", "func" ]
 
   },
 
   rules: {
     firebaseRulesPath: "rules",
     firebaseDeviceRulesPath: "device_rules",
-    firebaseUserRulesPath: "user_rules",
+    firebaseUserRulesPath: "user_rules"
 
   }, // End rules
 
   schedules: {
-    firebaseSchedulesPath: "schedules",
+    firebaseSchedulesPath: "schedules"
 
   } // End schedules
 
-} // End module.exports
+}; // End module.exports
