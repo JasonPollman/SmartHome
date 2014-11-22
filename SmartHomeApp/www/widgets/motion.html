@@ -9,31 +9,22 @@
                         ($(this).val() == "0") ? "img/runner.png" : "img/runner-motion.png"
                 );
             });
-        });
-        $(document).one("pageshow", function () {
 
             var ele = $("#hidden-motion");
             var enabled = $("#enable-widget-motion-0");
             var indicator = $("#motion-indicator");
-
             var thisPage = $.mobile.activePage.attr("id");
-            console.log(thisPage);
-            if(thisPage == "rule") {
-                if(enabled.val() == "1") {
-                    indicator.removeClass("ui-state-disabled");
-                    indicator.click(function () {
-                        var val = $(ele).val();
-                        (val == "1") ? $(ele).val("0") : $(ele).val("1");
-                        $(ele).trigger("change");
-                    });
-                }
-                else {
-                    indicator.off();
-                    indicator.addClass("ui-state-disabled");
-                }
 
-                enabled.change(function () {
-                    if($(this).val() == "1") {
+            // Hide the motion indicator on the schedules page, since we can't schedule a "motion" event.
+            if (thisPage == "schedule") {
+                indicator.hide().after('<div class="message info"><i class="fa fa-lightbulb-o"></i><p>This device has no schedulable settings.</p></div>');
+            }
+
+            if (thisPage == "rule") {
+
+                function showhideMotion() {
+
+                    if (enabled.val() == "1") {
                         indicator.removeClass("ui-state-disabled");
                         indicator.click(function () {
                             var val = $(ele).val();
@@ -45,15 +36,14 @@
                         indicator.off();
                         indicator.addClass("ui-state-disabled");
                     }
-                });
 
-            } // End if(thisPage == "rule")
+                } // End showhideMotion()
 
-            if(thisPage == "schedule") {
-                indicator.hide().after('<div class="message info"><i class="fa fa-lightbulb-o"></i><p>This device has no schedulable settings.</p></div>');
-            }
+                enabled.change(showhideMotion());
+                showhideMotion();
 
-        });
+            } // End if (thisPage == "rule")
 
+        }); // End document ready
     </script>
 </div>

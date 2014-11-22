@@ -60,7 +60,6 @@ $(document).on("pagecreate", function () {
  */
 $(document).on("pageremove", function () {
     for(var i in FIREBASES) {
-        console.log(FIREBASES[i].toString());
         if(FIREBASES[i] != undefined && FIREBASES[i].off != undefined) FIREBASES[i].off();
     }
 });

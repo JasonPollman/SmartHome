@@ -472,8 +472,24 @@ var SmartHome = function() {
               Devices[discoveredMAC].emit("instantiated");
               supportedDevices++;
             }
-            else if(Devices[discoveredMAC]) { // Print an error
+            else if(Devices[discoveredMAC]) { // Device has already been instantiated on a previous scan...
               console.warn("Found Supported " + Devices[discoveredMAC].toString());
+              supportedDevices++;
+
+              // Add the device to firebase
+              deviceFirebase.child(Devices[discoveredMAC].mac).set({
+                name: Devices[discoveredMAC].name,
+                address: Devices[discoveredMAC].address,
+                mac: Devices[discoveredMAC].mac,
+                port: Devices[discoveredMAC].port,
+                supported: true,
+                driver: {
+                  make    : drivers[i].driverDetails.make,
+                  type    : drivers[i].driverDetails.type,
+                  model   : drivers[i].driverDetails.model,
+                  version : drivers[i].driverDetails.version
+                }
+              }); // End set()
             }
             else if(!Devices[discoveredMAC]) { // Print an error
               console.error("Unable to pair driver (" + discoveredDriver.driverDetails.make + ":" + discoveredDriver.driverDetails.model + ":" + discoveredDriver.driverDetails.version + ") discovered device with correct MAC address for device @ " + discovered.address);
@@ -494,11 +510,11 @@ var SmartHome = function() {
 
           for(var k in drivers[i].driverKeywords) { // Loop through the device keywords
 
-            if(networkDevices[n].name.match(RegExp(drivers[i].driverKeywords[k], 'ig'))) { // If the device's name matche's a keyword:
+            if(!Devices[networkDevices[n].mac] && networkDevices[n].name.match(RegExp(drivers[i].driverKeywords[k], 'ig'))) { // If the device's name matche's a keyword:
 
               // Instantiate the device
               Devices[networkDevices[n].mac] = new drivers[getDriverID(drivers[i].driverDetails.make, drivers[i].driverDetails.model, drivers[i].driverDetails.version)](networkDevices[n].name, networkDevices[n].address, networkDevices[n].mac);
-              console.warn("Found Supported " + Devices[networkDevices[n].mac].toString());
+              console.warn("Found *New* Supported " + Devices[networkDevices[n].mac].toString());
               
               // Add the device to firebase
               deviceFirebase.child(networkDevices[n].mac).set({
@@ -521,6 +537,26 @@ var SmartHome = function() {
 
               // We found a driver via keyword, break the keyword search loop
               break;
+
+            }
+            else if(Devices[networkDevices[n].mac]) { // Device has already been instantiated on a previous scan...
+              supportedDevices++;
+              console.warn("Found Supported " + Devices[networkDevices[n].mac].toString());
+
+              // Add the device to firebase
+              deviceFirebase.child(Devices[networkDevices[n].mac]).set({
+                name: Devices[networkDevices[n].mac].name,
+                address: Devices[networkDevices[n].mac].address,
+                mac: Devices[networkDevices[n].mac].mac,
+                port: Devices[networkDevices[n].mac].port,
+                supported: true,
+                driver: {
+                  make    : drivers[i].driverDetails.make,
+                  type    : drivers[i].driverDetails.type,
+                  model   : drivers[i].driverDetails.model,
+                  version : drivers[i].driverDetails.version
+                }
+              }); // End set()
 
             }
 

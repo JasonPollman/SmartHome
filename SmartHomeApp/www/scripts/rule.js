@@ -31,7 +31,9 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
                     if (!rule)
                         throw new Error("Unable to find rule. The rule '" + rule.name + "' does not exist.");
 
-                    //injectWidgetsStatic(rule);
+                    $SH_injectWidgetsStatic(".widgets-wrapper-source", rule, FIREBASE_RULES_OBJ.child("device_rules"), rule.source_mac, "source_path", "source_value");
+                    $SH_injectWidgetsStatic(".widgets-wrapper-target", rule, FIREBASE_RULES_OBJ.child("device_rules"), rule.target_mac, "target_path", "target_value");
+                    $("#rule").trigger("create");
 
                     // Make the page header the device's name
                     $("h1.rule-name").html(UCFirst(rule.alias));
@@ -54,7 +56,7 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
                         FIREBASE_RULES_OBJ.child("device_rules").child(rule.key).update(rule);
                     });
 
-                    $("#schedule-source-device").change(function () {
+                    $("#rule-source-device").change(function () {
 
                         var value = cleanValue($(this).val());
 
@@ -64,11 +66,11 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
 
                         FIREBASE_RULES_OBJ.child(i).update(rule);
 
-                        //injectWidgetsStatic(rule);
-                        $("#rule").trigger("create");
+                        $SH_injectWidgetsStatic(".widgets-wrapper-source", rule, FIREBASE_RULES_OBJ.child("device_rules"), rule.source_mac, "source_path", "source_value");
+                        $(".widgets-wrapper-source").trigger("create");
                     });
 
-                    $("#schedule-target-device").change(function () {
+                    $("#rule-target-device").change(function () {
 
                         var value = cleanValue($(this).val());
 
@@ -78,8 +80,8 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
 
                         FIREBASE_RULES_OBJ.child(i).update(rule);
 
-                        //injectWidgetsStatic(rule);
-                        $("#rule").trigger("create");
+                        $SH_injectWidgetsStatic(".widgets-wrapper-target", rule, FIREBASE_RULES_OBJ.child("device_rules"), rule.target_mac, "target_path", "target_value");
+                        $(".widgets-wrapper-target").trigger("create");
                     });
 
                     $("#delete-rule").click(function (e) {
