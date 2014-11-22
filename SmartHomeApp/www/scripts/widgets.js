@@ -8,10 +8,6 @@ $(document).ready(function(){
     var deviceDataPath = '/users/' + user + "/device_configs/" + deviceMAC + "/" +"config/";
     var lightConfigPath = '/users/' + user + "/device_configs/" + deviceMAC + "/" + "groups/1/action/";
     var WeMoMACs= ["08:86:3B:6D:95:25", "08:86:3B:71:32:A1"];
-    console.log("Path: " + firebaseRef + lightConfigPath);
-    console.log("Path: " + firebaseRef + "/" + deviceMAC + "/");
-    
-    
     
     /*Device name header*/
     

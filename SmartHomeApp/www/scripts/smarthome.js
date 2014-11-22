@@ -486,8 +486,6 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
 
                                 firebaseObj.child(staticObj.key).once("value", function (data) {
 
-                                    console.log("DATA", data.val());
-
                                     var i = this[0];
                                     var r = this[1]
 
@@ -535,7 +533,6 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
 
                             var enable = $(wrapper + " #enable-" + "widget-" + i + "-" + REFS[r].delta);
 
-                            console.log(firebaseObj.child(staticObj.key).child(path_key).toString());
                             firebaseObj.child(staticObj.key).child(path_key).once("value", function (data) {
 
                                 /*console.log("DATA~~~~~~~~~~~" + data.val());
@@ -550,10 +547,8 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
                                     $(wrapper + " #widget-" + i + "-" + REFS[r].delta).slider({disabled: true}).slider("refresh");
                                 }*/
                             });
-                            console.log("ENABLE>>>>>>>>>>>>>>>>", $(enable).change);
-                            $(enable).change(function () {
 
-                                console.log("HERE2");
+                            $(enable).change(function () {
 
                                 var e = $(wrapper + " #" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i + ' .widget');
 
@@ -563,8 +558,6 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
 
                                     // Remove the reference to the rule's/schedule's paths/values
                                     firebaseObj.child(staticObj.key).once("value", function (data) {
-
-                                        console.log("HERE 3");
 
                                         var sch = data.val();
                                         if(!sch[path_key]) sch[path_key] = [];
