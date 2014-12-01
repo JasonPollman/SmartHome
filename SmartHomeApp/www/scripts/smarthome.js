@@ -37,7 +37,10 @@ var BOOTSTRAP_MSG_INTERVAL     = 200; // In MS.
 var BOOTSTRAP_PING_TIMEOUT     = 5000;
 
 var USER                     = "jason";
-var FIREBASE_USER_ROOT       = FIREBASE_ROOT + "/users/" + USER;
+var USER_EMAIL				 = null;
+var FIREBASE_USER_DIR_ROOT	 = FIREBASE_ROOT + "/users/";
+var FIREBASE_USER_DIR_OBJ   = new Firebase(FIREBASE_USER_DIR_ROOT);
+var FIREBASE_USER_ROOT       = FIREBASE_USER_DIR_ROOT + USER;
 var FIREBASE_USER_ROOT_OBJ   = new Firebase(FIREBASE_USER_ROOT);
 var FIREBASE_USER_DATA       = FIREBASE_ROOT + "/users/" + USER + "/device_configs/";
 var FIREBASE_USER_DATA_OBJ   = new Firebase(FIREBASE_USER_DATA);
@@ -47,6 +50,7 @@ var FIREBASE_USER_STATUS_OBJ = new Firebase(FIREBASE_USER_STATUS);
 var SPLASH_PAGE     = "index.html";
 var MY_DEVICES_PAGE = "my-devices.html";
 var DEVICES_PAGE    = "devices.html";
+var LOGIN_PAGE		= "login.html";
 
 var DEVICE_ICON_DIR         = "img/device-icons";
 var DEFAULT_DEVICE_ICON     = "default.png";

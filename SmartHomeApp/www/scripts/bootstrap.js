@@ -81,7 +81,7 @@ var Bootstrap = {
                 }
 
                 persistentConnection(false, true);
-                $.mobile.changePage(redirectTo || MY_DEVICES_PAGE);
+                $.mobile.changePage(redirectTo || LOGIN_PAGE);
 
             }, 1000);
 

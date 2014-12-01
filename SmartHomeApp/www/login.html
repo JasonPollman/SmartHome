@@ -1,0 +1,21 @@
+<!-- So this page cannot be directly accessed -->
+<head>
+    <script>
+        window.location.href = "index.html";
+    </script>
+</head>
+
+<!-- The "Login" Page -->
+<div data-role="page" id="login" data-theme="b">
+    <form>
+        <div style="padding:20px 20px;" id="loginForm">
+            <h3>Please Sign in or Register</h3>
+            <input type="email" name="email" id="email" value="" required="true" placeholder=" Email" data-theme="b">
+            <input type="password" name="password" id="password" value="" required="true" placeholder=" Password" data-theme="b">
+            <button id="signin">Sign in</button>
+            <button id="register">Register</button>
+            <span id='loginError'/>
+        </div>
+    </form>
+</div>
+	

@@ -15,7 +15,7 @@ $(document).on('pagebeforechange', function(e, data){
         var to = $.mobile.path.parseUrl(to).filename.replace(/(.*)\.(.*)/ig, '$1');
         var from = $(from).attr("id");
 
-        if (from !== 'loading-page' && to === 'index') {
+        if ((from !== 'loading-page' && to === 'index') || (from !== 'loading-page' && to === 'login')) {
 
             e.preventDefault();
             e.stopPropagation();

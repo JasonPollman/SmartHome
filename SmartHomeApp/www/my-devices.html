@@ -43,6 +43,11 @@
                     <i class="lIcon fa fa-eye"></i>Color Theme
                 </a>
             </li>
+			<li data-icon="false">
+                <a href='#changePass' data-rel='popup' data-position-to='window' data-role='button' data-transition='pop' data-inline='true'>
+                    <i class="lIcon fa fa-lock"></i>Reset Password
+                </a>
+            </li>
             <li data-icon="false">
                 <a href='#credits' data-rel='popup' data-position-to='window' data-role='button' data-transition='pop' data-inline='true'>
                     <i class="lIcon fa fa-legal"></i>Credits
@@ -132,6 +137,25 @@
                 <i class="fa fa-check-circle-o"></i>Done
             </a>
             </div>
+        </div>
+    </div>
+	
+	<!-- The "Password Reset" Page -->
+    <div data-role='popup' id='changePass' data-theme='b' data-content-theme="b">
+        <div data-role='header' data-theme='b'>
+              <h1 data-theme='b'>Password Reset</h1>
+        </div>
+        <div data-role='content' data-theme='b'>
+			<input type="password" name="password" id="oldPassword" value="" required="true" placeholder=" Current Password" data-theme="b">
+			<input type="password" name="password" id="newPassword" value="" required="true" placeholder=" New Password" data-theme="b">
+			<input type="password" name="password" id="newPasswordAgain" value="" required="true" placeholder=" Re-type Password" data-theme="b">
+			<button id='resetPassButton'>Reset Password</button>
+			<span id='resetError' style='visibility: hidden;'>Reset Password</span>
+                <div  class='center'>
+                    <a href='#' data-rel='back' data-role='button' data-inline='true'>
+            <i class="fa fa-check-circle-o"></i>Okay
+        </a>
+        </div>
         </div>
     </div>
 
