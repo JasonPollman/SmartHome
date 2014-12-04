@@ -96,15 +96,24 @@ var NetworkDiscover = function () {
 
   // Execute NMap
   console.warn("Executing NMap on Local Network " + localIP + "...");
-  exec("nmap -sP " + localIP + "/24", function (error, stdout, stderr) {
+
+  var platform = os.platform();
+  var cmd = platform != 'win32' ? "sudo nmap -sP " + localIP + "/24" : "nmap -sP " + localIP + "/24";
+  console.warn("You *may* be prompted to enter your administrative password,\nif you are not already an administrator.\n\nNMap requires authentication to obtain MAC Addresses.\n");
+
+  exec(cmd, function (error, stdout, stderr) {
 
     if(error) {
-      console.error(error);
+      console.error("There was an error executing NMap, do you have administrative privileges?");
+      console.error("SmartHome API will now exit.");
+      process.exit();
       return;
     }
 
     if(stderr) {
-      console.error(stderr);
+      console.error("There was an error executing NMap, do you have administrative privileges?");
+      console.error("SmartHome API will now exit.");
+      process.exit();
       return;
     }
 

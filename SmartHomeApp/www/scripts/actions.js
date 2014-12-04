@@ -72,9 +72,9 @@ $(document).on("pagecreate", function () {
 
     FIREBASE_USER_ROOT_OBJ.once("value", function (data) {
 
-        var user = data.val();
+        var user = data.val() || {};
 
-        if (!user.settings) {
+        if (user.settings == undefined) {
             user.settings = {};
             if (!user.settings.color) user.settings.color = "green";
         }

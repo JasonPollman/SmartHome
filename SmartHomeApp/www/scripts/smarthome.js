@@ -17,7 +17,7 @@ var LAST_PAGE_GLOBAL    = "$SH_LastPage";
 var SESSION_ID_GLOBAL   = "$SH_SESSION_ID";
 var SESSION_REF_GLOBAL  = {};
 
-var FIREBASE_ROOT              = "https://smarthometest.firebaseio.com/" + $SH_KEY + "/";
+var FIREBASE_ROOT              = "https://newsmarthometest.firebaseio.com/" + $SH_KEY + "/";
 
 var FIREBASE_OBJ               = new Firebase(FIREBASE_ROOT);
 var FIREBASE_DEVICE_DATA       = FIREBASE_ROOT + "device_data";
@@ -39,7 +39,7 @@ var BOOTSTRAP_PING_TIMEOUT     = 5000;
 var USER                     = "jason";
 var USER_EMAIL				 = null;
 var FIREBASE_USER_DIR_ROOT	 = FIREBASE_ROOT + "/users/";
-var FIREBASE_USER_DIR_OBJ   = new Firebase(FIREBASE_USER_DIR_ROOT);
+var FIREBASE_USER_DIR_OBJ    = new Firebase(FIREBASE_USER_DIR_ROOT);
 var FIREBASE_USER_ROOT       = FIREBASE_USER_DIR_ROOT + USER;
 var FIREBASE_USER_ROOT_OBJ   = new Firebase(FIREBASE_USER_ROOT);
 var FIREBASE_USER_DATA       = FIREBASE_ROOT + "/users/" + USER + "/device_configs/";

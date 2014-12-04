@@ -55,7 +55,7 @@ $('#signin').click(
                   } else {
                     console.log("Error authenticating user:", error);
                     $('#loginError').text("Incorrect username or password.");
-                    $('#loginError').append("<button style='background:none;border:none;margin:0;padding:0;' class='smart-color' id='passwordReset'>Send password reset?</button>");
+                    $('#loginError').append("<br /><button style='background:none;border:none;margin:0;padding:0;' class='smart-color' id='passwordReset'>Send password reset?</button>");
                     
                     //insert password reset link at this point
                   }

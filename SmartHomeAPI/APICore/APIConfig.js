@@ -47,7 +47,7 @@ module.exports = {
 
     requireAuthentication: false,
 
-    firebaseRootURI   : "https://smarthometest.firebaseio.com/" + fs.readFileSync('.key').toString(),
+    firebaseRootURI   : "https://newsmarthometest.firebaseio.com/" + fs.readFileSync('.key').toString(),
     firebaseAPIStatus : "api_status",
 
     firebaseDevicePath              : "device_data",

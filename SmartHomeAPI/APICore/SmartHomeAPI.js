@@ -76,20 +76,29 @@ var SmartHome = function() {
    * Remove all connected devices, etc.
    *
    */
+  var shuttingDown = false;
   var shutdown = function () {
 
-    // Clear the "connected_devices" Firebase object:
-    if(deviceFirebase) deviceFirebase.remove();
-    APIStatus.update({ reachable: false, last_shutdown_status: 0, last_shutdown: Date.now() }, function () {
+    if(shuttingDown == false) { // So we don't accumulate a crap ton of data in the DB if a program refuses to shutdown... like before. :(
 
-      (APIConfig.exitWithError) ?
-          console.error("Smart Home API Server v" + APIConfig.general.version + " Shutting Down with Error:\n\n" + APIConfig.lastError + "\n") :
-          console.warn("Smart Home API Server v" + APIConfig.general.version + " Shutting Down...");
+      // Clear the "connected_devices" Firebase object:
+      if (deviceFirebase) deviceFirebase.remove();
+      APIStatus.update({reachable: false, last_shutdown_status: 0, last_shutdown: Date.now()}, function () {
 
-      // Exit the program...
+        (APIConfig.exitWithError) ?
+            console.error("Smart Home API Server v" + APIConfig.general.version + " Shutting Down with Error:\n\n" + APIConfig.lastError + "\n") :
+            console.warn("Smart Home API Server v" + APIConfig.general.version + " Shutting Down...");
+
+        // Exit the program...
+        shuttingDown = true;
+        process.exit();
+
+      });
+
+    }
+    else {
       process.exit();
-
-    });
+    }
 
   }; // End shutdown()
 
