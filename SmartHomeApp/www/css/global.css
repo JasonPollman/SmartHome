@@ -87,7 +87,9 @@ hr {
 #login #login-content input {
     padding-left: 10px;
 }
-#login #login-content div {
+#login #login-content div,
+#changePass div {
+    position: relative;
     border-top: none;
     border-left: none;
     border-right: none;

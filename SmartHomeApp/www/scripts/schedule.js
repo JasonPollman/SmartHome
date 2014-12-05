@@ -115,17 +115,7 @@ $(document).on("pagecreate", "#schedule", function () { // When the "device" pag
 
                     $("#schedule-input-device").change(function () {
 
-                        var value = $(this).val();
-
-                        if($.isNumeric(value)) {
-                            value = Number(value);
-                        }
-                        else if(value === "true") {
-                            value = Boolean(true);
-                        }
-                        else if(value === "false") {
-                            value = Boolean(false);
-                        }
+                        var value = cleanValue($(this).val());
 
                         schedule.device = value;
                         schedule.setting_path = [];

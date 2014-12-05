@@ -1,4 +1,5 @@
 // Incase we want to make this a non-browser thing, this could be changed to global = global in node. :P
+// But in browsers, the global variable is "window"...
 var global = window;
 
 // <------------------------------------------- GLOBAL SETTINGS ------------------------------------------> //
@@ -36,16 +37,16 @@ var BOOTSTRAP_MSG_ELEMENT      = "#bootstrap-msg";
 var BOOTSTRAP_MSG_INTERVAL     = 200; // In MS.
 var BOOTSTRAP_PING_TIMEOUT     = 5000;
 
-var USER                     = "jason";
+var USER                     = null;
 var USER_EMAIL				 = null;
 var FIREBASE_USER_DIR_ROOT	 = FIREBASE_ROOT + "/users/";
 var FIREBASE_USER_DIR_OBJ    = new Firebase(FIREBASE_USER_DIR_ROOT);
-var FIREBASE_USER_ROOT       = FIREBASE_USER_DIR_ROOT + USER;
-var FIREBASE_USER_ROOT_OBJ   = new Firebase(FIREBASE_USER_ROOT);
-var FIREBASE_USER_DATA       = FIREBASE_ROOT + "/users/" + USER + "/device_configs/";
-var FIREBASE_USER_DATA_OBJ   = new Firebase(FIREBASE_USER_DATA);
-var FIREBASE_USER_STATUS     = FIREBASE_ROOT + "/users/" + USER + "/last_request/";
-var FIREBASE_USER_STATUS_OBJ = new Firebase(FIREBASE_USER_STATUS);
+var FIREBASE_USER_ROOT       = null;
+var FIREBASE_USER_ROOT_OBJ   = null;
+var FIREBASE_USER_DATA       = null;
+var FIREBASE_USER_DATA_OBJ   = null;
+var FIREBASE_USER_STATUS     = null;
+var FIREBASE_USER_STATUS_OBJ = null;
 
 var SPLASH_PAGE     = "index.html";
 var MY_DEVICES_PAGE = "my-devices.html";
@@ -67,7 +68,36 @@ var FIREBASES = [
     FIREBASE_USER_DATA_OBJ,
     FIREBASE_USER_STATUS_OBJ,
     FIREBASE_USER_ROOT_OBJ
-]
+];
+
+global.$SH_SetUser = function (userEmail) {
+
+    USER_EMAIL = userEmail;
+    USER = USER_EMAIL.replace(/[^@a-z0-9]/ig, '-');
+
+    FIREBASE_USER_ROOT       = FIREBASE_USER_DIR_ROOT + USER;
+    FIREBASE_USER_ROOT_OBJ   = new Firebase(FIREBASE_USER_ROOT);
+    FIREBASE_USER_DATA       = FIREBASE_ROOT + "/users/" + USER + "/device_configs/";
+    FIREBASE_USER_DATA_OBJ   = new Firebase(FIREBASE_USER_DATA);
+    FIREBASE_USER_STATUS     = FIREBASE_ROOT + "/users/" + USER + "/last_request/";
+    FIREBASE_USER_STATUS_OBJ = new Firebase(FIREBASE_USER_STATUS);
+
+}; // End $SH_SetUser()
+
+
+global.$SH_UserLogout = function () {
+
+    USER = null;
+    USER_EMAIL = null;
+
+    FIREBASE_USER_ROOT       = null;
+    FIREBASE_USER_ROOT_OBJ   = null;
+    FIREBASE_USER_DATA       = null;
+    FIREBASE_USER_DATA_OBJ   = null;
+    FIREBASE_USER_STATUS     = null;
+    FIREBASE_USER_STATUS_OBJ = null;
+
+};
 
 
 // <------------------------------------------- USEFUL METHODS -------------------------------------------> //
@@ -150,16 +180,22 @@ global.UCFirst = function (s) {
 
 global.resizeHeight = function () {
 
+    var UIheader  = $(".ui-header");
+    var UIfooter  = $(".ui-footer");
+    var UIcontent = $(".ui-content");
+
     var screen = $.mobile.getScreenHeight(),
-        header = $(".ui-header").hasClass("ui-header-fixed") ? $(".ui-header").outerHeight() - 1 : $(".ui-header").outerHeight(),
-        footer = $(".ui-footer").hasClass("ui-footer-fixed") ? $(".ui-footer").outerHeight() - 1 : $(".ui-footer").outerHeight(),
-        contentCurrent = $(".ui-content").outerHeight() - $(".ui-content").height();
+        header = UIheader.hasClass("ui-header-fixed") ? UIheader.outerHeight() - 1 : UIheader.outerHeight(),
+        footer = UIfooter.hasClass("ui-footer-fixed") ? UIfooter.outerHeight() - 1 : UIfooter.outerHeight(),
+        contentCurrent = UIcontent.outerHeight() - UIcontent.height();
     var content = screen - header - footer - contentCurrent;
-    $(".ui-content").each(function () {
+
+    UIcontent.each(function () {
         if(!$(this).parent().hasClass("ui-popup")) {
             $(this).height(content);
         }
     });
+
 }; // End resizeHeight
 
 
@@ -175,7 +211,7 @@ global.sentenceCase = function (string) {
 
     for(var i = 0; i < n.length; i++) {
 
-        var spaceput = ""
+        var spaceput = "";
         var spaceCount = n[i].replace(/^(\s*).*$/,"$1").length;
 
         n[i] = n[i].replace(/^\s+/,"");
@@ -469,7 +505,7 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
                             $(wrapper + " #" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i).trigger("create");
 
                             // Grab the widget, that is, since we overrode the 'this' variable
-                            var e = $(wrapper + " #" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i + ' .widget');
+                            var e = $(wrapper + " #" + device.name + "-" + REFS[r].delta + ' .widget-wrapper-' + i).find("select, input");
 
                             // Set the widget's HTML attributes
                             $(e).attr("name", i + "-" + REFS[r].delta);
@@ -478,10 +514,16 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
                             $(e).attr("min", widgets[i].min);
                             $(e).attr("max", widgets[i].max);
                             $(e).attr("step", widgets[i].step);
+
                             $(e).addClass(i + " delta-" + r);
                             $(e).addClass("z-" + widgets[i].z);
 
+
+                            //console.log(e.attr("data-role"));
+
                             $(e).change(function () {
+
+                                //console.log($(e).val() + " CHANGING");
 
                                 var i = this[0];
                                 var r = this[1];
@@ -527,7 +569,10 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
 
                                 $(e).val(data.val().toString());
 
-                                if ($(e).attr("data-type") == "range") $(e).slider().slider("refresh");
+                                if ($(e).attr("data-type") == "range")  $(e).slider({disabled: false}).slider("refresh");
+                                if ($(e).attr("data-role") == "slider") $(e).slider({disabled: false}).slider("refresh");
+                                if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu("disable").selectmenu("refresh", true);
+
 
                                 // If we have all three required swatch fields, build the swatch...
                                 if (swatch[r].hue && swatch[r].sat && swatch[r].bri)
@@ -537,19 +582,29 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
 
                             var enable = $(wrapper + " #enable-" + "widget-" + i + "-" + REFS[r].delta);
 
+                            // Enable / Disable on load
                             firebaseObj.child(staticObj.key).child(path_key).once("value", function (data) {
 
-                                /*console.log("DATA~~~~~~~~~~~" + data.val());
+                                //console.log("DATA~~~~~~~~~~~" + data.val());
                                 if(data.val() == null) return;
 
                                 var values = data.val();
                                 if(values.indexOf($(enable).attr("name")) > -1) {
-                                    $(enable).val(1).slider("refresh");
+                                    $(enable).val(1).trigger("change");
+
+                                    if ($(e).attr("data-type") == "range")  $(e).slider({disabled: false}).slider("refresh");
+                                    if ($(e).attr("data-role") == "slider") $(e).slider({disabled: false}).slider("refresh");
+                                    if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu("enable").selectmenu("refresh", true);
+
                                 }
                                 else {
+
                                     $(enable).val(0).slider("refresh");
-                                    $(wrapper + " #widget-" + i + "-" + REFS[r].delta).slider({disabled: true}).slider("refresh");
-                                }*/
+
+                                    if ($(e).attr("data-type") == "range")  $(e).slider({disabled: true}).slider("refresh");
+                                    if ($(e).attr("data-role") == "slider") $(e).slider({disabled: true}).slider("refresh");
+                                    if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu("disable").selectmenu("refresh", true);
+                                }
                             });
 
                             $(enable).change(function () {
@@ -558,12 +613,18 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
 
                                 if($(enable).val() == 0) { // The widget isn't enabled for this rule/schedule
 
-                                    $(wrapper + " #widget-" + i + "-" + REFS[r].delta).slider({disabled: true}).slider("refresh");
+
+                                    if ($(e).attr("data-type") == "range")  $(e).slider({disabled: true}).slider("refresh");
+                                    if ($(e).attr("data-role") == "slider") $(e).slider({disabled: true}).slider("refresh");
+                                    if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu("disable").selectmenu("refresh", true);
+
+                                    //console.log("DISABLING");
 
                                     // Remove the reference to the rule's/schedule's paths/values
                                     firebaseObj.child(staticObj.key).once("value", function (data) {
 
                                         var sch = data.val();
+
                                         if(!sch[path_key]) sch[path_key] = [];
                                         if(!sch[value_key]) sch[value_key] = [];
 
@@ -578,12 +639,17 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
                                 }
                                 else { // The widget is enabled for this schedule/rule
 
-                                    $(wrapper + " #widget-" + i + "-" + REFS[r].delta).slider({disabled: false}).slider("refresh");
+                                    if ($(e).attr("data-type") == "range")  $(e).slider({disabled: false}).slider("refresh");
+                                    if ($(e).attr("data-role") == "slider") $(e).slider({disabled: false}).slider("refresh");
+                                    if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu("enable").selectmenu("refresh", true);
+
+                                    //console.log("ENABLING");
 
                                     // Remove the reference to the rule's/schedule's paths/values
                                     firebaseObj.child(staticObj.key).once("value", function (data) {
 
                                         var sch = data.val();
+
                                         if(!sch[path_key]) sch[path_key] = [];
                                         if(!sch[value_key]) sch[value_key] = [];
 
@@ -618,3 +684,38 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
     });
 
 } // End $SH_InjectWidgetsStatic()
+
+
+/**
+ * Not used — DEPRECIATED!
+ * Removes motion widgets from the "Target Device" in Rules.
+ * However, this was replaced by just removing motion items when the select menu was created...
+ * ...which is a bit more intuitive (and safer too).
+ */
+global.updateTargetSelect = function () {
+
+    var ruleDeviceTarget = $("#rule-target-device");
+
+    ruleDeviceTarget.children().each(function() {
+
+        var option = this;
+
+        FIREBASE_DEVICE_DATA_OBJ.once("value", function (data) {
+            var values = data.val();
+            for(var i in values) {
+                if(i == $(option).val() && values[i].widgets != undefined) {
+                    for(var n in values[i].widgets) {
+                        if(values[i].widgets[n] && values[i].widgets[n].type && values[i].widgets[n].type == "motion") {
+                            $(option).remove();
+                        }
+                    }
+                }
+            }
+        });
+
+    });
+
+    ruleDeviceTarget.selectmenu("refresh", true);
+    $("#rule-source-device").selectmenu("refresh", true);
+
+} // End updateTargetSelect()

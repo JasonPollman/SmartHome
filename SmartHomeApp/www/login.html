@@ -9,16 +9,14 @@
 <div data-role="page" id="login" data-content-theme="b" data-theme="b">
 
     <div data-role="header" data-theme="b">
-        <h1>Please Sign in or Register</h1>
+        <a><i class="fa fa-key lIcon"></i></a><h1>SmartHome Login</h1>
     </div>
 
     <div data-role="content" data-theme="b" data-content-theme="b" class="center" id="login-content">
 
         <div style="padding:20px 20px;" id="loginForm">
 
-            <img src="img/logo2.svg" id="login-hero" />
-
-            <form>
+            <form id="login-form-form">
                 <input type="email" name="email" id="email" value="" required="true" placeholder="Email" data-theme="b" data-clear-btn="true">
                 <input type="password" name="password" id="password" value="" required="true" placeholder="Password" data-theme="b" data-clear-btn="true">
                 <button id="signin">Sign in</button>

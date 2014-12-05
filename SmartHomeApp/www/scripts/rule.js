@@ -33,6 +33,7 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
 
                     $SH_injectWidgetsStatic(".widgets-wrapper-source", rule, FIREBASE_RULES_OBJ.child("device_rules"), rule.source_mac, "source_path", "source_value");
                     $SH_injectWidgetsStatic(".widgets-wrapper-target", rule, FIREBASE_RULES_OBJ.child("device_rules"), rule.target_mac, "target_path", "target_value");
+
                     $("#rule").trigger("create");
 
                     // Make the page header the device's name
@@ -56,15 +57,29 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
                         FIREBASE_RULES_OBJ.child("device_rules").child(rule.key).update(rule);
                     });
 
+                    var allSourceDevices   = $("#rule-source-device").children();
+                    var allTargetDevices = $("#rule-target-device").children();
+
                     $("#rule-source-device").change(function () {
 
                         var value = cleanValue($(this).val());
+
+                        $("#rule-target-device").empty();
+                        $("#rule-target-device").append(allTargetDevices);
+
+                        $("#rule-target-device").children().each(function () {
+                            if(cleanValue($(this).val()) == value) {
+                                $(this).remove();
+                            }
+                        });
+
+                        $("#rule-target-device").selectmenu("refresh", true).trigger("change");
 
                         rule.source_mac   = value;
                         rule.source_path  = [];
                         rule.source_value = [];
 
-                        FIREBASE_RULES_OBJ.child(i).update(rule);
+                        FIREBASE_RULES_OBJ.child("device_rules").child(i).update(rule);
 
                         $SH_injectWidgetsStatic(".widgets-wrapper-source", rule, FIREBASE_RULES_OBJ.child("device_rules"), rule.source_mac, "source_path", "source_value");
                         $(".widgets-wrapper-source").trigger("create");
@@ -78,7 +93,7 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
                         rule.target_path  = [];
                         rule.target_value = [];
 
-                        FIREBASE_RULES_OBJ.child(i).update(rule);
+                        FIREBASE_RULES_OBJ.child("device_rules").child(i).update(rule);
 
                         $SH_injectWidgetsStatic(".widgets-wrapper-target", rule, FIREBASE_RULES_OBJ.child("device_rules"), rule.target_mac, "target_path", "target_value");
                         $(".widgets-wrapper-target").trigger("create");
@@ -112,7 +127,20 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
 $(document).on("pagebeforecreate", "#rule", function () { // When the "device" page is inserted into the DOM...
     var keys = Object.keys(global[DEVICES_GLOBAL]);
     for (var i in global[DEVICES_GLOBAL]) {
-        $("#rule-source-device").append('<option ' + ((keys[0] == i) ? "selected" : "") + ' value="' + global[DEVICES_GLOBAL][i].mac + '">' + UCFirst(global[DEVICES_GLOBAL][i].name.replace(/[^a-z0-9]/ig, ' ')) + '</option>');
-        $("#rule-target-device").append('<option ' + ((keys[0] == i) ? "selected" : "") + ' value="' + global[DEVICES_GLOBAL][i].mac + '">' + UCFirst(global[DEVICES_GLOBAL][i].name.replace(/[^a-z0-9]/ig, ' ')) + '</option>')
+        $("#rule-source-device").append('<option value="' + global[DEVICES_GLOBAL][i].mac + '">' + UCFirst(global[DEVICES_GLOBAL][i].name.replace(/[^a-z0-9]/ig, ' ')) + '</option>');
+
+        if(global[DEVICES_GLOBAL][i].widgets) {
+            var motion = false;
+            for(var n in global[DEVICES_GLOBAL][i].widgets) {
+                if(global[DEVICES_GLOBAL][i].widgets[n].type && global[DEVICES_GLOBAL][i].widgets[n].type == "motion") {
+                    motion = true;
+                }
+            }
+
+            if(motion == false) $("#rule-target-device").append('<option value="' + global[DEVICES_GLOBAL][i].mac + '">' + UCFirst(global[DEVICES_GLOBAL][i].name.replace(/[^a-z0-9]/ig, ' ')) + '</option>')
+        }
+        else {
+            $("#rule-target-device").append('<option value="' + global[DEVICES_GLOBAL][i].mac + '">' + UCFirst(global[DEVICES_GLOBAL][i].name.replace(/[^a-z0-9]/ig, ' ')) + '</option>')
+        }
     }
 });

@@ -82,6 +82,9 @@ var SchedulesMod = function () {
             var deviceSettingsClone = {};
             deviceSettingsClone.setEqual(Devices[device.mac].settings);
 
+            // The schedule was deleted from the front-end
+            if(Schedules[i] == undefined) return;
+
             if(!Schedules[i].setting_path) {
               Schedules[i].setting_path = [];
             }

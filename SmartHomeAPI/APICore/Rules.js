@@ -56,12 +56,13 @@ var Rules = function () {
           diffPaths.setEqual(lastStateCurrentDifference[k]);
           diffPaths = diffPaths.path.join('/');
 
-          if(rule.source_path.indexOf(diffPaths) < 0) continue rulesloop;
+          if(rule.source_path.indexOf(diffPaths) < 0) {
+            continue rulesloop;
+          }
           
         }
 
       } // End for loop     
-
 
       if(rule.enabled == true) { // Only implement a rule if it is set to "enabled"
 
@@ -85,10 +86,8 @@ var Rules = function () {
             targetDeviceSettingsClone.setEqual(Devices[rule.target_mac].settings);
             
             var sourcePath = []; var targetPath = [];
-
-            // Break the path's into dot notation path/to/setting => path.to.setting
-            for(var n in rule.source_path) sourcePath.push(rule.source_path[n].replace(/\//ig, "."));
-            for(var n in rule.target_path) targetPath.push(rule.target_path[n].replace(/\//ig, "."));
+            for(var n in rule.source_path) sourcePath.push(rule.source_path[n]);
+            for(var n in rule.target_path) targetPath.push(rule.target_path[n]);
 
             // Counts the number of matches in the source devices settings.
             // Must equal the number of source_values
@@ -172,6 +171,11 @@ var Rules = function () {
     else { // Warn the user that they have a malformed rule
 
       console.warn("Rule '" + rule.name() + "' is missing a required key or is malformed.");
+
+      if(rulesData.status == undefined) rulesData.status = {
+        message: ""
+      }
+
       if(rulesData.status.message != "Error: This rule is malformed.")
         firebaseRules.child(rule.name()).child("status").update({ code: 1, message: "Error: This rule is malformed.", timestamp: Date.now() });
     } 

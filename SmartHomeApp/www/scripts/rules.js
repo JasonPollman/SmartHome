@@ -11,6 +11,8 @@ $(document).on("pagecreate", "#rules", function () {
 
     function setRule (child) {
 
+        $("#rules-empty").remove();
+
         // Clone the pesduoRule for modification...
         var newRule = pesduoRule.clone();
 
@@ -60,7 +62,7 @@ $(document).on("pagecreate", "#rules", function () {
         $("#my-rules").find("#" + ruleName).remove();
     });
 
-    $("#add-rule").click(function (e) {
+    $(".add-rule").click(function (e) {
 
         e.stopPropagation();
         e.preventDefault();
@@ -77,7 +79,7 @@ $(document).on("pagecreate", "#rules", function () {
         }
 
         var newRuleID = FIREBASE_RULES_OBJ.child("device_rules").push(newRule);
-        $.mobile.changePage('rule.html?id=' + newRuleID.name());
+        $.mobile.changePage('rule.html?id=' + newRuleID.name(), { transition: PAGE_TRANSITION_TYPE });
     })
 
 });

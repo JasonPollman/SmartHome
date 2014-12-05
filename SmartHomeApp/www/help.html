@@ -21,8 +21,25 @@
 
             <div data-role='collapsible' class="ui-bar-b">
                 <h2>Accounts</h2>
-
-                <p>User accounts will be supported in a future release!</p>
+                <div data-role="collapsible">
+                    <h3>Adding User Accounts</h3>
+                    <ol>
+                        <li>From the login page, enter a valid email address and secure password.</li>
+                        <li>Click "Register".</li>
+                        <li>That's it! Your account has been created and you will be automatically logged in.</li>
+                    </ol>
+                </div>
+                <div data-role="collapsible">
+                    <h3>I Forgot My Password</h3>
+                    <ol>
+                        <li>From the login page, enter your email address in the username field.</li>
+                        <li>Click "Sign In".</li>
+                        <li>A link will appear that reads: "Send Password Reset"</li>
+                        <li>Click the link and a password reset email will be sent to your email address.</li>
+                        <li>Log in with the password provided in the email.</li>
+                        <li>Once logged in change your password immediately!</li>
+                    </ol>
+                </div>
             </div>
 
             <div data-role='collapsible' class="ui-bar-b">
@@ -30,18 +47,23 @@
 
                 <div data-role="collapsible">
                     <h3>Connectivity</h3>
-
                     <h3>Troubleshooting Steps</h3>
                     <ol>
-                        <li>Make sure your Devices are on the same network as the SmartHome API</li>
-                        <li>Check your internet connection</li>
-                        <li>Check the SmartHome API Terminal for any error messages</li>
+                        <li>Make sure your smart devices are on the same network as the SmartHome API.</li>
+                        <li>Check that you have a valid internet connection.</li>
+                        <li>Refer to the device's instruction manual to ensure that your device is properly configured.</li>
+                        <li>Check the SmartHome API Terminal for any error messages.</li>
+                        <li>Open a ticket a the <a>SmartHome Help Desk.</a></li>
                     </ol>
                 </div>
 
-                <h3></h3>
+                <div data-role="collapsible">
+                    <h3>Configuring Devices</h3>
+                    <p>From the <a href="my-devices.html">My Devices</a> page, select a device you would like to configure.</p>
+                    <p>Once you've selected a device, you'll be redirected to that device's page.</p>
+                    <p>From there, you can modify each of the device's "widgets" by moving its sliders or clicking its buttons.</p>
+                </div>
 
-                <p></p>
             </div>
 
             <div data-role='collapsible' class="ui-bar-b">
@@ -50,27 +72,29 @@
                 <!-- Sub-sets! -->
                 <div data-role="collapsible">
                     <h3>Adding Schedules</h3>
-                    <!-------------------------------- EXAMPLE -------------------------------->
-                    <p>From the <a href="schedules.html">Schedules</a> page, click the <i class="fa fa-plus"></i> icon
-                        to create a new schedule.</p>
+                    <p>From the <a href="schedules.html">Schedules</a> page, click the <i class="fa fa-plus"></i> icon to create a new schedule.</p>
                 </div>
-                <div data-role="collapsible">
-                    <h3>Editing Schedules</h3>
-                    <DT>
-                    <p>From the <a href="schedules.html">Schedules</a> page, click on a schedule you would like to edit.
-                    </p>
 
-                    <p><i class="fa fa-plus"></i> Schedule Settings</p>
-                    <DD><p>Here you can edit the Date, the time, and the name of a schedule</p></DD>
-                    <p><i class="fa fa-plus"></i> Device Settings</p>
-                    <DD><p>Here you can modify specific settings for Devices in the schedule </p></p></DD>
-                    </DT>
+                <div data-role="collapsible">
+
+                    <h3>Editing Schedules</h3>
+                    <p>From the <a href="schedules.html">Schedules</a> page, click on a schedule you would like to modify and you will be redirected to that specific schedules' settings page.</p>
+
+                    <div data-role="collapsible">
+                        <h3>Schedule Settings</h3>
+                        <p>Here you can modify the generic settings of the schedule, such as its name and time.</p>
+                    </div>
+
+                    <div data-role="collapsible">
+                        <h3>Device Settings</h3>
+                        <p>Here you can change and modify the schedule's devices settings which will be changed when the schedule is enforced.</p>
+                    </div>
+
                 </div>
+
                 <div data-role="collapsible">
                     <h3>Deleting Schedules</h3>
-
-                    <p>From the <a href="schedules.html">Schedules</a> page, click on the schedule you would like to
-                        delete, then in the top right corner click on the <i class="fa fa-times"></i> icon.</p>
+                    <p>From the <a href="schedules.html">Schedules</a> page, click on the schedule you would like to delete and you will be redirected to that schedule's settings page. From there, click on the <i class="fa fa-times"></i> icon in the top right corner of the page.</p>
                 </div>
 
             </div>
@@ -78,31 +102,35 @@
             <div data-role='collapsible' class="ui-bar-b">
 
                 <h2>Rules</h2>
-                <!-- Sub-sets! -->
+
                 <div data-role="collapsible">
                     <h3>Adding Rules</h3>
-
-                    <p>From the <a href="rules.html">Rules</a> page, click the <i class="fa fa-plus"></i> icon to create
-                        a new rule.</p>
+                    <p>From the <a href="rules.html">Rules</a> page, click the <i class="fa fa-plus"></i> icon to create a new rule.</p>
                 </div>
+
                 <div data-role="collapsible">
                     <h3>Editing Rules</h3>
-                    <DT>
-                    <p>From the <a href="rules.html">Schedules</a> page, click on a rule you would like to edit.</p>
+                    <p>From the <a href="rules.html">Rules</a> page, click on a rule you would like to modify and you will be redirected to that specific rule's settings page.</p>
 
-                    <p><i class="fa fa-plus"></i> Rule Settings</p>
-                    <DD><p>Here you can modify the generic settings of the rule</p></DD>
-                    <p><i class="fa fa-plus"></i> Source Device Settings</p>
-                    <DD><p>Here you can change and modify the source device</p></p></DD>
-                    <p><i class="fa fa-plus"></i> Target Device Settings</p>
-                    <DD><p>Here you can change and modify the source device</p></p></DD>
-                    </DT>
+                    <div data-role="collapsible">
+                        <h3>Rule Settings</h3>
+                        <p>Here you can modify the generic settings of the rule, such as its name and source and target devices.</p>
+                    </div>
+
+                    <div data-role="collapsible">
+                        <h3>Source Device Settings</h3>
+                        <p>Here you can change and modify the source device (e.g. the device that triggers the rule).</p>
+                    </div>
+
+                    <div data-role="collapsible">
+                        <h3>Target Device Settings</h3>
+                        <p>Here you can change and modify the target device (e.g. the device that the rule acts upon).</p>
+                    </div>
                 </div>
+
                 <div data-role="collapsible">
                     <h3>Deleting Rules</h3>
-
-                    <p>From the <a href="rules.html">Rules</a> page, click on the rule you would like to delete, then in
-                        the top right corner click on the <i class="fa fa-times"></i> icon.</p>
+                    <p>From the <a href="rules.html">Rules</a> page, click on the rule you would like to delete. You will be redirected to that rule's setting page. From there, click on the <i class="fa fa-times"></i> icon in the top right corner of the page.</p>
                 </div>
 
             </div>

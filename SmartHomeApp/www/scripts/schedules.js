@@ -11,6 +11,8 @@ $(document).on("pagecreate", "#schedules", function () {
 
     function setSchedule (child) {
 
+        $("#schedules-empty").remove();
+
         // Clone the pseudeSchedule for modification...
         var newSchedule = pseudoSchedule.clone();
 
@@ -95,7 +97,7 @@ $(document).on("pagecreate", "#schedules", function () {
         $("#my-schedules").find("#" + scheduleName).remove();
     });
 
-    $("#add-schedule").click(function (e) {
+    $(".add-schedule").click(function (e) {
 
         e.stopPropagation();
         e.preventDefault();
@@ -109,7 +111,7 @@ $(document).on("pagecreate", "#schedules", function () {
         }
 
         var newScheduleID = FIREBASE_SCHEDULES_OBJ.push(newSchedule);
-        $.mobile.changePage('schedule.html?id=' + newScheduleID.name());
+        $.mobile.changePage('schedule.html?id=' + newScheduleID.name(), { transition: PAGE_TRANSITION_TYPE });
     })
 
 });

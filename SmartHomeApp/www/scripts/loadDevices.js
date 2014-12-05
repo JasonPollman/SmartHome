@@ -78,7 +78,7 @@ $(document).on("pagecreate", "#my-devices", function () {
             + '<h3 class="device-icon-text">' + UCFirst(device.name.replace(/_/ig, " ")) + '</h3>'
             + '<p class="device-info">IPv4 Address: ' + device.address + '</p>'
             + '<p class="device-info">Device MAC: ' + device.mac + '</p>'
-            + ((device.last_change && device.last_change.user) ? '<p class="device-info">Last Changed by <span class="em">' + UCFirst(device.last_change.user) + '</span></p>' : '')
+            + ((device.last_change && device.last_change.user) ? '<p class="device-info">Last Changed by <span class="lastchange em">' + UCFirst(device.last_change.user.replace(/-/, '.')) + '</span></p>' : '')
             + '</a></li>';
 
         if($(myConnectedDevices).find("#" + device.mac.replace(/:/ig, '-')).length > 0) {

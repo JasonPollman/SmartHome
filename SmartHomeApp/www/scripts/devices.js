@@ -269,14 +269,15 @@ function injectWidgets(page, params) {
 
                                             var status = data.val();
 
+                                            if(!status) status = {};
+
                                             if(status.device_response && status.device_response.status != 0) { // The device returned an error:
 
                                                 var msg = "Unexpected Error";
                                                 if(status.device_response && status.device_response.message) msg = global["sentenceCase"](JSON.stringify(status.device_response.message).replace(/[^a-z0-9\s\._]/ig, " "));
 
                                                 $("#device-error-message-content").html(UCFirst(msg));
-                                                $("#device-error-message").trigger("create");
-                                                $("#device-error-message").popup("open");
+                                                $("#device-error-message").trigger("create").popup("open");
 
                                                 $(document).on("pageshow", function () {
                                                     $("#device-error-message").popup("close");

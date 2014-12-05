@@ -1,49 +1,64 @@
 <div data-theme="b" class="motion-widget-wrapper">
     <input id="hidden-motion" class="widget" type="hidden" name="" value="0" />
     <img id="motion-indicator" src="img/runner.png" class="motion-indicator"></div>
-    <script>
-        $(function () {
-            $("#hidden-motion").change(function () {
-                console.log("CHANGING");
-                $("#motion-indicator").attr("src",
-                        ($(this).val() == "0") ? "img/runner.png" : "img/runner-motion.png"
-                );
+<script>
+    $(function () {
+
+        var ele = $("#hidden-motion");
+        var enabled = $("#enable-widget-motion-0");
+        var indicator = $("#motion-indicator");
+        var thisPage = $.mobile.activePage.attr("id");
+
+        ele.change(function () {
+            $("#motion-indicator").attr("src",
+                    ($(this).val() == "0") ? "img/runner.png" : "img/runner-motion.png"
+            );
+        });
+
+        // Hide the motion indicator on the schedules page, since we can't schedule a "motion" event.
+        if (thisPage == "schedule") {
+            indicator.hide().after('<div class="message info"><i class="fa fa-lightbulb-o"></i><p>This device has no schedulable settings.</p></div>');
+            $(enabled).val(0).trigger("change").slider({ disabled: true });
+        }
+
+        if (thisPage == "rule") {
+
+            // Set the runner image to the database value...
+            FIREBASE_RULES_OBJ.child("device_rules").child($SH_GetParameters().id).child("source_value").once("value", function (data) {
+                console.log(data.val());
+                ele.val(data.val()[0]);
+                ele.trigger("change");
+
+                enabled.change(showhideMotion);
+                enabled.trigger("change");
             });
 
-            var ele = $("#hidden-motion");
-            var enabled = $("#enable-widget-motion-0");
-            var indicator = $("#motion-indicator");
-            var thisPage = $.mobile.activePage.attr("id");
+            /**
+             * Disable or enable to runner image...
+             */
+            function showhideMotion() {
 
-            // Hide the motion indicator on the schedules page, since we can't schedule a "motion" event.
-            if (thisPage == "schedule") {
-                indicator.hide().after('<div class="message info"><i class="fa fa-lightbulb-o"></i><p>This device has no schedulable settings.</p></div>');
-            }
+                indicator.off();
 
-            if (thisPage == "rule") {
+                if (enabled.val().toString() == "1") {
+                    indicator.removeClass("ui-state-disabled");
+                    indicator.click(function () {
+                        var val = $(ele).val();
+                        (val == "1") ? $(ele).val("0") : $(ele).val("1");
+                        $(ele).trigger("change");
+                    });
+                }
+                else {
+                    indicator.addClass("ui-state-disabled");
+                }
 
-                function showhideMotion() {
+            } // End showhideMotion()
 
-                    if (enabled.val() == "1") {
-                        indicator.removeClass("ui-state-disabled");
-                        indicator.click(function () {
-                            var val = $(ele).val();
-                            (val == "1") ? $(ele).val("0") : $(ele).val("1");
-                            $(ele).trigger("change");
-                        });
-                    }
-                    else {
-                        indicator.off();
-                        indicator.addClass("ui-state-disabled");
-                    }
 
-                } // End showhideMotion()
 
-                enabled.change(showhideMotion());
-                showhideMotion();
 
-            } // End if (thisPage == "rule")
+        } // End if (thisPage == "rule")
 
-        }); // End document ready
-    </script>
+    }); // End document ready
+</script>
 </div>

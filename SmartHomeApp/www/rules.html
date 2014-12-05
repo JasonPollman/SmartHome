@@ -11,7 +11,7 @@
     <div data-role="header" data-position="fixed" role="banner" data-theme="b" data-tap-toggle="false">
         <a href="#" data-rel="back" data-role="button" role="button"><i class="fa fa-arrow-circle-left"></i></a>
         <h1>Device Rules</h1>
-        <a href='#' id="add-rule" data-position-to='window' data-role='button' data-transition='pop' data-inline='true'>
+        <a href='#' class="add-rule" data-position-to='window' data-role='button' data-transition='pop' data-inline='true'>
             <i class="fa fa-plus"></i>
         </a>
     </div>
@@ -31,6 +31,9 @@
 
         <ul data-role="listview" id="my-rules">
             <!-- Inject Rules -->
+            <div id="rules-empty" class="center">
+                <h3 style="padding: 20px;">You haven't set and rules yet, click the <i class="add-rule fa fa-plus" style="text-align: center; margin-left: 7px; margin-right: -2px;"></i> icon to create a new one.</h3>
+            </div>
             <li id="pseduo-rule">
                 <a href="#" class="rule-href">
                     <img src="img/rules.png">
