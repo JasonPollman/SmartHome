@@ -41,7 +41,7 @@ var log = function(msg, color, noTimestamp, lvl) {
 
     // Log all messages to firebase...
     var APIStatus = new Firebase(APIConfig.general.firebaseRootURI + "/" + APIConfig.general.firebaseAPIStatus);
-    APIStatus.update({ status: (msg || "undefined message"), code: ((lvl < 2) ? 1 : 0) });
+    APIStatus.update({ status: (msg || "undefined message"), code: ((lvl < 1) ? 1 : 0) });
 
     if(typeof msg == 'string' && !noTimestamp) msg = msg.replace(/\n/g, "\n                        ");
     msg = ((!noTimestamp) ? (module.exports.pad(d.getMonth() + 1, 2) + '/' + module.exports.pad(d.getDate(), 2) + '/' + module.exports.pad(d.getFullYear(), 2) + ' ' + module.exports.pad(d.getHours(), 2) + ":" + module.exports.pad(d.getMinutes(), 2) + ":" + module.exports.pad(d.getSeconds(), 2) + ":" + module.exports.pad(d.getMilliseconds(), 3) + " > ") : "") + msg + '\n';

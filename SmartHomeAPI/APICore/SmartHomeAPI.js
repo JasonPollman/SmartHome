@@ -35,42 +35,26 @@ catch(e) {
  */
 var SmartHome = function() {
 
+  // So we can reference this from within callbacks:
+  var self = this;
+
+  // Overwrite the global console, so we can control formatting...
   var console = APIUtil.console;
 
-  // Inform firebase that the API is starting up...
-
-  var APIStatus = new Firebase(APIConfig.general.firebaseRootURI + "/" + APIConfig.general.firebaseAPIStatus);
-  APIStatus.update({ last_startup: Date.now(), status: "startup pending", code: 0 });
-
-  // So we can ping the backend from the front-end.
-  APIStatus.child("sessions").once("value", function (data) {
-
-    var sessions = data.val();
-
-    for(var i in sessions) {
-
-      if(sessions[i].last != undefined && Date.now() - sessions[i].last > 300000) { // 5 Mins, Delete old sessions...
-        APIStatus.child("sessions").child(i).remove();
-      }
-
-    } // End for loop
-
-  }); // End APIStatus.child("sessions").on("value")
-
-  APIStatus.child("sessions").on("child_changed", marcoPolo);
-  APIStatus.child("sessions").on("child_added", marcoPolo);
-
-  function marcoPolo(child) {
-
-    var session = child.val();
-
-    if(session.ping && session.ping == "marco") {
-      APIStatus.child("sessions").child(child.name()).update({
-        ping: "polo",
-        last: Date.now()
-      });
+  // Write the restart to the log file.
+  fs.writeFile(APIConfig.general.logPath, "\n-------------- SMART HOME API BOOT --------------\n\n", {
+    flag: 'a',
+    encoding: 'utf-8'
+  }, function (err) {
+    if (err) {
+      APIConfig.lastError = '"Unable to write to the the SmartHome API Log.\nPlease run this process as an administration (e.g. sudo)."';
+      APIConfig.exitWithError = true;
+      process.kill(process.pid, "SIGINT");
     }
-  }
+  });
+
+  // Clear the console.
+  console.clear();
 
 
   /**
@@ -83,41 +67,104 @@ var SmartHome = function() {
 
     if(shuttingDown == false) { // So we don't accumulate a crap ton of data in the DB if a program refuses to shutdown... like before. :(
 
+      shuttingDown = true;
+
       // Clear the "connected_devices" Firebase object:
       if (deviceFirebase) deviceFirebase.remove();
-      APIStatus.update({reachable: false, last_shutdown_status: 0, last_shutdown: Date.now() }, function () {
+      APIStatus.update({reachable: false, last_shutdown_status: 0, last_shutdown: Date.now(), locked: 0, code: -1 }, function () {
 
         (APIConfig.exitWithError) ?
             console.error("Smart Home API Server v" + APIConfig.general.version + " Shutting Down with Error:\n\n" + APIConfig.lastError + "\n") :
             console.warn("Smart Home API Server v" + APIConfig.general.version + " Shutting Down...");
 
         // Exit the program...
-        shuttingDown = true;
-        process.exit();
+        process.exit(0);
 
       });
 
     }
     else {
-      process.exit();
+
+      // Hard kill
+      process.kill(process.pid, "SIGKILL");
     }
 
   }; // End shutdown()
 
-  // Call the shutdown() function when the "SIGINT" signal is sent to the terminal.
+
+  /**
+   * Shutdown API's per request
+   */
+  // The APIStatus Object in Firebase
+  var APIStatus = new Firebase(APIConfig.general.firebaseRootURI + "/" + APIConfig.general.firebaseAPIStatus);
+
+  // Shutdown this instance of the API on request...
+  APIStatus.child("kill").on("value", function (data) {
+    if(data.val() == process.pid) {
+      console.error("This process has been been shutdown by another instance of the SmartHome API.");
+      shutdown();
+    }
+  });
+
+
+  /**
+   * Check to see if another instance of the SmartHome API with this key is running, if so stop it...
+   */
+  var unableToShutdown;
+  APIStatus.once("value", function (data) {
+
+    // If the API is locked (1), it means the API is in use by a SmartHome API process,
+    // 0 == not in use, -1 means shutdown the running process.
+    var status = data.val();
+    if(status.locked == 1) {
+
+      console.warn("Another instance of the SmartHome API using the key " + APIConfig.general.APIKey + "\nis already running...\n\nAttempting to forcefully shut it down.\n");
+      APIStatus.child("kill").set(status.pid, function (error) { // Tell the other process to shutdown
+
+        if(error) { // There was an error updating the value...
+          console.error("Unable to shutdown previous SmartHome API instance, this instance cannot continue.");
+          process.exit();
+        }
+
+        unableToShutdown = setTimeout(function () {
+          APIStatus.child("locked").once("value", function () {
+            if(data.val() != 0) console.error("Unable to shutdown previous process.\nThis instance cannot continue....\n\nIf necessary, you must unlock the API manually by setting the database 'lock' value to 0.\n");
+            process.exit();
+          });
+        }, 3000); // 3 Seconds
+
+      }); // End APIStatus.child("locked").update(-1)
+
+    } // End if(status.locked == 1)
+
+    // Start this instance, if we get an unlock code...
+    APIStatus.on("value", function (data) {
+      if(data.val().locked == 0 && data.val().code != -1 && shuttingDown == false) {
+        APIStatus.update({ last_startup: Date.now(), reachable: true, status: "startup pending", locked: 1, pid: process.pid, kill: 0, code: -1 });
+        self.emit("process singular");
+      }
+    })
+
+  }); // End APIStatus.child("locked").once("value")
+
+
+  /**
+   * Call the shutdown() function when the "SIGINT" signal is sent to the terminal.
+   */
   process.on("SIGINT", shutdown);
 
-  // What to do on uncaught exceptions....
+
+  /**
+   * On Unhandled Exceptions
+   */
   process.on("uncaughtException", function (e) {
     APIConfig.exitWithError = true;
     APIConfig.lastError = "An uncaught exception has occurred..." + "\n\nMessage: \"" + e.message + "\".\n\nStacktrace: " + e.stack;
     process.kill(process.pid, "SIGINT");
   });
 
-  // <!------------------------- PRIVATE CLASS VARIABLES -------------------------!>
 
-  // So we can reference this from within callbacks:
-  var self = this;
+  // <!------------------------- PRIVATE CLASS VARIABLES -------------------------!>
 
   // Holds all the drivers:
   var drivers = {};
@@ -155,69 +202,92 @@ var SmartHome = function() {
 
   // <!---------------------------- BEGIN PROGRAM FLOW ----------------------------!>
 
-  // #1 ---> Write the restart to the log file.
-  fs.writeFile(APIConfig.general.logPath, "\n-------------- SMART HOME API BOOT --------------\n\n", { flag: 'a', encoding: 'utf-8' }, function (err) {
-    if(err) {
-      APIConfig.lastError = '"Unable to write to the the SmartHome API Log.\nPlease run this process as an administration (e.g. sudo)."';
-      APIConfig.exitWithError = true;
-      process.kill(process.pid, "SIGINT");
-    }
-  });
-  
-  // #2 ---> Clear the console.
-  console.clear();
+  self.once("process singular", function () { // Dont's start until we know this is the only running instance...
 
-  // #3 ---> Clean up configuration values...
-  (function () {
+    clearTimeout(unableToShutdown);
 
-    // Append a '/' to APIConfig.devices.driverDirectory if it doesn't have a trailing slash
-    if(APIConfig.devices.driverDirectory.charAt(APIConfig.devices.driverDirectory.length - 1) != '/')
-      APIConfig.devices.driverDirectory += '/';
+    // #1 --> So we can ping the backend from the front-end.
+    APIStatus.child("sessions").once("value", function (data) {
 
-    // Append a '/' to APIConfig.devices.driverInterfaces if it doesn't have a trailing slash
-    if(APIConfig.devices.interfaceDirectory.charAt(APIConfig.devices.interfaceDirectory.length - 1) != '/')
-      APIConfig.devices.interfaceDirectory += '/';
+      var sessions = data.val();
 
-  })();
-  
+      for (var i in sessions) {
 
-  // #4 ---> Show msg that Smart Home API Server is starting...
-  console.warn("Smart Home API Server v" + APIConfig.general.version + " Booting on '" + os.platform() + "'...");
+        if (sessions[i].last != undefined && Date.now() - sessions[i].last > 300000) { // 5 Mins, Delete old sessions...
+          APIStatus.child("sessions").child(i).remove();
+        }
 
-  // #5 ---> Load the device interfaces
-  loadInterfaces();
+      } // End for loop
 
-  // #6 ---> Once the interfaces are loaded, load the device drivers:
-  self.on("interfaces loaded", loadDrivers);
+    }); // End APIStatus.child("sessions").on("value")
 
-  // #6 ---> Setup the devices, based on the network devices connected:
-  self.on("drivers loaded", function () {
+    APIStatus.child("sessions").on("child_changed", marcoPolo);
+    APIStatus.child("sessions").on("child_added", marcoPolo);
 
-    // Get the network's WAN IP...
-    WANIP(function (err, ip) {
+    function marcoPolo(child) {
 
-      if (err) {
-        console.error("WAN IP Retrieval Failed!");
-        return;
+      var session = child.val();
+
+      if (session.ping && session.ping == "marco") {
+        APIStatus.child("sessions").child(child.name()).update({
+          ping: "polo",
+          last: Date.now()
+        });
       }
+    }
 
-      // Update the firebase "api_status" object...
-      APIStatus.update({ wan_ip: ip, status: "Got Network WAN IPv4", code: 0, reachable: true });
-    });
+    // #2 ---> Clean up configuration values...
+    (function () {
 
-    scanNetwork.call();
+      // Append a '/' to APIConfig.devices.driverDirectory if it doesn't have a trailing slash
+      if (APIConfig.devices.driverDirectory.charAt(APIConfig.devices.driverDirectory.length - 1) != '/')
+        APIConfig.devices.driverDirectory += '/';
 
-    // Once the network scan is complete load rules and schedules...
-    self.once("network scan complete", function () {
-      var Schedules = require("./Schedules"); // The SmartHome Schedules Module  
-      var Rules     = require("./Rules");     // The SmartHome Rules Module
-      console.notice("SmartHome API Ready!", false, 118);
-    });
-    
-  }); // End self.on("drivers loaded")
+      // Append a '/' to APIConfig.devices.driverInterfaces if it doesn't have a trailing slash
+      if (APIConfig.devices.interfaceDirectory.charAt(APIConfig.devices.interfaceDirectory.length - 1) != '/')
+        APIConfig.devices.interfaceDirectory += '/';
 
-  // Set an interval to continuously re-scan the network:
-  setInterval(scanNetwork, APIConfig.devices.scanInterval); 
+    })();
+
+    // #3 ---> Show msg that Smart Home API Server is starting...
+    console.warn("Smart Home API Server v" + APIConfig.general.version + " Booting on '" + os.platform() + "'...");
+
+    // #4 ---> Load the device interfaces
+    loadInterfaces();
+
+    // #5 ---> Once the interfaces are loaded, load the device drivers:
+    self.on("interfaces loaded", loadDrivers);
+
+    // #6 ---> Setup the devices, based on the network devices connected:
+    self.on("drivers loaded", function () {
+
+      // Get the network's WAN IP...
+      WANIP(function (err, ip) {
+
+        if (err) {
+          console.error("WAN IP Retrieval Failed!");
+          return;
+        }
+
+        // Update the firebase "api_status" object...
+        APIStatus.update({wan_ip: ip, status: "Got Network WAN IPv4" });
+      });
+
+      scanNetwork.call();
+
+      // Once the network scan is complete load rules and schedules...
+      self.once("network scan complete", function () {
+        var Schedules = require("./Schedules"); // The SmartHome Schedules Module
+        var Rules = require("./Rules");     // The SmartHome Rules Module
+        console.notice("SmartHome API Ready!", false, 118);
+      });
+
+    }); // End self.on("drivers loaded")
+
+    // Set an interval to continuously re-scan the network:
+    setInterval(scanNetwork, APIConfig.devices.scanInterval);
+
+  }); // End self.on("process singular");
 
   
   // <!----------------------------- END PROGRAM FLOW -----------------------------!>
@@ -228,7 +298,7 @@ var SmartHome = function() {
   var scan;
   function scanNetwork() {
 
-    APIStatus.update({ status: "Scanning Network for Connected Devices", code: 0, reachable: true });
+    APIStatus.update({ status: "Scanning Network for Connected Devices", });
 
     // Notify the user we are scanning the network...
     console.warn("Scanning network for connected devices. Please wait...");
@@ -428,7 +498,7 @@ var SmartHome = function() {
     // Clear all currently connected devices
     deviceFirebase.remove();
 
-    APIStatus.update({ status: "Pairing Devices with Drivers", code: 0 });
+    APIStatus.update({ status: "Pairing Devices with Drivers" });
 
     // Push all devices to the "connected_devices" firebase object...
     for(var n in networkDevices) {
@@ -588,7 +658,7 @@ var SmartHome = function() {
             console.warn("No supported devices were found!\nNext network discovery scan will occur again in: " + APIConfig.devices.scanInterval + " ms.");
         }
 
-        APIStatus.update({ status: "API Ready", last_startup_status: 0, code: 0 });
+        APIStatus.update({ status: "API Ready", last_startup_status: 0 });
 
         // Clear this interval to stop checking
         clearInterval(devCheckInterval);
