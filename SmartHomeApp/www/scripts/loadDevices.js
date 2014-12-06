@@ -19,11 +19,11 @@ $(document).on("pagecreate", "#my-devices", function () {
     if(!global[DEVICES_GLOBAL] || Object.keys(global[DEVICES_GLOBAL]).length == 0) {
         $("#my-connected-devices").append('<li class="em">No Smart Devices Detected!<img src="img/sad-face.png" /></li>');
     }
-    else { // Otherwise, detect if the devices are connected or not, and set an iterval to continually check this...
+    else { // Otherwise, detect if the devices are connected or not, and set an interval to continually check this...
 
         FIREBASE_DEVICE_CONNECTION_LISTENER = FIREBASE_CONN_DATA_OBJ.on("value", function (data) {
             detectDevices(data.val() || {});
-        })
+        });
 
     } // End If/else block
 
@@ -41,7 +41,7 @@ $(document).on("pagecreate", "#my-devices", function () {
             var device = global[DEVICES_GLOBAL][d];
 
             // If the device is connected make the device icon as a link...
-            if ((!last[d] || last[d] == false) && connectedDevices[d]) {
+            if ((!last[d] || last[d] == false) && connectedDevices[d] && connectedDevices[d].supported && connectedDevices[d].supported == true) {
                 connectDevice(device);
                 last[d] = true;
             }

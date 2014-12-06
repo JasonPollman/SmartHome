@@ -47,6 +47,8 @@ module.exports = {
 
     requireAuthentication: false,
 
+    APIKey: fs.readFileSync('.key').toString(),
+
     firebaseRootURI   : "https://newsmarthometest.firebaseio.com/" + fs.readFileSync('.key').toString(),
     firebaseAPIStatus : "api_status",
 

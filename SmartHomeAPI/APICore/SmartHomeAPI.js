@@ -5,6 +5,7 @@ try { // Load required Node Modules
   var fs       = require('fs');                           // The file system module
   var cli      = require('cli-color');                    // So we can output colors to a tty
   var os       = require('os');                           // The OS Module
+  var readline = require('readline');                     // The readline Node Module
 
   var APIUtil      = require('./APIUtil.js');             // The SmartHome API Utility Function Module
   var APIConfig    = require('./APIConfig.js');           // The SmartHome API Configuration Module
@@ -37,6 +38,7 @@ var SmartHome = function() {
   var console = APIUtil.console;
 
   // Inform firebase that the API is starting up...
+
   var APIStatus = new Firebase(APIConfig.general.firebaseRootURI + "/" + APIConfig.general.firebaseAPIStatus);
   APIStatus.update({ last_startup: Date.now(), status: "startup pending", code: 0 });
 
@@ -83,7 +85,7 @@ var SmartHome = function() {
 
       // Clear the "connected_devices" Firebase object:
       if (deviceFirebase) deviceFirebase.remove();
-      APIStatus.update({reachable: false, last_shutdown_status: 0, last_shutdown: Date.now()}, function () {
+      APIStatus.update({reachable: false, last_shutdown_status: 0, last_shutdown: Date.now() }, function () {
 
         (APIConfig.exitWithError) ?
             console.error("Smart Home API Server v" + APIConfig.general.version + " Shutting Down with Error:\n\n" + APIConfig.lastError + "\n") :

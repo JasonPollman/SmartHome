@@ -50,13 +50,13 @@
             </div>
         </div>
 
-        <div class="wrapper input-wrapper" data-theme="b">
+        <div data-role="collapsible-set">
             <div data-theme="b" data-role="collapsible">
                 <h3 data-theme="b" data-tap-toggle="false">
                     Rule Settings
                 </h3>
 
-                <form>
+                <form class="wrapper input-wrapper">
 
                     <input type="text" name="rule-input-name" id="rule-input-name" value="" data-clear-btn="true" placeholder="Rule Name...">
 
@@ -74,9 +74,7 @@
 
                 </form>
             </div>
-        </div>
 
-        <div class="wrapper">
             <div data-theme="b" data-role="collapsible">
                 <h3 data-theme="b" data-tap-toggle="false" style="font-weight: normal">
                     Source Device Settings
@@ -85,20 +83,16 @@
                     <!-- Inject Widgets -->
                 </div>
             </div>
-        </div>
 
-        <div class="wrapper">
             <div data-theme="b" data-role="collapsible">
                 <h3 data-theme="b" data-tap-toggle="false" style="font-weight: normal">
                     Target Device Settings
                 </h3>
-                <div class="widgets-wrapper-target">
+                <div class="widgets-wrapper-target" data-role="collapsible-set">
                     <!-- Inject Widgets -->
                 </div>
             </div>
         </div>
-
-
 
     </div>
 

@@ -62,7 +62,7 @@ var USER_COLOR              = "lib/native-droid/css/jquerymobile.nativedroid.col
 var FIREBASES = [
     FIREBASE_OBJ,
     FIREBASE_DEVICE_DATA_OBJ,
-    FIREBASE_CONN_DATA_OBJ,
+    // FIREBASE_CONN_DATA_OBJ,
     FIREBASE_SCHEDULES_OBJ,
     FIREBASE_RULES_OBJ,
     FIREBASE_USER_DATA_OBJ,

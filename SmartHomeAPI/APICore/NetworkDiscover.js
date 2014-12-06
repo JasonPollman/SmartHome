@@ -127,7 +127,7 @@ var NetworkDiscover = function () {
       exec("ping " + (os.platform() == 'win32' ? "-n 3 " : "-c 3 ") + devices[i].address, function (error, stdout, stderr) {
 
         if(!(error || stderr)) {
-          
+
           // The percentage of packet loss:
           if(os.platform() == 'win32') {
             var loss = Number(stdout.match(/(\d+(\.\d+)?)\% loss/ig)[0].replace(/\% loss/, ''));
@@ -138,7 +138,7 @@ var NetworkDiscover = function () {
 
           // Drop the device, if the loss is above the threshold.
           if(loss > APIConfig.devices.packetLossThreshold) delete devices[i];
-          
+
         }
 
         console.notice("Ping Results:\n\n" + stdout);
@@ -146,7 +146,7 @@ var NetworkDiscover = function () {
         self.emit("pinged");
 
       }); // End exec(ping)
-      
+
 
     } // End for loop
 
