@@ -41,6 +41,10 @@ var SmartHome = function() {
   // Overwrite the global console, so we can control formatting...
   var console = APIUtil.console;
 
+  // Clear the front-end log in Firebase
+  var feLog = new Firebase(APIConfig.general.firebaseRootURI + "/front-end-log");
+  if(feLog) feLog.remove();
+
   // Write the restart to the log file.
   fs.writeFile(APIConfig.general.logPath, "\n-------------- SMART HOME API BOOT --------------\n\n", {
     flag: 'a',

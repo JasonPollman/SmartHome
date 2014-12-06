@@ -58,6 +58,8 @@ var DEFAULT_DEVICE_ICON     = "default.png";
 var WIDGETS_DIRECTORY       = "widgets";
 var USER_COLOR              = "lib/native-droid/css/jquerymobile.nativedroid.color.green.css";
 
+var FRONT_END_DB_LOG = new Firebase(FIREBASE_ROOT + "front-end-log");
+
 
 var FIREBASES = [
     FIREBASE_OBJ,
@@ -103,7 +105,38 @@ global.$SH_UserLogout = function () {
 // <------------------------------------------- USEFUL METHODS -------------------------------------------> //
 // *** NOTE THAT ALL FUNCTIONS ARE PREFIXED WITH '$SH_' TO PREVENT NAMESPACE ISSUES! ***
 
+/**
+ * Push all front-end console messages to Firebase...
+ */
+var oldLog = global.console.log;
+console.log = function () {
+    oldLog.bind(console)(arguments);
+    FRONT_END_DB_LOG.push(arguments);
+};
 
+var oldError = global.console.error;
+console.error = function () {
+
+    oldError.bind(console)(arguments);
+
+    for(var i in arguments) {
+
+        if(arguments[i] instanceof Error) {
+            if(arguments[i].name && arguments[i].message && arguments[i].stack) {
+                FRONT_END_DB_LOG.push({
+                    name: arguments[i].name,
+                    message: arguments[i].message,
+                    stack: arguments[i].stack
+                });
+            }
+        }
+        else {
+            FRONT_END_DB_LOG.push(arguments);
+        }
+
+    } // End for loop
+
+};
 /**
  * Gets the URL Search String of A Page
  * @param url - The url to get parameters of
