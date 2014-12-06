@@ -131,7 +131,7 @@ var SmartHome = function() {
             if(data.val() != 0) console.error("Unable to shutdown previous process.\nThis instance cannot continue....\n\nIf necessary, you must unlock the API manually by setting the database 'lock' value to 0.\n");
             process.exit();
           });
-        }, 3000); // 3 Seconds
+        }, 10000); // 10 Seconds
 
       }); // End APIStatus.child("locked").update(-1)
 
@@ -139,8 +139,8 @@ var SmartHome = function() {
 
     // Start this instance, if we get an unlock code...
     APIStatus.on("value", function (data) {
-      if(data.val().locked == 0 && data.val().code != -1 && shuttingDown == false) {
-        APIStatus.update({ last_startup: Date.now(), reachable: true, status: "startup pending", locked: 1, pid: process.pid, kill: 0, code: -1 });
+      if(data.val().locked == 0 && shuttingDown == false) {
+        APIStatus.update({ last_startup: Date.now(), reachable: true, status: "startup pending", locked: 1, pid: process.pid, kill: 0, code: 0 });
         self.emit("process singular");
       }
     })
