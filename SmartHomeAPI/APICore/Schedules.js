@@ -29,6 +29,7 @@ var SchedulesMod = function () {
 
   firebaseSchedules.on("child_removed", function (data) {
     delete Schedules[data.name()];
+    if(ScheduleIntervals[data.name()] != undefined) clearInterval(ScheduleIntervals[scheduleKey]);
   });
 
   console.notice("Schedules loading complete...");
@@ -42,8 +43,6 @@ var SchedulesMod = function () {
   function setSchedule(schedule) {
 
     var scheduleData = schedule.val();
-
-    console.log("Schedule " + schedule.name() + " set!");
 
     // A schedule must pass the following field verification:
     if(scheduleData.device                           &&

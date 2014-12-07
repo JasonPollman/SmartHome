@@ -631,7 +631,7 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
                                             $(e).val(results[index].toString()).trigger("change");
                                             if ($(e).attr("data-type") == "range")  $(e).slider({disabled: false}).slider("refresh");
                                             if ($(e).attr("data-role") == "slider") $(e).slider({disabled: false}).slider("refresh");
-                                            if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu("enable").selectmenu("refresh", true);
+                                            if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu().selectmenu("refresh", true);
                                         }
                                     });
 
@@ -678,7 +678,7 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
 
                                     if ($(e).attr("data-type") == "range")  $(e).slider({disabled: false}).slider("refresh");
                                     if ($(e).attr("data-role") == "slider") $(e).slider({disabled: false}).slider("refresh");
-                                    if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu("enable").selectmenu("refresh", true);
+                                    if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu().selectmenu("refresh", true);
 
                                     // Remove the reference to the rule's/schedule's paths/values
                                     firebaseObj.child(staticObj.key).once("value", function (data) {
