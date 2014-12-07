@@ -28,8 +28,9 @@ var SchedulesMod = function () {
   firebaseSchedules.on("child_changed", setSchedule);
 
   firebaseSchedules.on("child_removed", function (data) {
+    var scheduleKey = data.name();
     delete Schedules[data.name()];
-    if(ScheduleIntervals[data.name()] != undefined) clearInterval(ScheduleIntervals[scheduleKey]);
+    if(ScheduleIntervals[scheduleKey] != undefined) clearInterval(ScheduleIntervals[scheduleKey]);
   });
 
   console.notice("Schedules loading complete...");
