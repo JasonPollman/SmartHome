@@ -43,7 +43,7 @@ var SmartHome = function() {
 
   // Clear the front-end log in Firebase
   var feLog = new Firebase(APIConfig.general.firebaseRootURI + "/front-end-log");
-  feLog.remove();
+  if(feLog && feLog.remove instanceof Function) feLog.remove();
 
   // Write the restart to the log file.
   fs.writeFile(APIConfig.general.logPath, "\n-------------- SMART HOME API BOOT --------------\n\n", {
