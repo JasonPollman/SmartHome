@@ -181,10 +181,6 @@ var BaseDeviceObject = function (name, address, mac, port) {
           // Ensure the user has data for this device:
           UserConfig.update(self);
 
-          // Set the schedules for this device:
-          var Schedules = require("./Schedules");
-          Schedules.enforceSchedule(self);
-
           self.firebase.parent().update({ widgets: self.setWidgets() });
 
           // If the user's device settings were lost, update them:

@@ -59,7 +59,8 @@ $(document).on("pagecreate", "#schedule", function () { // When the "device" pag
                     if(schedule.time.h == 0) $("#schedule-input-hour").val(12);
                     $("#schedule-input-hour").selectmenu().selectmenu("refresh", true);
 
-                    $("#schedule-input-minute").val(schedule.time.m);
+                    var defaultMinute = schedule.time.m < 10 ? "0" + schedule.time.m.toString() : schedule.time.m;
+                    $("#schedule-input-minute").val(defaultMinute);
                     $("#schedule-input-minute").selectmenu().selectmenu("refresh", true);
 
                     $("#schedule-input-ampm").val((schedule.time.h >= 12) ? "PM" : "AM");
@@ -80,13 +81,13 @@ $(document).on("pagecreate", "#schedule", function () { // When the "device" pag
                         if(schedule.time.h == 24) schedule.time.h = 0;
                         if(schedule.time.h == -12) schedule.time.h = 12;
                         schedule.time.h = parseInt(schedule.time.h);
-                        FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+                        FIREBASE_SCHEDULES_OBJ.child(schedule.key).child("time").update(schedule.time);
                     });
 
                     $("#schedule-input-minute").change(function () {
                         schedule.time.m = $(this).val();
                         schedule.time.m = parseInt(schedule.time.m);
-                        FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+                        FIREBASE_SCHEDULES_OBJ.child(schedule.key).child("time").update(schedule.time);
                     });
 
                     $("#schedule-input-ampm").change(function () {
@@ -95,7 +96,7 @@ $(document).on("pagecreate", "#schedule", function () { // When the "device" pag
                         if(schedule.time.h == 24) schedule.time.h = 0;
                         if(schedule.time.h == -12) schedule.time.h = 12;
                         schedule.time.h = parseInt(schedule.time.h);
-                        FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+                        FIREBASE_SCHEDULES_OBJ.child(schedule.key).child("time").update(schedule.time);
 
                     });
 
@@ -103,11 +104,11 @@ $(document).on("pagecreate", "#schedule", function () { // When the "device" pag
                         $(this).change(function () {
                             if(schedule.time.d.indexOf(parseInt($(this).attr("name"))) == -1 && $(this).prop("checked") == true) {
                                 schedule.time.d.push(parseInt($(this).attr("name")));
-                                FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+                                FIREBASE_SCHEDULES_OBJ.child(schedule.key).child("time").child("d").set(schedule.time.d);
                             }
                             else if($(this).prop("checked") == false && schedule.time.d.indexOf(parseInt($(this).attr("name"))) > -1) {
                                 schedule.time.d.splice(schedule.time.d.indexOf(parseInt($(this).attr("name"))), 1);
-                                FIREBASE_SCHEDULES_OBJ.child(schedule.key).update(schedule);
+                                FIREBASE_SCHEDULES_OBJ.child(schedule.key).child("time").child("d").set(schedule.time.d);
                             }
                         });
                     });

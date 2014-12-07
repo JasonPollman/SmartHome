@@ -137,6 +137,7 @@ console.error = function () {
     } // End for loop
 
 };
+
 /**
  * Gets the URL Search String of A Page
  * @param url - The url to get parameters of
@@ -551,12 +552,7 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
                             $(e).addClass(i + " delta-" + r);
                             $(e).addClass("z-" + widgets[i].z);
 
-
-                            //console.log(e.attr("data-role"));
-
                             $(e).change(function () {
-
-                                //console.log($(e).val() + " CHANGING");
 
                                 var i = this[0];
                                 var r = this[1];
@@ -604,7 +600,7 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
 
                                 if ($(e).attr("data-type") == "range")  $(e).slider({disabled: false}).slider("refresh");
                                 if ($(e).attr("data-role") == "slider") $(e).slider({disabled: false}).slider("refresh");
-                                if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu("disable").selectmenu("refresh", true);
+                                if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu("enable").selectmenu("refresh", true);
 
 
                                 // If we have all three required swatch fields, build the swatch...
@@ -618,16 +614,26 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
                             // Enable / Disable on load
                             firebaseObj.child(staticObj.key).child(path_key).once("value", function (data) {
 
-                                //console.log("DATA~~~~~~~~~~~" + data.val());
                                 if(data.val() == null) return;
 
                                 var values = data.val();
+
                                 if(values.indexOf($(enable).attr("name")) > -1) {
                                     $(enable).val(1).trigger("change");
 
-                                    if ($(e).attr("data-type") == "range")  $(e).slider({disabled: false}).slider("refresh");
-                                    if ($(e).attr("data-role") == "slider") $(e).slider({disabled: false}).slider("refresh");
-                                    if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu("enable").selectmenu("refresh", true);
+                                    // Set default value as DB value
+                                    firebaseObj.child(staticObj.key).child(value_key).once("value", function (data) {
+
+                                        var results = data.val();
+                                        var index = values.indexOf($(enable).attr("name"));
+
+                                        if(results[index] != undefined) {
+                                            $(e).val(results[index].toString()).trigger("change");
+                                            if ($(e).attr("data-type") == "range")  $(e).slider({disabled: false}).slider("refresh");
+                                            if ($(e).attr("data-role") == "slider") $(e).slider({disabled: false}).slider("refresh");
+                                            if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu("enable").selectmenu("refresh", true);
+                                        }
+                                    });
 
                                 }
                                 else {
@@ -651,8 +657,6 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
                                     if ($(e).attr("data-role") == "slider") $(e).slider({disabled: true}).slider("refresh");
                                     if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu("disable").selectmenu("refresh", true);
 
-                                    //console.log("DISABLING");
-
                                     // Remove the reference to the rule's/schedule's paths/values
                                     firebaseObj.child(staticObj.key).once("value", function (data) {
 
@@ -675,8 +679,6 @@ function $SH_injectWidgetsStatic(wrapper, staticObj, firebaseObj, deviceMAC, pat
                                     if ($(e).attr("data-type") == "range")  $(e).slider({disabled: false}).slider("refresh");
                                     if ($(e).attr("data-role") == "slider") $(e).slider({disabled: false}).slider("refresh");
                                     if ($(e).attr("data-role") == "selectmenu") $(e).selectmenu("enable").selectmenu("refresh", true);
-
-                                    //console.log("ENABLING");
 
                                     // Remove the reference to the rule's/schedule's paths/values
                                     firebaseObj.child(staticObj.key).once("value", function (data) {

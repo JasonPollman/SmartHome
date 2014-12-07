@@ -139,7 +139,7 @@ var Rules = function () {
 
     } // End for loop
   
-  } // End verifyEnforcement()
+  }; // End verifyEnforcement()
 
 
   /**

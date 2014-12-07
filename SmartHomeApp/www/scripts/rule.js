@@ -31,9 +31,6 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
                     if (!rule)
                         throw new Error("Unable to find rule. The rule '" + rule.name + "' does not exist.");
 
-                    $SH_injectWidgetsStatic(".widgets-wrapper-source", rule, FIREBASE_RULES_OBJ.child("device_rules"), rule.source_mac, "source_path", "source_value");
-                    $SH_injectWidgetsStatic(".widgets-wrapper-target", rule, FIREBASE_RULES_OBJ.child("device_rules"), rule.target_mac, "target_path", "target_value");
-
                     $("#rule").trigger("create");
 
                     // Make the page header the device's name
@@ -75,9 +72,11 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
 
                         $("#rule-target-device").selectmenu("refresh", true).trigger("change");
 
-                        rule.source_mac   = value;
-                        rule.source_path  = [];
-                        rule.source_value = [];
+                        if(rule.source_mac != value) {
+                            rule.source_mac = value;
+                            rule.source_path = [];
+                            rule.source_value = [];
+                        }
 
                         FIREBASE_RULES_OBJ.child("device_rules").child(i).update(rule);
 
@@ -85,15 +84,15 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
                         $(".widgets-wrapper-source").trigger("create");
                     });
 
-                    $("#rule-source-device").selectmenu("refresh", true).trigger("change");
-
                     $("#rule-target-device").change(function () {
 
                         var value = cleanValue($(this).val());
 
-                        rule.target_mac   = value;
-                        rule.target_path  = [];
-                        rule.target_value = [];
+                        if(rule.target_mac != value) {
+                            rule.target_mac   = value;
+                            rule.target_path  = [];
+                            rule.target_value = [];
+                        }
 
                         FIREBASE_RULES_OBJ.child("device_rules").child(i).update(rule);
 
@@ -101,7 +100,7 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
                         $(".widgets-wrapper-target").trigger("create");
                     });
 
-                    $("#rule-target-device").selectmenu("refresh", true).trigger("change");
+                    $("#rule-source-device").selectmenu("refresh").trigger("change");
 
                     $("#delete-rule").click(function (e) {
 
@@ -131,7 +130,6 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
 $(document).on("pagebeforecreate", "#rule", function () { // When the "device" page is inserted into the DOM...
     var keys = Object.keys(global[DEVICES_GLOBAL]);
     for (var i in global[DEVICES_GLOBAL]) {
-
         $("#rule-source-device").append('<option value="' + global[DEVICES_GLOBAL][i].mac + '">' + UCFirst(global[DEVICES_GLOBAL][i].name.replace(/[^a-z0-9]/ig, ' ')) + '</option>');
 
         if(global[DEVICES_GLOBAL][i].widgets) {

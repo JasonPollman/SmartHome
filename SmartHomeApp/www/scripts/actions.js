@@ -148,10 +148,18 @@ $(document).on("pagecreate", function () {
 
 /**
  * Adds the default page transition to EVERY page using the global setting (for consistency).
+ * And clean up some stuff for the native droid theme.
  */
 $(document).on("pagecreate", function () {
     var links = $("a, button");
-    for (var i = 0; i < links.length - 1; i++) $(links[i]).attr("data-transition", PAGE_TRANSITION_TYPE);
+    links.each(function () {
+        $(this).attr("data-transition", PAGE_TRANSITION_TYPE);
+    });
+
+    var selects = $("select");
+    selects.each(function () {
+        $(this).attr("data-native-menu", "true");
+    })
 });
 
 

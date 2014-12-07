@@ -2,6 +2,10 @@
  * General purpose CSS should go here...
  */
 
+body {
+    -webkit-overflow-scrolling: touch;
+}
+
 /* Give something a drop shadow */
 .shadowed {
     -webkit-filter: drop-shadow(0 10px 10px rgba(0,0,0,0.9));
