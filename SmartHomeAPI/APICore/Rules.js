@@ -169,15 +169,7 @@ var Rules = function () {
 
     }
     else { // Warn the user that they have a malformed rule
-
       console.warn("Rule '" + rule.name() + "' is missing a required key or is malformed.");
-
-      if(rulesData.status == undefined) rulesData.status = {
-        message: ""
-      }
-
-      if(rulesData.status.message != "Error: This rule is malformed.")
-        firebaseRules.child(rule.name()).child("status").update({ code: 1, message: "Error: This rule is malformed.", timestamp: Date.now() });
     } 
 
   } // End setRule()

@@ -43,7 +43,7 @@ var SmartHome = function() {
 
   // Clear the front-end log in Firebase
   var feLog = new Firebase(APIConfig.general.firebaseRootURI + "/front-end-log");
-  if(feLog) feLog.remove();
+  feLog.remove();
 
   // Write the restart to the log file.
   fs.writeFile(APIConfig.general.logPath, "\n-------------- SMART HOME API BOOT --------------\n\n", {
@@ -90,6 +90,7 @@ var SmartHome = function() {
     else {
 
       // Hard kill
+      if(APIConfig.lastError) console.error("Smart Home API Server v" + APIConfig.general.version + " Shutting Down, Last Known Error:\n\n" + APIConfig.lastError + "\n");
       process.kill(process.pid, "SIGKILL");
     }
 

@@ -85,6 +85,8 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
                         $(".widgets-wrapper-source").trigger("create");
                     });
 
+                    $("#rule-source-device").selectmenu("refresh", true).trigger("change");
+
                     $("#rule-target-device").change(function () {
 
                         var value = cleanValue($(this).val());
@@ -98,6 +100,8 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
                         $SH_injectWidgetsStatic(".widgets-wrapper-target", rule, FIREBASE_RULES_OBJ.child("device_rules"), rule.target_mac, "target_path", "target_value");
                         $(".widgets-wrapper-target").trigger("create");
                     });
+
+                    $("#rule-target-device").selectmenu("refresh", true).trigger("change");
 
                     $("#delete-rule").click(function (e) {
 
@@ -127,6 +131,7 @@ $(document).on("pagecreate", "#rule", function () { // When the "device" page is
 $(document).on("pagebeforecreate", "#rule", function () { // When the "device" page is inserted into the DOM...
     var keys = Object.keys(global[DEVICES_GLOBAL]);
     for (var i in global[DEVICES_GLOBAL]) {
+
         $("#rule-source-device").append('<option value="' + global[DEVICES_GLOBAL][i].mac + '">' + UCFirst(global[DEVICES_GLOBAL][i].name.replace(/[^a-z0-9]/ig, ' ')) + '</option>');
 
         if(global[DEVICES_GLOBAL][i].widgets) {

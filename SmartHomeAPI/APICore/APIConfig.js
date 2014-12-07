@@ -58,7 +58,7 @@ module.exports = {
     firebaseAllDevicesPath          : "connected_devices",
     firebaseUserSettingsChangesPath : "last_request",
 
-    logPath: "smarthomelog.log"
+    logPath: "/smarthomelog.log"
 
   }, // End general
 
