@@ -122,11 +122,17 @@ var SchedulesMod = function () {
 
             function (code, msg) {
 
-              // Update the status of the last request
-              Devices[schedule.device].updateStatus(code, msg, "SmartHome Schedules API");
+              if (Devices[schedule.device] != undefined &&
+                  Devices[schedule.device].updateStatus instanceof Function &&
+                  Devices[schedule.device].setState instanceof Function) {
 
-              // Set the new device's state:
-              Devices[schedule.device].setState(deviceSettingsClone, "Schedule: \"" + scheduleKey + "\".");
+                // Update the status of the last request
+                Devices[schedule.device].updateStatus(code, msg, "SmartHome Schedules API");
+
+                // Set the new device's state:
+                Devices[schedule.device].setState(deviceSettingsClone, "Schedule: \"" + scheduleKey + "\".");
+
+              }
 
             } // End anon-function
 

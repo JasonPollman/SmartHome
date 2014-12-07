@@ -119,11 +119,16 @@ var Rules = function () {
 
                 function (code, msg) {
 
-                  // Update the status of the last request
-                  Devices[rule.target_mac].updateStatus(code, msg, "SmartHome Rules API");
+                  if(Devices[rule.target_mac] != undefined &&
+                      Devices[rule.target_mac].updateStatus instanceof  Function &&
+                      Devices[rule.target_mac].setState instanceof Function) {
 
-                  // Set the new device's state:
-                  Devices[rule.target_mac].setState(targetDeviceSettingsClone, "Rule: \"" + i + "\".");
+                    // Update the status of the last request
+                    Devices[rule.target_mac].updateStatus(code, msg, "SmartHome Rules API");
+
+                    // Set the new device's state:
+                    Devices[rule.target_mac].setState(targetDeviceSettingsClone, "Rule: \"" + i + "\".");
+                  }
                   
                 } // End anon-function
 
