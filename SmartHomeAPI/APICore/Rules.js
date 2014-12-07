@@ -165,12 +165,13 @@ var Rules = function () {
        rulesData.enabled != undefined) {
 
       Rules[rule.name()] = rulesData;
-      firebaseRules.child(rule.name()).child("status").update({ code: 1, message: "Success: Rule loaded.", timestamp: Date.now() });
 
     }
     else { // Warn the user that they have a malformed rule
+
       console.warn("Rule '" + rule.name() + "' is missing a required key or is malformed.");
-    } 
+
+    }
 
   } // End setRule()
 
