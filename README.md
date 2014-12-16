@@ -3,9 +3,9 @@
 
 **Project Designed, Developed, & Tested by:**
 Jason Pollman, Michael Battalgia, Lawrence Ismail & Patrick Sinnott
+[SmartHome Project Information Poster](http://www.theafterbyte.com/pss/poster.pdf?raw=true)
 
 > SmartHome: A smarter way to control your smart devices.
-
 
 ##Project Infrastructure:
 ###SmartHomeAPI   
