@@ -1,4 +1,4 @@
-![SmartHome Project](http://www.jasonpollman.com/sh-logo.png?raw=true)
+![SmartHome Project](http://www.jasonpollman.com/pss/sh-logo.png?raw=true)
 #SmartHome Project
 
 **Project Designed, Developed, & Tested by:**
