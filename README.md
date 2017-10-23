@@ -1,4 +1,4 @@
-![SmartHome Project]https://jasonpollman.github.io/legacy/smart-home/logo.png?raw=true)
+![SmartHome Project](https://jasonpollman.github.io/legacy/smart-home/logo.png?raw=true)
 # SmartHome Project
 
 **Project Designed, Developed, & Tested by:**    
