@@ -7,14 +7,14 @@ Jason Pollman, Michael Battalgia, Lawrence Ismail & Patrick Sinnott
 
 > SmartHome: A smarter way to control your smart devices.
 
-##Project Infrastructure:
-###SmartHomeAPI   
+## Project Infrastructure:
+### SmartHomeAPI   
 ![SmartHome API](https://jasonpollman.github.io/legacy/smart-home/api.png?raw=true)
 
 * This is the back-end component of the SmartHome Project, written in Node.js.
 * See the directory's README.md for more information.
     
-###SmartHomeApp   
+### SmartHomeApp   
 ![SmartHome App Screenshot 1](https://jasonpollman.github.io/legacy/smart-home/3.png?raw=true)     
 ![SmartHome App Screenshot 2](https://jasonpollman.github.io/legacy/smart-home/6.png?raw=true)    
 ![SmartHome App Screenshot 3](https://jasonpollman.github.io/legacy/smart-home/7.png?raw=true)     
