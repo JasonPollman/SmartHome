@@ -9,16 +9,16 @@ Jason Pollman, Michael Battalgia, Lawrence Ismail & Patrick Sinnott
 
 ## Project Infrastructure:
 ### SmartHomeAPI   
-![SmartHome API](https://jasonpollman.github.io/legacy/smart-home/api.png?raw=true)
+<img src="https://jasonpollman.github.io/legacy/smart-home/api.png?raw=true">
 
 * This is the back-end component of the SmartHome Project, written in Node.js.
 * See the directory's README.md for more information.
     
 ### SmartHomeApp   
-<img src="https://jasonpollman.github.io/legacy/smart-home/3.png?raw=true" width="200">
-![SmartHome App Screenshot 2](https://jasonpollman.github.io/legacy/smart-home/6.png?raw=true)    
-![SmartHome App Screenshot 3](https://jasonpollman.github.io/legacy/smart-home/7.png?raw=true)     
-![SmartHome App Screenshot 4](https://jasonpollman.github.io/legacy/smart-home/8.png?raw=true)
+<img src="https://jasonpollman.github.io/legacy/smart-home/3.png?raw=true" width="300">
+<img src="https://jasonpollman.github.io/legacy/smart-home/6.png?raw=true" width="300">
+<img src="https://jasonpollman.github.io/legacy/smart-home/7.png?raw=true" width="300">
+<img src="https://jasonpollman.github.io/legacy/smart-home/8.png?raw=true" width="300">
 
 * This is the front-end component for the SmartHome Project—a PhoneGap project written primarily in JavaScript, HTML, & CSS.
 * Several builds for different OS' reside in the sub-directory *PhoneGap Builds*. Use the latest version!
